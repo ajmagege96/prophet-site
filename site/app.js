@@ -10,6 +10,36 @@
   });
 })();
 
+/* ── Contract address copy button ─────────────────────── */
+/* Shows first 6 … last 6 of {{contract_address}}; click copies the full
+   address and the pill reads "copied" for a moment. */
+(function () {
+  var btns = document.querySelectorAll('[data-ca-copy]');
+  for (var i = 0; i < btns.length; i++) {
+    (function (btn) {
+      var ca = btn.getAttribute('data-ca') || '';
+      var text = btn.querySelector('[data-ca-text]');
+      /* Sample address for preview while {{contract_address}} is unfilled */
+      if (!ca || (/^\{\{/).test(ca)) ca = '7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr';
+      text.textContent = ca.slice(0, 6) + '\u2026' + ca.slice(-6);
+      btn.addEventListener('click', function () {
+        var done = function () {
+          var was = text.textContent;
+          text.textContent = 'copied';
+          btn.classList.add('site-header__ca--copied');
+          setTimeout(function () {
+            text.textContent = was;
+            btn.classList.remove('site-header__ca--copied');
+          }, 1400);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(ca).then(done, done);
+        } else { done(); }
+      });
+    })(btns[i]);
+  }
+})();
+
 /* ── Carousel ─────────────────────────────────────────── */
 (function () {
   var track = document.querySelector('[data-carousel-track]');
@@ -355,11 +385,19 @@
   }
 
   /* ── Takes renderer ───────────────────────────────────── */
+  /* Empty-state line: {{empty_no_takes}} on the container; while the server
+     hasn't filled it, fall back to the approved mock copy. */
+  var EMPTY_MOCK = 'Nobody\'s taken this one yet. The first contributor earns the most credit. What do you think?';
+  function emptyLine() {
+    var v = takesContainer.getAttribute('data-empty-none') || '';
+    return (/^\{\{/).test(v) || !v ? EMPTY_MOCK : v;
+  }
+
   function renderTakes(slug) {
     if (!takesContainer) return;
     var takes = TAKES[slug] || [];
     if (takes.length === 0) {
-      takesContainer.innerHTML = '<div class="takes__empty">No takes yet.</div>';
+      takesContainer.innerHTML = '<div class="takes__empty">' + emptyLine() + '</div>';
       return;
     }
     var html = '';
@@ -384,4 +422,44 @@
 
   /* Init first card */
   if (cards.length > 0) setActiveCard(0);
+})();
+
+/* ── Roadmap timeline light ───────────────────────────── */
+/* A long streak travels the line continuously. Dots sit over the line, so
+   the streak is never visible inside one; instead a dot fills when the
+   streak's leading edge is ~10% into it and drains when the trailing edge
+   is ~10% past it. Horizontal on desktop, vertical on mobile. */
+(function () {
+  var wrap = document.querySelector('[data-timeline]');
+  if (!wrap) return;
+  var light = wrap.querySelector('[data-timeline-light]');
+  var dots = Array.prototype.slice.call(wrap.querySelectorAll('[data-timeline-dot]'));
+  var track = wrap.querySelector('.timeline__track');
+  if (!light || !dots.length || !track) return;
+
+  var SPEED = 200;  /* px per second */
+  var start = null;
+
+  function frame(now) {
+    if (start === null) start = now;
+    var horiz = track.offsetWidth > track.offsetHeight;
+    var len = horiz ? track.offsetWidth : track.offsetHeight;
+    var streak = horiz ? light.offsetWidth : light.offsetHeight;
+    var total = len + streak;
+    var trailing = ((now - start) / 1000 * SPEED) % total - streak;
+    var leading = trailing + streak;
+    light.style.transform = horiz ? 'translateX(' + trailing + 'px)' : 'translateY(' + trailing + 'px)';
+
+    var tb = track.getBoundingClientRect();
+    for (var i = 0; i < dots.length; i++) {
+      var r = dots[i].getBoundingClientRect();
+      var d0 = horiz ? r.left - tb.left : r.top - tb.top;
+      var size = horiz ? r.width : r.height;
+      var d1 = d0 + size;
+      var full = leading >= d0 + size * 0.1 && trailing <= d1 + size * 0.1;
+      dots[i].classList.toggle('timeline__dot--full', full);
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
 })();

@@ -5,6 +5,15 @@
 | `{{docs_url}}` | External link to documentation site |
 | `{{x_url}}` | Link to the project's X (Twitter) account |
 | `{{tg_url}}` | Link to the project's Telegram channel |
+| `{{linkedin_url}}` | Link to the project's LinkedIn page |
+| `{{tradeleague_url}}` | Link for the "Automated by TradeLeague" footer lockup |
+| `{{jupiter_url}}` | $PROPHET on Jupiter (footer token link) |
+| `{{pumpfun_url}}` | $PROPHET on pump.fun (footer token link) |
+| `{{solscan_url}}` | $PROPHET on Solscan (footer token link) |
+| `{{tl_x_url}}` | TradeLeague on X (footer) |
+| `{{tl_tg_url}}` | TradeLeague on Telegram (footer) |
+| `{{tl_linkedin_url}}` | TradeLeague on LinkedIn (footer) |
+| `{{contract_address}}` | $PROPHET contract address; the header pill shows first 6 … last 6 and copies the full value |
 | `{{username}}` | Signed-in user's display name; replaced with a [COPY] label when signed out |
 | `{{polymarket_as_of}}` | Relative timestamp of last Polymarket status check (shown on hover in home panel) |
 | `{{polymarket_status}}` | Polymarket feed status: `up` (green pulsing dot, also the default if the class is unset) or `down` (red dot) |
@@ -28,3 +37,5 @@
 | `{{take.xp}}` | XP earned by the take, rendered as "+N XP" under the timestamp |
 | `{{take.claim}}` | One-line claim text |
 | `{{take.ago}}` | Relative timestamp (e.g. "2h ago") |
+| `{{buy_url}}` | Buy $PROPHET link (pump.fun) |
+| `{{empty_no_takes}}` | Line shown in the take slot when the selected market has no takes (generated later; mock: "Nobody's taken this one yet. The first contributor earns the most credit. What do you think?") |
