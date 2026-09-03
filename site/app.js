@@ -364,7 +364,7 @@
     votePop.hidden = true;
     if (state === 'vote') {
       var chosen = votes[card.dataset.slug];
-      voteOpen.textContent = chosen ? 'Voted ' + chosen.toUpperCase() : 'Vote';
+      voteOpen.innerHTML = chosen ? 'Voted <span class="tally tally--' + chosen + '">' + chosen.toUpperCase() + '</span>' : 'Vote';
       var btns = votePop.querySelectorAll('[data-vote]');
       for (var k = 0; k < btns.length; k++) {
         btns[k].classList.toggle('vote-btn--chosen', btns[k].dataset.vote === chosen);
@@ -462,4 +462,73 @@
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
+})();
+
+/* ── List panels: filter tags, row dropdowns, vote popups ── */
+(function () {
+  var panel = document.querySelector('[data-panel]');
+  if (!panel) return;
+
+  /* Filter tags: one on at a time shows only that group; click again to show all */
+  var tagBar = panel.querySelector('[data-filters]');
+  var groups = panel.querySelectorAll('[data-group]');
+  var active = null;
+  if (tagBar) {
+    tagBar.addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-filter]');
+      if (!btn) return;
+      active = btn.dataset.filter === active ? null : btn.dataset.filter;
+      var tags = tagBar.querySelectorAll('[data-filter]');
+      for (var i = 0; i < tags.length; i++) tags[i].classList.toggle('filters__tag--on', tags[i].dataset.filter === active);
+      for (var g = 0; g < groups.length; g++) groups[g].classList.toggle('is-hidden', !!active && groups[g].dataset.group !== active);
+    });
+  }
+
+  /* Empty state per group: {{empty_*}} on the section; fallback copy while unfilled */
+  for (var g2 = 0; g2 < groups.length; g2++) {
+    var list = groups[g2].querySelector('.pgroup__list');
+    var empty = groups[g2].querySelector('[data-empty]');
+    if (!list || !empty) continue;
+    if (!list.querySelector('[data-row]')) {
+      var txt = groups[g2].getAttribute('data-empty-text') || '';
+      empty.textContent = (/^\{\{/).test(txt) || !txt ? groups[g2].getAttribute('data-empty-fallback') : txt;
+      empty.hidden = false;
+      list.hidden = true;
+    }
+  }
+
+  /* Click a row to open its contributions; clicks inside the dropdown or vote don't toggle */
+  var rows = panel.querySelectorAll('[data-row]');
+  for (var r = 0; r < rows.length; r++) {
+    rows[r].addEventListener('click', function (e) {
+      if (e.target.closest('[data-drop]') || e.target.closest('[data-vote-wrap]')) return;
+      var drop = this.querySelector('[data-drop]');
+      if (!drop) return;
+      drop.hidden = !drop.hidden;
+      this.classList.toggle('prow--open', !drop.hidden);
+    });
+  }
+
+  /* Vote popups per row (mock, in-memory) */
+  var wraps = panel.querySelectorAll('[data-vote-wrap]');
+  for (var w = 0; w < wraps.length; w++) {
+    (function (wrap) {
+      var open = wrap.querySelector('[data-vote-open]');
+      var pop = wrap.querySelector('[data-vote-pop]');
+      open.addEventListener('click', function () { pop.hidden = !pop.hidden; });
+      pop.addEventListener('click', function (e) {
+        var btn = e.target.closest('[data-vote]');
+        if (!btn) return;
+        var btns = pop.querySelectorAll('[data-vote]');
+        for (var k = 0; k < btns.length; k++) btns[k].classList.toggle('vote-btn--chosen', btns[k] === btn);
+        open.innerHTML = 'Voted <span class="tally tally--' + btn.dataset.vote + '">' + btn.dataset.vote.toUpperCase() + '</span>';
+        pop.hidden = true;
+      });
+    })(wraps[w]);
+  }
+  document.addEventListener('click', function (e) {
+    for (var i = 0; i < wraps.length; i++) {
+      if (!wraps[i].contains(e.target)) wraps[i].querySelector('[data-vote-pop]').hidden = true;
+    }
+  });
 })();

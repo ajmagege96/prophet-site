@@ -74,8 +74,8 @@
     <!-- ── Filter tags ──────────────────────────────────── -->
     <div class="filters" data-filters>
       <button class="filters__tag" data-filter="none">No thesis</button>
-      <button class="filters__tag filters__tag--vote" data-filter="vote">Vote open</button>
-      <button class="filters__tag filters__tag--called" data-filter="called">Called</button>
+      <button class="filters__tag filters__tag--vote" data-filter="vote">Open votes</button>
+      <button class="filters__tag filters__tag--called" data-filter="called">Prophecies</button>
     </div>
 
     <!-- ── Carousel ─────────────────────────────────────── -->
@@ -86,7 +86,7 @@
         <!-- repeat: market — server loop replaces this <template>; browsers don't render it.
              market.state is only rendered when it is not plain "open"; every listed market is open.
              market.filter_state drives the tags above the carousel: none | vote | called.
-             The state badge sits top-right. Vote: vote open · <span class="tally tally--yes|no">62% YES</span>.
+             The state badge sits top-right. Vote: vote open · <span class="tally tally--yes|no">62% YES</span> · <span class="votes">[vote icon]{{market.vote_count}}</span>.
              Called: called <span class="tally tally--yes|no">YES</span> <span class="conviction">[star icon]N</span> (no dot). -->
         <template>
         <div class="carousel__card outline" data-card data-state="{{market.filter_state}}" data-slug="{{market.slug}}" data-stance="{{market.thesis_stance}}" data-thesis="{{market.thesis}}" data-contributors="{{market.contributors_json}}">
@@ -186,7 +186,7 @@
         <div class="carousel__card outline" data-card data-state="vote" data-slug="sec-exchange" data-stance="yes" data-thesis="The SEC has approved every exchange that met the custody bar this cycle, and this one meets it. The remaining objections are procedural rather than substantive. Timing is the only real risk, not the outcome." data-contributors="[{&quot;user&quot;: &quot;delta_k&quot;, &quot;claim&quot;: &quot;Custody structure mirrors the two already approved&quot;, &quot;xp&quot;: 11}, {&quot;user&quot;: &quot;ines&quot;, &quot;claim&quot;: &quot;Public comment period closed without a formal objection&quot;, &quot;xp&quot;: 4}]">
           <div class="carousel__top">
             <img class="carousel__img" src="https://polymarket-upload.s3.us-east-2.amazonaws.com/coinbase-stock-d8abe3f599.png" alt="" loading="lazy">
-            <span class="carousel__state carousel__state--vote">vote open · <span class="tally tally--yes">62% YES</span></span>
+            <span class="carousel__state carousel__state--vote">vote open · <span class="tally tally--yes">62% YES</span> · <span class="votes" title="votes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><polyline points="8 12.5 11 15.5 16 9.5"/></svg>128</span></span>
           </div>
           <p class="carousel__question">Will the SEC approve a new crypto exchange?</p>
           <span class="carousel__yes heading">34%<small>yes</small></span>
@@ -196,7 +196,7 @@
         <div class="carousel__card outline" data-card data-state="vote" data-slug="dxy-100" data-stance="no" data-thesis="Rate-cut pricing is already in the dollar, so the index holds 100 unless the Fed surprises dovish. Relative growth still favors the US and the alternatives are weak. A break below needs a catalyst that isn&#x27;t on the calendar yet." data-contributors="[{&quot;user&quot;: &quot;tessellate&quot;, &quot;claim&quot;: &quot;Euro-area PMIs keep undershooting&quot;, &quot;xp&quot;: 7}, {&quot;user&quot;: &quot;bram_o&quot;, &quot;claim&quot;: &quot;Futures already price two cuts; little left to remove&quot;, &quot;xp&quot;: 3}]">
           <div class="carousel__top">
             <img class="carousel__img" src="https://polymarket-upload.s3.us-east-2.amazonaws.com/us-canada-diplomatic-agreement-to-lower-tariffs-by-august-31-dHLeCIoNnnOg.jpg" alt="" loading="lazy">
-            <span class="carousel__state carousel__state--vote">vote open · <span class="tally tally--no">55% NO</span></span>
+            <span class="carousel__state carousel__state--vote">vote open · <span class="tally tally--no">55% NO</span> · <span class="votes" title="votes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><polyline points="8 12.5 11 15.5 16 9.5"/></svg>74</span></span>
           </div>
           <p class="carousel__question">Will the US dollar index drop below 100?</p>
           <span class="carousel__yes heading">41%<small>yes</small></span>

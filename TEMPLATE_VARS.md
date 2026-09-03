@@ -31,6 +31,7 @@
 | `{{contributor.xp}}` | XP earned for that contribution |
 | `{{market.thesis_stance}}` | `yes` or `no`: which way the thesis (or draft) calls it; shown bold beside the Thesis label |
 | `{{market.thesis}}` | Full thesis text (called) or draft thesis (vote open), set as `data-thesis` on the card; shown in the Thesis block above the takes when the card is selected; empty otherwise |
+| `{{market.vote_count}}` | Votes cast so far on an open vote (shown after a vote icon in the badge) |
 | `{{market.filter_state}}` | `none` (no thesis yet), `vote` (vote open), or `called`; drives the filter tags above the carousel |
 | `{{take.username}}` | Username of the person who posted the take (used in `<!-- repeat: take -->`) |
 | `{{take.stance}}` | Take stance: YES or NO (used in `<!-- repeat: take -->`) |
@@ -39,3 +40,28 @@
 | `{{take.ago}}` | Relative timestamp (e.g. "2h ago") |
 | `{{buy_url}}` | Buy $PROPHET link (pump.fun) |
 | `{{empty_no_takes}}` | Line shown in the take slot when the selected market has no takes (generated later; mock: "Nobody's taken this one yet. The first contributor earns the most credit. What do you think?") |
+
+### Prophecies page
+| Variable | Description |
+|---|---|
+| `{{vote.slug}}`, `{{vote.image_url}}`, `{{vote.question}}` | Open-vote row identity (`<!-- repeat: vote -->`) |
+| `{{vote.stance}}` / `{{vote.stance_upper}}` | Draft stance: `yes`/`no` and `YES`/`NO` |
+| `{{vote.thesis}}` | Draft thesis text |
+| `{{vote.tally_pct}}`, `{{vote.tally_side}}` / `{{vote.tally_side_upper}}` | Live tally in weight, e.g. `62%` + `yes` / `YES` |
+| `{{vote.vote_count}}` | Votes cast so far (vote icon + count in the badge) |
+| `{{vote.take_count}}` | Takes on the market (person icon + count under the badge) |
+| `{{vote.time_left}}` | Relative time left, e.g. `2d`, `14h` |
+| `{{vote.button_label}}` | `Vote`, or `Voted <span class="tally tally--yes">YES</span>` / `…tally--no">NO</span>` once the viewer has voted (side colored green/red) |
+| `{{vote.my_yes_class}}` / `{{vote.my_no_class}}` | `vote-btn--chosen` on the popup button the viewer picked, empty otherwise |
+| `{{thesis.slug}}`, `{{thesis.image_url}}`, `{{thesis.question}}` | Live-thesis row identity (`<!-- repeat: thesis -->`) |
+| `{{thesis.stance}}` / `{{thesis.stance_upper}}`, `{{thesis.conviction}}` | Called side and conviction 1–5 |
+| `{{thesis.text}}` | Thesis text |
+| `{{thesis.take_count}}`, `{{thesis.called_ago}}` | Takes and relative time since the call |
+| `{{history.slug}}`, `{{history.image_url}}`, `{{history.question}}` | History row identity (`<!-- repeat: history -->`) |
+| `{{history.stance}}` / `{{history.stance_upper}}`, `{{history.conviction}}` | What was called |
+| `{{history.called_pct}}` | Market YES % at the moment of the call (shown as "61% at call") |
+| `{{history.volume}}`, `{{history.take_count}}` | Final volume and take count |
+| `{{history.outcome}}` | `won` or `lost` (rendered as a green/red tag) |
+| `{{history.resolved_ago}}` | Relative time since resolution, shown bare (e.g. "2w ago") |
+| `{{empty_open_votes}}`, `{{empty_prophecies}}`, `{{empty_history}}` | Empty-state line for each group, set on the section; shown when its list has no rows (fallbacks: "No open votes right now.", "No prophecies yet.", "Nothing resolved yet.") |
+| `take.*` inside any row's dropdown | Same take variables as the home panel (`<!-- repeat: take -->` inside each row's Contributions dropdown) |

@@ -407,6 +407,8 @@ ul, ol { list-style: none; }
 .conviction { display: inline-flex; align-items: center; gap: 2px; color: var(--purple-text); }
 .conviction .ico { width: 11px; height: 11px; fill: currentColor; }
 .tally { font-weight: 500; }
+.votes { display: inline-flex; align-items: center; gap: 3px; }
+.votes .ico { width: 11px; height: 11px; fill: none; stroke: currentColor; }
 .tally--yes { color: var(--green); }
 .tally--no  { color: #e53935; }
 .carousel__state:empty { display: none; }
@@ -671,6 +673,65 @@ ul, ol { list-style: none; }
 }
 .walkthrough__btn:hover { opacity: 0.8; }
 
+/* ── List panels (Prophecies, Record) ─────────────────── */
+/* Filter tags on top; each group's list scrolls on its own. */
+.panel {
+  height: 100%;
+  position: relative;
+  z-index: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow: hidden;
+}
+.panel .filters { margin-bottom: 0; flex: 0 0 auto; }
+/* Groups share the hero's height; a group shrinks to fit and its list scrolls.
+   When other groups are hidden or empty, the remaining list gets the room. */
+.pgroup { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }
+.pgroup.is-hidden { display: none; }
+.pgroup__title { font-size: 11px; opacity: 0.6; margin-bottom: 8px; flex: 0 0 auto; }
+.pgroup__list { flex: 0 1 auto; min-height: 0; overflow-y: auto; scrollbar-width: thin; padding-right: 4px; }
+.pgroup__empty { font-size: 13px; opacity: 0.5; padding: 8px 0; }
+.pgroup__empty[hidden] { display: none; }
+
+.prow {
+  display: grid;
+  grid-template-columns: 36px 1fr;
+  gap: 10px 12px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.prow:hover { border-color: rgba(242, 240, 230, 0.3); }
+.prow--open { border-color: rgba(242, 240, 230, 0.7); }
+.prow__img { width: 36px; height: 36px; object-fit: cover; border-radius: 4px; border: 1px solid var(--outline); }
+.prow__main { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.prow__q { font-size: 14px; line-height: 1.35; }
+.prow__q .tally { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; margin-left: 6px; vertical-align: 1px; }
+.prow__thesis { font-size: 12px; line-height: 1.45; opacity: 0.75; }
+.prow__label { font-size: 9px; opacity: 0.6; margin-right: 4px; }
+.prow__num { color: var(--offwhite); opacity: 1; font-weight: 500; }
+.prow__side { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+.prow__state { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; }
+.prow__state--vote { color: var(--purple-text); }
+.prow__meta { font-size: 11px; opacity: 0.45; white-space: nowrap; }
+.prow__row { display: flex; align-items: center; gap: 10px; }
+.prow__side .vote { margin-left: auto; }
+.prow__side .vote__pop { right: 0; }
+.prow__outcome { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 2px 8px; border: 1px solid currentColor; border-radius: 2px; }
+.prow__outcome--won { color: var(--green); }
+.prow__outcome--lost { color: #e53935; }
+
+/* Dropdown: contributions under a clicked row, scrolls on its own */
+.prow__drop { grid-column: 1 / -1; padding-top: 4px; border-top: 1px solid var(--outline); cursor: default; }
+.prow__drop[hidden] { display: none; }
+.prow__takes { max-height: 180px; overflow-y: auto; scrollbar-width: thin; padding-right: 4px; }
+.prow__takes .takes__item:last-child { border-bottom: none; }
+
 /* ── Below the fold ───────────────────────────────────── */
 .below {
   max-width: 1200px;
@@ -834,6 +895,12 @@ ul, ol { list-style: none; }
     margin: 24px auto 0;
   }
   .prompt-bar { padding: 12px 14px; }
+
+  .panel { padding: 24px 48px 24px; gap: 20px; }
+  .prow { grid-template-columns: 40px 1fr auto; align-items: start; padding: 14px 16px; }
+  .prow__img { width: 40px; height: 40px; }
+  .prow__side { grid-column: auto; flex-direction: column; align-items: flex-end; gap: 6px; min-width: 200px; }
+  .prow__side .vote { margin-left: 0; }
 
   .below { padding: 72px 48px; }
   .site-footer__inner { padding: 16px 48px; }
