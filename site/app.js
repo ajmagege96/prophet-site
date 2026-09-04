@@ -649,16 +649,12 @@
 
 /* ── Circuit board behind the prompt bar ──────────────── */
 /* Desktop only (1024px+), home page only, decorative.
+ * The rules this must satisfy are written down in BOARD-SPEC.md.
  *
- * Rebuilt so the failures that kept recurring are structurally impossible:
- *   - ONE run exists at a time, because it is a single variable, not a list.
- *   - The beat is its own timer. One tick = one flash = one run. There is no
- *     condition, cap or return value it can fall through.
- *   - A run always ends before the next tick, because MAX_LEN is derived
- *     from the beat rather than guessed.
- *
- * Language is the roadmap timeline's: a 160px green streak at 200px/s and
- * square pads that fill as the light lands and drain behind it.
+ * Two structural choices keep it honest:
+ *   - The beat is a plain setInterval that pushes exactly one run. There is
+ *     no condition in it to fall through, so it cannot fire twice or skip.
+ *   - A fresh route is generated on every flash, so nothing repeats.
  */
 (function () {
   var canvas = document.querySelector('[data-board]');
@@ -668,24 +664,21 @@
 
   var GREEN  = '16, 240, 95';
   var BEAT   = 3000;   /* ms between flashes */
+  var SPEED  = 200;    /* px/s, the roadmap's own speed */
   var STREAK = 160;    /* px, the roadmap streak length */
   var DRAIN  = 300;    /* ms for a pad to fade once the light has passed */
   var PADSZ  = 6;
   var PEAK   = 0.50;   /* the roadmap peaks at 0.9; this is dimmer */
-
-  var SPEED   = 200;   /* px/s, the roadmap's own speed */
-  var MAX_LEN = 900;   /* runs go far; a long one is still travelling when the
-                          next flash fires, which is fine. The beat is what
-                          must never vary. */
-
-  var BAND = 520, CLEAR = 20, MIN_LEG = 48;
+  var MAX_LEN = 950;   /* long enough to climb to the cards; short enough that
+                          no more than two are ever travelling at once */
+  var CLEAR = 20, MIN_LEG = 48;
 
   var wide    = window.matchMedia('(min-width: 1024px)');
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-  var traces = [], runs = [], origin = { x: 0, y: 0 };
-  var barBox = null, ceiling = 0, floorY = 0, leftX = 0, rightX = 0;
-  var beatTimer = null, raf = null, lastPick = -1;
+  var runs = [], rects = [], offBar = [], origin = { x: 0, y: 0 };
+  var barBox = null, ceiling = 0, floorY = 0, leftX = 0, rightX = 0, headroom = 0;
+  var beatTimer = null, raf = null;
 
   function docRect(el) {
     var r = el.getBoundingClientRect();
@@ -713,7 +706,7 @@
   /* Whole content regions, not individual words, so a trace never threads
      between two lines of a list. */
   function obstacles() {
-    var out = [], seen = [], i, j;
+    var out = [], seen = [], i, k;
     function add(el) {
       if (!el || el === bar || bar.contains(el) || el.contains(bar) || seen.indexOf(el) >= 0) return;
       if (el.closest && el.closest('[data-walkthrough]')) return;
@@ -726,130 +719,101 @@
     var all = document.body.querySelectorAll('*');
     for (i = 0; i < all.length; i++) {
       if (all[i] === canvas) continue;
-      for (j = 0; j < all[i].childNodes.length; j++) {
-        var n = all[i].childNodes[j];
+      for (k = 0; k < all[i].childNodes.length; k++) {
+        var n = all[i].childNodes[k];
         if (n.nodeType === 3 && n.nodeValue.trim()) { add(all[i]); break; }
       }
     }
     return out;
   }
 
-  function hits(x1, y1, x2, y2, rects) {
+  function hits(x1, y1, x2, y2, list) {
     var lx = Math.min(x1, x2), hx = Math.max(x1, x2);
     var ly = Math.min(y1, y2), hy = Math.max(y1, y2);
-    for (var i = 0; i < rects.length; i++) {
-      var r = rects[i];
+    for (var i = 0; i < list.length; i++) {
+      var r = list[i];
       if (hx >= r.l && lx <= r.r && hy >= r.t && ly <= r.b) return true;
     }
     return false;
   }
 
-  /* March one axis-aligned leg, stopping at the band, the hero, the cards or
-     before any content. Returns how far it actually got. */
-  function march(x, y, dx, dy, want, rects) {
+  /* March one axis-aligned leg. Stops at the hero on all four sides, at the
+     top of the cards, or before any content. Returns how far it got. */
+  function march(x, y, dx, dy, want, list) {
     var step = 4, gone = 0;
     while (gone < want) {
       var nx = x + dx * (gone + step), ny = y + dy * (gone + step);
       if (ny < ceiling || ny > floorY || nx < leftX || nx > rightX) break;
-      var out = Math.max(barBox.l - nx, 0, nx - barBox.r, barBox.t - ny, ny - barBox.b);
-      if (out > BAND) break;
-      if (hits(x + dx * gone, y + dy * gone, nx, ny, rects)) break;
+      if (hits(x + dx * gone, y + dy * gone, nx, ny, list)) break;
       gone += step;
     }
     return gone;
   }
 
-  function apart(pts, others, gap) {
-    for (var i = 0; i < pts.length - 1; i++) {
-      for (var o = 0; o < others.length; o++) {
-        var q = others[o].pts;
-        for (var k = 0; k < q.length - 1; k++) {
-          if (Math.max(pts[i].x, pts[i + 1].x) + gap >= Math.min(q[k].x, q[k + 1].x) &&
-              Math.min(pts[i].x, pts[i + 1].x) - gap <= Math.max(q[k].x, q[k + 1].x) &&
-              Math.max(pts[i].y, pts[i + 1].y) + gap >= Math.min(q[k].y, q[k + 1].y) &&
-              Math.min(pts[i].y, pts[i + 1].y) - gap <= Math.max(q[k].y, q[k + 1].y)) return false;
-        }
+  /* One fresh route. Returns null if it could not be laid down. */
+  function makeRoute() {
+    var w = barBox.r - barBox.l, h = barBox.b - barBox.t;
+    var side = Math.random();
+    var st;
+    if (side < 0.30) {                                  /* down from the bottom edge */
+      st = { x: barBox.l + w * rnd(0.10, 0.90), y: barBox.b, dx: 0, dy: 1, first: rnd(46, 120) };
+    } else {                                            /* out of a side edge, then climb */
+      var left = side < 0.65;
+      st = { x: left ? barBox.l : barBox.r, y: barBox.t + h * rnd(0.34, 0.66),
+             dx: left ? -1 : 1, dy: 0, first: rnd(195, 265),
+             climb: headroom * rnd(0.5, 1.05), up: Math.random() < 0.72 };
+    }
+
+    var pts = [{ x: st.x, y: st.y }];
+    var x = st.x, y = st.y, dx = st.dx, dy = st.dy, total = 0, lastTurn = 0;
+    var legs = 2 + Math.floor(Math.random() * 3);       /* 2 to 4 */
+
+    for (var leg = 0; leg < legs; leg++) {
+      var want = leg === 0 ? st.first : (st.climb && leg === 1 ? st.climb : rnd(90, 300));
+      want = Math.min(want, MAX_LEN - total);
+      if (want < MIN_LEG) break;
+      var got = march(x, y, dx, dy, want, leg === 0 ? rects : offBar);
+      if (got < MIN_LEG) { if (leg === 0) return null; break; }
+      x += dx * got; y += dy * got; total += got;
+      pts.push({ x: x, y: y });
+
+      if (leg < legs - 1) {
+        /* Turns alternate, so a route can never make two turns the same way
+           and double back on itself. */
+        var turn;
+        if (leg === 0 && st.up !== undefined) turn = st.up ? -1 : 1;
+        else if (lastTurn) turn = -lastTurn;
+        else turn = Math.random() < 0.5 ? 1 : -1;
+        lastTurn = turn;
+        var ndx = dy * turn; dy = -dx * turn; dx = ndx;
       }
     }
-    return true;
+    if (pts.length < 2 || total < 90) return null;
+
+    var segs = [], len = 0;
+    for (var p = 0; p < pts.length - 1; p++) {
+      var L = Math.abs(pts[p + 1].x - pts[p].x) + Math.abs(pts[p + 1].y - pts[p].y);
+      segs.push({ a: pts[p], b: pts[p + 1], from: len, len: L });
+      len += L;
+    }
+    return { pts: pts, segs: segs, len: len, pad: pts[pts.length - 1] };
   }
 
-  function makeTraces() {
-    var out = [], rects = obstacles();
-    var offBar = rects.concat([grow(barBox, 18)]);   /* nothing runs along the frame */
-    var w = barBox.r - barBox.l, h = barBox.b - barBox.t, i;
-
-    var starts = [];
-    /* room between the bar and the top of the cards, so a climb can be
-       anything from a short rise to the full height */
-    var headroom = Math.max(120, barBox.t - ceiling - CLEAR);
-    for (i = 0; i < 13; i++) {                       /* bottom edge, clear of the corners */
-      starts.push({ x: barBox.l + w * (0.09 + 0.82 * (i + 0.5) / 13), y: barBox.b, dx: 0, dy: 1, first: rnd(40, 110) });
-    }
-    for (i = 0; i < 9; i++) {                        /* middle of the side edges only */
-      var fy = barBox.t + h * (0.34 + 0.32 * (i + 0.5) / 9);
-      starts.push({ x: barBox.l, y: fy, dx: -1, dy: 0, first: rnd(190, 250), up: i % 2 === 0, climb: headroom * rnd(0.3, 1) });
-      starts.push({ x: barBox.r, y: fy, dx: 1, dy: 0, first: rnd(190, 250), up: i % 2 === 1, climb: headroom * rnd(0.3, 1) });
-    }
-    for (i = starts.length - 1; i > 0; i--) {        /* shuffle: a different board each load */
-      var s = Math.floor(Math.random() * (i + 1)), tmp = starts[i];
-      starts[i] = starts[s]; starts[s] = tmp;
-    }
-
-    for (i = 0; i < starts.length; i++) {
-      var st = starts[i], pts = [{ x: st.x, y: st.y }];
-      var x = st.x, y = st.y, dx = st.dx, dy = st.dy, total = 0, ok = true;
-      var legs = 2 + Math.floor(Math.random() * 3);  /* 2 to 4: corners, never a snake */
-
-      for (var leg = 0; leg < legs; leg++) {
-        var want = leg === 0 ? st.first : (st.climb && leg === 1 ? st.climb : rnd(90, 300));
-        want = Math.min(want, MAX_LEN - total);      /* a run must fit inside one beat */
-        if (want < MIN_LEG) break;
-        var got = march(x, y, dx, dy, want, leg === 0 ? rects : offBar);
-        if (got < MIN_LEG) { if (leg === 0) ok = false; break; }
-        x += dx * got; y += dy * got; total += got;
-        pts.push({ x: x, y: y });
-        if (leg < legs - 1) {                         /* right angle, nothing else */
-          var turn = Math.random() < 0.5 ? 1 : -1;
-          if (leg === 0 && st.up !== undefined) turn = st.up ? -1 : 1;
-          var ndx = dy * turn; dy = -dx * turn; dx = ndx;
-        }
-      }
-      if (!ok || pts.length < 2 || !apart(pts, out, 7)) continue;
-
-      var segs = [], len = 0;
-      for (var p = 0; p < pts.length - 1; p++) {
-        var L = Math.abs(pts[p + 1].x - pts[p].x) + Math.abs(pts[p + 1].y - pts[p].y);
-        segs.push({ a: pts[p], b: pts[p + 1], from: len, len: L });
-        len += L;
-      }
-      out.push({ pts: pts, segs: segs, len: len, pad: pts[pts.length - 1] });
-    }
-    return out;
-  }
-
-  function build() {
+  function measure() {
     barBox = docRect(bar);
     var hero = bar.closest('.hero');
     var hb = hero ? grow(docRect(hero), -CLEAR) : null;
     var cards = document.querySelector('.carousel');
-    ceiling = cards ? docRect(cards).t : (hb ? hb.t : 0);      /* never above the cards */
-    floorY = hb ? hb.b : barBox.b + BAND;
-    /* and never off the page: the hero spans the viewport, so its edges are
-       the left and right limits */
-    leftX = hb ? hb.l : 0;
-    rightX = hb ? hb.r : document.documentElement.clientWidth;
+    ceiling = cards ? docRect(cards).t : (hb ? hb.t : 0);   /* never above the cards */
+    floorY  = hb ? hb.b : barBox.b + 400;
+    leftX   = hb ? hb.l : 0;
+    rightX  = hb ? hb.r : document.documentElement.clientWidth;
+    headroom = Math.max(120, barBox.t - ceiling);
 
-    var best = [];                                   /* keep the fullest of a few attempts */
-    for (var a = 0; a < 8; a++) {
-      var got = makeTraces();
-      if (got.length > best.length) best = got;
-      if (best.length >= 8) break;
-    }
-    traces = best;
+    rects = obstacles();
+    offBar = rects.concat([grow(barBox, 18)]);   /* nothing runs along the frame */
 
-    var box = { l: Math.max(leftX - 12, barBox.l - BAND), t: Math.max(ceiling - 12, barBox.t - BAND),
-                r: Math.min(rightX + 12, barBox.r + BAND), b: Math.min(floorY + 12, barBox.b + BAND) };
+    var box = { l: leftX - 12, t: ceiling - 12, r: rightX + 12, b: floorY + 12 };
     canvas.style.left = box.l + 'px';
     canvas.style.top = box.t + 'px';
     canvas.style.width = (box.r - box.l) + 'px';
@@ -861,27 +825,24 @@
     origin = { x: box.l, y: box.t };
   }
 
-  /* ── the beat: one tick, one flash, one run. Nothing else touches it. ── */
+  /* ── the beat: one tick, one flash, one run ── */
   function beat() {
-    if (!traces.length) return;
-    var i = traces.length === 1 ? 0
-          : (lastPick + 1 + Math.floor(Math.random() * (traces.length - 1))) % traces.length;
-    lastPick = i;
-    /* Exactly one push per tick. The beat is a plain interval with no
-       condition in it, so it cannot fire twice or be skipped. */
-    runs.push({ i: i, start: performance.now() });
+    var route = null;
+    for (var i = 0; i < 40 && !route; i++) route = makeRoute();
+    if (!route) return;
+    runs.push({ t: route, start: performance.now() });
     bar.classList.add('prompt-bar--pulse');
     setTimeout(function () { bar.classList.remove('prompt-bar--pulse'); }, 900);
   }
 
-  function profile(r, d) {                            /* transparent -> green -> transparent */
+  function profile(r, d) {                              /* transparent → green → transparent */
     var u = (r - d) / STREAK;
     return (u <= 0 || u >= 1) ? 0 : Math.sin(Math.PI * u);
   }
 
   function padLevel(r, len) {
-    var lands = len - PADSZ / 2 + PADSZ * 0.1;        /* leading edge ~10% in */
-    var leaves = len + PADSZ * 0.1 + STREAK;          /* trailing edge ~10% past */
+    var lands = len - PADSZ / 2 + PADSZ * 0.1;          /* leading edge ~10% in */
+    var leaves = len + PADSZ * 0.1 + STREAK;            /* trailing edge ~10% past */
     if (r < lands) return 0;
     if (r <= leaves) return Math.min(1, (r - lands) / (SPEED * 0.15));
     var v = 1 - (r - leaves) / (SPEED * DRAIN / 1000);
@@ -898,8 +859,7 @@
     ctx.shadowBlur = 10;
 
     for (var n = runs.length - 1; n >= 0; n--) {
-      var t = traces[runs[n].i];
-      if (!t) { runs.splice(n, 1); continue; }
+      var t = runs[n].t;
       var r = (now - runs[n].start) / 1000 * SPEED;
       if (r > t.len + STREAK + SPEED * DRAIN / 1000 + 10) { runs.splice(n, 1); continue; }
 
@@ -946,11 +906,8 @@
   function startUp() {
     stop();
     if (!wide.matches || reduced.matches) { canvas.style.width = '0px'; canvas.style.height = '0px'; return; }
-    build();
-    if (!traces.length) return;
-    /* Only the timer fires beats. Kicking one off here too meant a second
-       init (fonts, load) produced two flashes back to back. */
-    beatTimer = setInterval(beat, BEAT);
+    measure();
+    beatTimer = setInterval(beat, BEAT);   /* only the timer fires beats */
     raf = requestAnimationFrame(draw);
   }
 
@@ -967,8 +924,8 @@
   });
 
   window.prophetBoard = {
-    traces: function () { return traces.length; },
-    maxLen: function () { return MAX_LEN; },
+    route: makeRoute,
+    live: function () { return runs.length; },
     set: function (o) {
       if (o && o.beat) BEAT = o.beat;
       if (o && o.speed) SPEED = o.speed;
