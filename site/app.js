@@ -662,16 +662,17 @@
   var ctx = canvas.getContext('2d');
 
   var GREEN = '16, 240, 95';
-  var BAND    = 340;   /* how far the board reaches from the bar */
+  var BAND    = 500;   /* how far the board reaches from the bar */
   var REST    = 0.05;  /* trace opacity at rest */
   var PAD     = 6;     /* square pad, px */
-  var SPEED   = 70;    /* px per second: slow enough to follow */
-  var STREAK  = 95;    /* long streak, so the run reads at this speed */
+  var SPEED   = 42;    /* px per second: slow enough to follow */
+  var STREAK  = 150;   /* long streak, so the run reads at this speed */
   var FILL_MS = 400;   /* pad fill/drain, as the timeline dot */
   var FRAME   = 1000 / 30;
   var CLEAR   = 20;    /* keep this far off any content, pad included */
 
-  var IDLE_GAP = 1700, TYPING_GAP = 700;
+  var IDLE_GAP = 1000, TYPING_GAP = 450;
+  var MAX_LIVE = 3;    /* two to three moving at any moment, never the board */
   var IDLE_LEVEL = 0.55, TYPING_LEVEL = 0.7, SEND_LEVEL = 1;
 
   var wide    = window.matchMedia('(min-width: 1024px)');
@@ -794,22 +795,22 @@
     var across = 11;
     for (i = 0; i < across; i++) {
       var fx = barBox.l + w * (i + 0.5) / across;
-      starts.push({ x: fx, y: barBox.b, dx: 0, dy: 1, reach: 30 + (i % 4) * 22 });
+      starts.push({ x: fx, y: barBox.b, dx: 0, dy: 1, reach: 40 + (i % 4) * 34 });
     }
     /* Side runs head out to the page gutter first, then climb: the gutters
        beside the content column are empty, so traces can travel up there. */
     for (i = 0; i < 3; i++) {
       var fy = barBox.t + h * (i + 0.5) / 3;
-      starts.push({ x: barBox.l, y: fy, dx: -1, dy: 0, reach: 250 + i * 45, up: i % 2 === 0 });
-      starts.push({ x: barBox.r, y: fy, dx: 1, dy: 0, reach: 250 + i * 45, up: i % 2 === 1 });
+      starts.push({ x: barBox.l, y: fy, dx: -1, dy: 0, reach: 250 + i * 60, up: i % 2 === 0 });
+      starts.push({ x: barBox.r, y: fy, dx: 1, dy: 0, reach: 250 + i * 60, up: i % 2 === 1 });
     }
 
     for (i = 0; i < starts.length; i++) {
       var s = starts[i], pts = [{ x: s.x, y: s.y }];
       var x = s.x, y = s.y, dx = s.dx, dy = s.dy, ok = true;
-      var legs = 2 + (i % 3);                       /* 2 to 4 legs, uneven by design */
+      var legs = 3 + (i % 3);                       /* 3 to 5 legs, uneven by design */
       for (var leg = 0; leg < legs; leg++) {
-        var want = leg === 0 ? s.reach : (s.up !== undefined && leg === 1 ? 150 + (i % 3) * 60 : 40 + ((i + leg) % 5) * 34);
+        var want = leg === 0 ? s.reach : (s.up !== undefined && leg === 1 ? 260 + (i % 3) * 90 : 70 + ((i + leg) % 5) * 52);
         var got = runLength(x, y, dx, dy, want, rects);
         if (got < 20) { if (leg === 0) ok = false; break; }
         x += dx * got; y += dy * got;
@@ -863,11 +864,13 @@
     var picks = [];
     if (all) { for (var i = 0; i < traces.length; i++) picks.push(i); }
     else {
-      var n = 2 + Math.floor(Math.random() * 3);     /* two to four, never all */
-      while (picks.length < n) {
-        var k = Math.floor(Math.random() * traces.length);
-        if (picks.indexOf(k) < 0) picks.push(k);
-      }
+      if (pulses.length >= MAX_LIVE) return;         /* let the board breathe */
+      var live = [], z;
+      for (z = 0; z < pulses.length; z++) live.push(pulses[z].i);
+      var free = [];
+      for (z = 0; z < traces.length; z++) if (live.indexOf(z) < 0) free.push(z);
+      if (!free.length) return;
+      picks.push(free[Math.floor(Math.random() * free.length)]);   /* one at a time */
     }
     for (var p = 0; p < picks.length; p++) {
       pulses.push({ i: picks[p], start: performance.now(), level: strength });
@@ -1007,6 +1010,15 @@
     pulse: function (s) { firePulse(s || SEND_LEVEL, false); },
     all: function () { firePulse(SEND_LEVEL, true); },
     rest: function (v) { REST = v; return REST; },
+    tune: function (o) {
+      if (!o) return { speed: SPEED, streak: STREAK, gap: IDLE_GAP, live: MAX_LIVE, rest: REST };
+      if (o.speed) SPEED = o.speed;
+      if (o.streak) STREAK = o.streak;
+      if (o.gap) IDLE_GAP = o.gap;
+      if (o.live) MAX_LIVE = o.live;
+      if (o.rest !== undefined) REST = o.rest;
+      return { speed: SPEED, streak: STREAK, gap: IDLE_GAP, live: MAX_LIVE, rest: REST };
+    },
     traces: function () { return traces.length; }
   };
 
