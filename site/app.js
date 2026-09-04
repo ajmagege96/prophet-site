@@ -663,22 +663,23 @@
 
   var GREEN = '16, 240, 95';
   var BAND    = 300;   /* how far the board reaches from the bar */
-  var REST    = 0.05;  /* trace opacity at rest */
+  var REST    = 0;     /* invisible until a pulse runs over it */
   var PAD     = 6;     /* square pad, px */
   var SPEED   = 200;   /* px per second, as the roadmap streak */
   var STREAK  = 160;   /* as .timeline__light height */
   var FILL_MS = 400;   /* pad fill/drain, as the timeline dot */
-  var FRAME   = 1000 / 30;
+  var FRAME   = 1000 / 60;   /* 60fps: at 200px/s, 30fps reads as steps */
   var CLEAR   = 20;    /* keep this far off any content, pad included */
 
-  var IDLE_GAP = 1800, TYPING_GAP = 700;
-  var MAX_LIVE = 2;    /* about one running at any moment */
-  var IDLE_LEVEL = 0.55, TYPING_LEVEL = 0.7, SEND_LEVEL = 1;
+  var IDLE_GAP = 1200, TYPING_GAP = 550;
+  var MAX_LIVE = 3;    /* they overlap, so one is always on screen */
+  var IDLE_LEVEL = 0.72, TYPING_LEVEL = 0.85, SEND_LEVEL = 1;
+  var PEAK = 0.62;     /* the roadmap streak peaks at 0.9; this is the same, dimmer */
 
   var wide    = window.matchMedia('(min-width: 1024px)');
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-  var traces = [], pulses = [], origin = { x: 0, y: 0 }, barBox = null;
+  var traces = [], pulses = [], origin = { x: 0, y: 0 }, barBox = null, heroBox = null;
   var raf = null, lastFrame = 0, lastPulse = 0, typingUntil = 0;
 
   function docRect(el) {
@@ -761,6 +762,7 @@
     while (gone < want) {
       var nx = x + dx * (gone + step), ny = y + dy * (gone + step);
       if (outset(nx, ny) > BAND) break;
+      if (heroBox && (ny < heroBox.t || ny > heroBox.b || nx < heroBox.l || nx > heroBox.r)) break;
       if (hits(x + dx * gone, y + dy * gone, nx, ny, rects)) break;
       gone += step;
     }
@@ -787,6 +789,8 @@
   function build() {
     traces = [];
     barBox = docRect(bar);
+    var hero = bar.closest('.hero');
+    heroBox = hero ? grow(docRect(hero), -CLEAR) : null;   /* the board lives in the hero only */
     var band = grow(barBox, BAND + 20);   /* origin is set by place(), not here */
     var rects = obstacles(band);
 
@@ -891,57 +895,74 @@
 
   function drawPad(t, lit) {
     var f = fade(t.pad.x, t.pad.y);
-    if (f <= 0) return;
+    if (f <= 0 || (lit <= 0.02 && REST <= 0)) return;
     var x = t.pad.x - origin.x - PAD / 2, y = t.pad.y - origin.y - PAD / 2;
+    ctx.save();
     if (lit > 0.02) {
-      ctx.fillStyle = 'rgba(' + GREEN + ',' + (0.85 * lit * f).toFixed(3) + ')';
+      ctx.shadowColor = 'rgba(' + GREEN + ', 0.5)';
+      ctx.shadowBlur = 10;
+      ctx.fillStyle = 'rgba(' + GREEN + ',' + (PEAK * lit * f).toFixed(3) + ')';
       ctx.fillRect(x, y, PAD, PAD);
     }
-    ctx.strokeStyle = 'rgba(' + GREEN + ',' + ((REST + 0.55 * lit) * f).toFixed(3) + ')';
+    ctx.strokeStyle = 'rgba(' + GREEN + ',' + ((REST + PEAK * 0.8 * lit) * f).toFixed(3) + ')';
     ctx.lineWidth = 1;
     ctx.strokeRect(x + 0.5, y + 0.5, PAD - 1, PAD - 1);
+    ctx.restore();
   }
 
   function paint(now, dt) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     var i, s, t;
 
-    /* traces at rest, sampled so they fade toward the band edge */
-    for (i = 0; i < traces.length; i++) {
-      t = traces[i];
-      for (s = 0; s < t.segs.length; s++) {
-        var seg = t.segs[s], STEPS = 6;
-        for (var k = 0; k < STEPS; k++) {
-          var p0 = { x: seg.a.x + (seg.b.x - seg.a.x) * (k / STEPS), y: seg.a.y + (seg.b.y - seg.a.y) * (k / STEPS) };
-          var p1 = { x: seg.a.x + (seg.b.x - seg.a.x) * ((k + 1) / STEPS), y: seg.a.y + (seg.b.y - seg.a.y) * ((k + 1) / STEPS) };
-          strokeSeg(p0, p1, REST * fade((p0.x + p1.x) / 2, (p0.y + p1.y) / 2));
+    /* Nothing is drawn at rest: a trace only exists while light is on it. */
+    if (REST > 0) {
+      for (i = 0; i < traces.length; i++) {
+        t = traces[i];
+        for (s = 0; s < t.segs.length; s++) {
+          strokeSeg(t.segs[s].a, t.segs[s].b, REST * fade(t.segs[s].a.x, t.segs[s].a.y));
         }
       }
     }
 
-    /* the light running out to a pad */
+    /* The streak: one stroke per segment with a gradient along it, so the
+       light reads as continuous instead of stepped, plus a real blur for
+       the roadmap's 0 0 10px glow. */
+    ctx.save();
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
     for (var p = pulses.length - 1; p >= 0; p--) {
       var pulse = pulses[p];
       t = traces[pulse.i];
       if (!t) { pulses.splice(p, 1); continue; }
       var r = (now - pulse.start) / 1000 * SPEED;
       if (r - STREAK > t.len + PAD) { pulses.splice(p, 1); continue; }
+
       for (s = 0; s < t.segs.length; s++) {
         var sg = t.segs[s];
         if (sg.from + sg.len < r - STREAK || sg.from > r) continue;
-        var N = 8;
-        for (var q = 0; q < N; q++) {
-          var t0 = q / N, t1 = (q + 1) / N;
-          var lv = level(r, sg.from + sg.len * (t0 + t1) / 2);
-          if (lv < 0.03) continue;
-          var a = { x: sg.a.x + (sg.b.x - sg.a.x) * t0, y: sg.a.y + (sg.b.y - sg.a.y) * t0 };
-          var b = { x: sg.a.x + (sg.b.x - sg.a.x) * t1, y: sg.a.y + (sg.b.y - sg.a.y) * t1 };
-          var f = fade((a.x + b.x) / 2, (a.y + b.y) / 2) * lv * pulse.level;
-          strokeSeg(a, b, 0.10 * f, 4);            /* halo */
-          strokeSeg(a, b, 0.85 * f, 1);
+        var g = ctx.createLinearGradient(sg.a.x - origin.x, sg.a.y - origin.y,
+                                         sg.b.x - origin.x, sg.b.y - origin.y);
+        var any = false, STOPS = 10;
+        for (var q = 0; q <= STOPS; q++) {
+          var tt = q / STOPS;
+          var lv = level(r, sg.from + sg.len * tt);
+          var f = lv * pulse.level * fade(sg.a.x + (sg.b.x - sg.a.x) * tt,
+                                          sg.a.y + (sg.b.y - sg.a.y) * tt);
+          if (f > 0.01) any = true;
+          g.addColorStop(tt, 'rgba(' + GREEN + ',' + (PEAK * f).toFixed(3) + ')');
         }
+        if (!any) continue;
+        ctx.shadowColor = 'rgba(' + GREEN + ', 0.5)';
+        ctx.shadowBlur = 10;
+        ctx.strokeStyle = g;
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(sg.a.x - origin.x, sg.a.y - origin.y);
+        ctx.lineTo(sg.b.x - origin.x, sg.b.y - origin.y);
+        ctx.stroke();
       }
     }
+    ctx.restore();
 
     /* pads fill as the light arrives, then drain */
     var step = dt / FILL_MS;
@@ -1019,7 +1040,8 @@
       if (o.rest !== undefined) REST = o.rest;
       return { speed: SPEED, streak: STREAK, gap: IDLE_GAP, live: MAX_LIVE, rest: REST };
     },
-    traces: function () { return traces.length; }
+    traces: function () { return traces.length; },
+    live: function () { return pulses.length; }
   };
 
   /* The bar moves as web fonts load and the layout settles, so rebuild on
