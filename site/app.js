@@ -647,213 +647,312 @@
   });
 })();
 
-/* ── Background pulse field ───────────────────────────── */
-/* Desktop only (1024px+). Same visual language as the roadmap timeline:
-   1px hairlines, 10px dots, a long green streak travelling the line, each
-   dot filling when the streak's leading edge is ~10% into it and draining
-   when the trailing edge is ~10% past. The prompt bar is the source.
-
-   Two geometries, switchable live:
-     window.prophetBackground.geometry('spokes' | 'constellation')
-   or append ?bg=spokes / ?bg=constellation to the URL. The choice is
-   remembered per browser so you can compare across pages. */
+/* ── Circuit board around the prompt bar ──────────────── */
+/* Desktop only (1024px+). Traces leave the bar's frame at 90 degrees,
+   run straight, turn at right angles, and end in a small square pad.
+   No diagonals, no curves, no trace touches another. Everything stays
+   inside a ~250px band around the bar and fades to nothing at its edge.
+   A trace that would cross text or a card is cut short before it.
+   Light travels a trace from the bar to its pad, the pad fills, then
+   drains — the same fill/drain language as the roadmap timeline. */
 (function () {
-  var canvas = document.querySelector('[data-bg]');
-  if (!canvas || !canvas.getContext) return;
+  var canvas = document.querySelector('[data-board]');
+  var bar = document.querySelector('.prompt-bar');
+  if (!canvas || !bar || !canvas.getContext) return;
   var ctx = canvas.getContext('2d');
 
-  /* Values lifted from the roadmap timeline so the two read as one system */
-  var GREEN   = '16, 240, 95';
-  var LINE    = 'rgba(242, 240, 230, 0.15)';
+  var GREEN = '16, 240, 95';
+  var BAND    = 250;   /* how far the board reaches from the bar */
+  var REST    = 0.05;  /* trace opacity at rest */
+  var PAD     = 6;     /* square pad, px */
   var SPEED   = 200;   /* px per second, as the timeline streak */
-  var STREAK  = 160;   /* streak length, as .timeline__light height */
-  var NODE_D  = 10;    /* dot diameter, as .timeline__dot */
-  var NODE_R  = NODE_D / 2;
-  var FILL_MS = 400;   /* fill/drain, as the dot's 0.4s transition */
-  var FRAME   = 1000 / 30;   /* 30fps cap */
+  var STREAK  = 70;    /* shorter streak: these runs are short */
+  var FILL_MS = 400;   /* pad fill/drain, as the timeline dot */
+  var FRAME   = 1000 / 30;
+  var CLEAR   = 16;    /* keep this far off any content */
 
-  var IDLE_GAP = 4000, TYPING_GAP = 1100;
-  var IDLE_LEVEL = 0.45, TYPING_LEVEL = 0.6, SEND_LEVEL = 1;
+  var IDLE_GAP = 5000, TYPING_GAP = 1400;
+  var IDLE_LEVEL = 0.55, TYPING_LEVEL = 0.7, SEND_LEVEL = 1;
 
   var wide    = window.matchMedia('(min-width: 1024px)');
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-  var W = 0, H = 0, dpr = 1;
-  var nodes = [], edges = [], maxDist = 0;
-  var pulses = [], raf = null, lastFrame = 0, lastPulse = 0, typingUntil = 0;
+  var traces = [], pulses = [], origin = { x: 0, y: 0 }, barBox = null;
+  var raf = null, lastFrame = 0, lastPulse = 0, typingUntil = 0;
 
-  var promptBar  = document.querySelector('.prompt-bar');
-  var promptWrap = document.querySelector('.prompt-bar-wrap');
-
-  /* ── geometry choice ── */
-  function stored() {
-    var q = (location.search.match(/[?&]bg=(spokes|constellation)/) || [])[1];
-    if (q) { try { localStorage.setItem('prophet_bg', q); } catch (e) {} return q; }
-    try { return localStorage.getItem('prophet_bg') || 'spokes'; } catch (e) { return 'spokes'; }
+  function docRect(el) {
+    var r = el.getBoundingClientRect();
+    return { l: r.left + scrollX, t: r.top + scrollY, r: r.right + scrollX, b: r.bottom + scrollY };
   }
-  var geometry = stored();
+  function grow(r, n) { return { l: r.l - n, t: r.t - n, r: r.r + n, b: r.b + n }; }
 
-  /* ── source point: the prompt bar, else low centre ── */
-  function sourcePoint() {
-    var el = promptWrap || promptBar;
-    if (el) {
-      var r = el.getBoundingClientRect();
-      if (r.width) return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+  /* An element inside a scrolling box still reports its full rect even when
+     it is scrolled out of sight. Clip to every clipping ancestor so only the
+     part actually on screen counts as an obstacle. */
+  function visibleRect(el) {
+    var r = docRect(el), p = el.parentElement;
+    while (p && p !== document.body) {
+      var ov = getComputedStyle(p).overflow + getComputedStyle(p).overflowY + getComputedStyle(p).overflowX;
+      if (/hidden|auto|scroll/.test(ov)) {
+        var pr = docRect(p);
+        r = { l: Math.max(r.l, pr.l), t: Math.max(r.t, pr.t), r: Math.min(r.r, pr.r), b: Math.min(r.b, pr.b) };
+        if (r.r <= r.l || r.b <= r.t) return null;
+      }
+      p = p.parentElement;
     }
-    return { x: W / 2, y: H * 0.78 };
-  }
-
-  function addNode(x, y) { nodes.push({ x: x, y: y, dist: Infinity, lit: 0 }); return nodes.length - 1; }
-  function addEdge(a, b) {
-    var dx = nodes[a].x - nodes[b].x, dy = nodes[a].y - nodes[b].y;
-    edges.push({ a: a, b: b, len: Math.sqrt(dx * dx + dy * dy) });
+    return r;
   }
 
-  /* (a) spokes radiating from the source, nodes spaced along each */
-  function buildSpokes(src) {
-    var SPOKES = 20, STEP = 118, EDGE = Math.max(W, H) * 1.1;
-    addNode(src.x, src.y);
-    for (var s = 0; s < SPOKES; s++) {
-      var a = (s / SPOKES) * Math.PI * 2 + (s % 3) * 0.045;   /* jitter, so it never reads as a fan */
-      var prev = 0;
-      for (var d = STEP * (0.75 + (s % 4) * 0.12); d < EDGE; d += STEP * (0.9 + (s % 5) * 0.07)) {
-        var x = src.x + Math.cos(a) * d, y = src.y + Math.sin(a) * d;
-        if (x < -60 || x > W + 60 || y < -60 || y > H + 60) break;
-        var n = addNode(x, y);
-        addEdge(prev, n);
-        prev = n;
+  /* Whole content regions are blocked, not just the text inside them, so a
+     trace never threads between two lines of a list. Small text elements are
+     added as well, to catch anything sitting on its own. */
+  var BLOCKS = '.feed, .takes, .thesis, .carousel, .filters, .below, .site-header, .site-footer, .panel, .pgroup';
+
+  function obstacles(band) {
+    var out = [], i, j, seen = [];
+    function push(el) {
+      if (!el || el === bar || bar.contains(el) || el.contains(bar)) return;
+      if (el.closest && el.closest('[data-walkthrough]')) return;
+      if (seen.indexOf(el) >= 0) return;
+      seen.push(el);
+      var r = visibleRect(el);
+      if (!r) return;
+      if (r.r <= r.l || r.b <= r.t) return;
+      if (r.r < band.l || r.l > band.r || r.b < band.t || r.t > band.b) return;
+      out.push(grow(r, CLEAR));
+    }
+    var blocks = document.querySelectorAll(BLOCKS);
+    for (i = 0; i < blocks.length; i++) push(blocks[i]);
+
+    var all = document.body.querySelectorAll('*');
+    for (i = 0; i < all.length; i++) {
+      var el = all[i];
+      if (el === canvas) continue;
+      for (j = 0; j < el.childNodes.length; j++) {
+        var n = el.childNodes[j];
+        if (n.nodeType === 3 && n.nodeValue.trim()) { push(el); break; }
       }
     }
+    return out;
   }
 
-  /* (b) irregular constellation: scattered points, joined to near neighbours */
-  function buildConstellation(src) {
-    var MIN = 128, MAX_LINK = 250, TRIES = 900;
-    addNode(src.x, src.y);
-    for (var t = 0; t < TRIES; t++) {
-      var x = -40 + Math.random() * (W + 80), y = -40 + Math.random() * (H + 80), ok = true;
-      for (var i = 0; i < nodes.length; i++) {
-        var dx = nodes[i].x - x, dy = nodes[i].y - y;
-        if (dx * dx + dy * dy < MIN * MIN) { ok = false; break; }
-      }
-      if (ok) addNode(x, y);
-    }
-    var seen = {};
-    for (var n = 0; n < nodes.length; n++) {
-      var near = [];
-      for (var m = 0; m < nodes.length; m++) {
-        if (m === n) continue;
-        var ex = nodes[m].x - nodes[n].x, ey = nodes[m].y - nodes[n].y;
-        var L = Math.sqrt(ex * ex + ey * ey);
-        if (L <= MAX_LINK) near.push({ i: m, L: L });
-      }
-      near.sort(function (p, q) { return p.L - q.L; });
-      var links = n === 0 ? 4 : 2 + (n % 2);        /* uneven degree, no repeating pattern */
-      for (var k = 0; k < Math.min(links, near.length); k++) {
-        var a = Math.min(n, near[k].i), b = Math.max(n, near[k].i), key = a + ':' + b;
-        if (!seen[key]) { seen[key] = 1; addEdge(a, b); }
-      }
-    }
+  /* How far a point sits outside the bar, used for the band fade */
+  function outset(x, y) {
+    var dx = Math.max(barBox.l - x, 0, x - barBox.r);
+    var dy = Math.max(barBox.t - y, 0, y - barBox.b);
+    return Math.max(dx, dy);
   }
 
-  /* Dijkstra from the source: every node gets its distance along the lines,
-     which is what the wavefront rides on. Branching at junctions is implicit. */
-  function measure() {
-    var adj = [], i;
-    for (i = 0; i < nodes.length; i++) adj.push([]);
-    for (i = 0; i < edges.length; i++) {
-      adj[edges[i].a].push({ to: edges[i].b, len: edges[i].len });
-      adj[edges[i].b].push({ to: edges[i].a, len: edges[i].len });
+  function hits(x1, y1, x2, y2, rects) {
+    var lo = { x: Math.min(x1, x2), y: Math.min(y1, y2) };
+    var hi = { x: Math.max(x1, x2), y: Math.max(y1, y2) };
+    for (var i = 0; i < rects.length; i++) {
+      var r = rects[i];
+      if (hi.x >= r.l && lo.x <= r.r && hi.y >= r.t && lo.y <= r.b) return r;
     }
-    nodes[0].dist = 0;
-    var queue = [0];
-    while (queue.length) {
-      var best = 0;
-      for (i = 1; i < queue.length; i++) if (nodes[queue[i]].dist < nodes[queue[best]].dist) best = i;
-      var u = queue.splice(best, 1)[0];
-      for (i = 0; i < adj[u].length; i++) {
-        var v = adj[u][i], nd = nodes[u].dist + v.len;
-        if (nd < nodes[v.to].dist) { nodes[v.to].dist = nd; queue.push(v.to); }
+    return null;
+  }
+
+  /* Walk one axis-aligned run, stopping at the band edge or before content.
+     Returns how far it got. */
+  function runLength(x, y, dx, dy, want, rects) {
+    var step = 4, gone = 0;
+    while (gone < want) {
+      var nx = x + dx * (gone + step), ny = y + dy * (gone + step);
+      if (outset(nx, ny) > BAND) break;
+      if (ny < barBox.t) break;          /* never rise past the bar: the feed is up there */
+      if (hits(x + dx * gone, y + dy * gone, nx, ny, rects)) break;
+      gone += step;
+    }
+    return gone;
+  }
+
+  /* Keep traces apart so they never read as a connected web */
+  function tooClose(pts, others, gap) {
+    for (var i = 0; i < pts.length - 1; i++) {
+      for (var o = 0; o < others.length; o++) {
+        var q = others[o].pts;
+        for (var k = 0; k < q.length - 1; k++) {
+          var ax = Math.min(pts[i].x, pts[i + 1].x) - gap, bx = Math.max(pts[i].x, pts[i + 1].x) + gap;
+          var ay = Math.min(pts[i].y, pts[i + 1].y) - gap, by = Math.max(pts[i].y, pts[i + 1].y) + gap;
+          var cx = Math.min(q[k].x, q[k + 1].x), dx2 = Math.max(q[k].x, q[k + 1].x);
+          var cy = Math.min(q[k].y, q[k + 1].y), dy2 = Math.max(q[k].y, q[k + 1].y);
+          if (bx >= cx && ax <= dx2 && by >= cy && ay <= dy2) return true;
+        }
       }
     }
-    /* drop anything the wavefront could never reach */
-    var keep = [], map = {};
-    for (i = 0; i < nodes.length; i++) if (nodes[i].dist < Infinity) { map[i] = keep.length; keep.push(nodes[i]); }
-    var kept = [];
-    for (i = 0; i < edges.length; i++) {
-      if (map[edges[i].a] !== undefined && map[edges[i].b] !== undefined) {
-        kept.push({ a: map[edges[i].a], b: map[edges[i].b], len: edges[i].len });
-      }
-    }
-    nodes = keep; edges = kept;
-    maxDist = 0;
-    for (i = 0; i < nodes.length; i++) if (nodes[i].dist > maxDist) maxDist = nodes[i].dist;
+    return false;
   }
 
   function build() {
-    nodes = []; edges = [];
-    var src = sourcePoint();
-    if (geometry === 'constellation') buildConstellation(src); else buildSpokes(src);
-    measure();
+    traces = [];
+    barBox = docRect(bar);
+    var band = grow(barBox, BAND + 20);   /* origin is set by place(), not here */
+    var rects = obstacles(band);
+
+    /* exit points on the bar's frame, each leaving at 90 degrees */
+    var starts = [], w = barBox.r - barBox.l, h = barBox.b - barBox.t, i;
+    var across = 9;
+    for (i = 0; i < across; i++) {
+      var fx = barBox.l + w * (i + 0.5) / across;
+      starts.push({ x: fx, y: barBox.b, dx: 0, dy: 1 });
+    }
+    for (i = 0; i < 2; i++) {
+      var fy = barBox.t + h * (i + 0.5) / 2;
+      starts.push({ x: barBox.l, y: fy, dx: -1, dy: 0 });
+      starts.push({ x: barBox.r, y: fy, dx: 1, dy: 0 });
+    }
+
+    for (i = 0; i < starts.length; i++) {
+      var s = starts[i], pts = [{ x: s.x, y: s.y }];
+      var x = s.x, y = s.y, dx = s.dx, dy = s.dy, ok = true;
+      var legs = 2 + (i % 2);                       /* 2 or 3 legs, uneven by design */
+      for (var leg = 0; leg < legs; leg++) {
+        var want = leg === 0 ? 34 + (i % 4) * 16 : 26 + ((i + leg) % 5) * 15;
+        var got = runLength(x, y, dx, dy, want, rects);
+        if (got < 20) { if (leg === 0) ok = false; break; }
+        x += dx * got; y += dy * got;
+        pts.push({ x: x, y: y });
+        if (leg < legs - 1) {                        /* right-angle turn only */
+          var turn = ((i + leg) % 2) ? 1 : -1;
+          var ndx = dy * turn, ndy = -dx * turn;
+          dx = ndx; dy = ndy;
+        }
+      }
+      if (!ok || pts.length < 2) continue;
+      if (tooClose(pts, traces, 12)) continue;
+
+      var len = 0, segs = [];
+      for (var p = 0; p < pts.length - 1; p++) {
+        var L = Math.abs(pts[p + 1].x - pts[p].x) + Math.abs(pts[p + 1].y - pts[p].y);
+        segs.push({ a: pts[p], b: pts[p + 1], from: len, len: L });
+        len += L;
+      }
+      traces.push({ pts: pts, segs: segs, len: len, pad: pts[pts.length - 1], lit: 0 });
+    }
   }
 
-  function resize() {
-    dpr = Math.min(window.devicePixelRatio || 1, 2);
-    W = window.innerWidth; H = window.innerHeight;
-    canvas.width = Math.floor(W * dpr); canvas.height = Math.floor(H * dpr);
+  function place() {
+    var band = grow(barBox, BAND + 20);
+    canvas.style.left = band.l + 'px';
+    canvas.style.top = band.t + 'px';
+    canvas.style.width = (band.r - band.l) + 'px';
+    canvas.style.height = (band.b - band.t) + 'px';
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.floor((band.r - band.l) * dpr);
+    canvas.height = Math.floor((band.b - band.t) * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    build();
+    origin = { x: band.l, y: band.t };
   }
 
-  /* Distance along the lines at a point on an edge. Where two branches meet
-     the shorter route wins, so a cycle lights from both ends. */
-  function distAt(e, t) {
-    var da = nodes[e.a].dist + t * e.len;
-    var db = nodes[e.b].dist + (1 - t) * e.len;
-    return da < db ? da : db;
+  /* fade to nothing at the edge of the band */
+  function fade(x, y) {
+    var d = outset(x, y);
+    return d >= BAND ? 0 : 1 - (d / BAND) * (d / BAND);
   }
-
-  /* Streak profile: transparent → green → transparent, as the timeline's gradient */
   function level(r, d) {
     var u = (r - d) / STREAK;
     return (u <= 0 || u >= 1) ? 0 : Math.sin(Math.PI * u);
   }
+  function smooth(v) { return v * v * (3 - 2 * v); }
 
-  function smooth(v) { return v * v * (3 - 2 * v); }   /* ease-in-out, as the dot transition */
-
-  function firePulse(strength) {
-    pulses.push({ start: performance.now(), level: strength });
-    if (promptBar) {
-      promptBar.classList.add('prompt-bar--pulse');
-      setTimeout(function () { promptBar.classList.remove('prompt-bar--pulse'); }, 260);
+  function firePulse(strength, all) {
+    if (!traces.length) return;
+    var picks = [];
+    if (all) { for (var i = 0; i < traces.length; i++) picks.push(i); }
+    else {
+      var n = 1 + (Math.random() < 0.4 ? 1 : 0);     /* one or two, never all */
+      while (picks.length < n) {
+        var k = Math.floor(Math.random() * traces.length);
+        if (picks.indexOf(k) < 0) picks.push(k);
+      }
     }
+    for (var p = 0; p < picks.length; p++) {
+      pulses.push({ i: picks[p], start: performance.now(), level: strength });
+    }
+    bar.classList.add('prompt-bar--pulse');
+    setTimeout(function () { bar.classList.remove('prompt-bar--pulse'); }, 240);
   }
 
-  function drawStatic() {
-    ctx.clearRect(0, 0, W, H);
-    ctx.lineWidth = 1; ctx.strokeStyle = LINE; ctx.beginPath();
-    for (var i = 0; i < edges.length; i++) {
-      ctx.moveTo(nodes[edges[i].a].x, nodes[edges[i].a].y);
-      ctx.lineTo(nodes[edges[i].b].x, nodes[edges[i].b].y);
-    }
-    ctx.stroke();
-    for (var n = 0; n < nodes.length; n++) drawNode(nodes[n], 0.18);
-  }
-
-  function drawNode(n, lit) {
+  function strokeSeg(a, b, alpha, wideLine) {
+    if (alpha <= 0.004) return;
     ctx.beginPath();
-    ctx.arc(n.x, n.y, NODE_R, 0, Math.PI * 2);
-    ctx.fillStyle = lit > 0.02 ? 'rgba(' + GREEN + ',' + (0.9 * lit).toFixed(3) + ')' : '#151B26';
-    ctx.fill();
-    ctx.lineWidth = 1;
-    ctx.strokeStyle = 'rgba(' + GREEN + ',' + (0.2 + 0.7 * lit).toFixed(3) + ')';
+    ctx.moveTo(a.x - origin.x, a.y - origin.y);
+    ctx.lineTo(b.x - origin.x, b.y - origin.y);
+    ctx.strokeStyle = 'rgba(' + GREEN + ',' + alpha.toFixed(3) + ')';
+    ctx.lineWidth = wideLine || 1;
     ctx.stroke();
-    if (lit > 0.02) {                                  /* the dot's soft halo */
-      ctx.beginPath();
-      ctx.arc(n.x, n.y, NODE_R + 4, 0, Math.PI * 2);
-      ctx.strokeStyle = 'rgba(' + GREEN + ',' + (0.28 * lit).toFixed(3) + ')';
-      ctx.lineWidth = 3;
-      ctx.stroke();
+  }
+
+  function drawPad(t, lit) {
+    var f = fade(t.pad.x, t.pad.y);
+    if (f <= 0) return;
+    var x = t.pad.x - origin.x - PAD / 2, y = t.pad.y - origin.y - PAD / 2;
+    if (lit > 0.02) {
+      ctx.fillStyle = 'rgba(' + GREEN + ',' + (0.85 * lit * f).toFixed(3) + ')';
+      ctx.fillRect(x, y, PAD, PAD);
+    }
+    ctx.strokeStyle = 'rgba(' + GREEN + ',' + ((REST + 0.55 * lit) * f).toFixed(3) + ')';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(x + 0.5, y + 0.5, PAD - 1, PAD - 1);
+  }
+
+  function paint(now, dt) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    var i, s, t;
+
+    /* traces at rest, sampled so they fade toward the band edge */
+    for (i = 0; i < traces.length; i++) {
+      t = traces[i];
+      for (s = 0; s < t.segs.length; s++) {
+        var seg = t.segs[s], STEPS = 6;
+        for (var k = 0; k < STEPS; k++) {
+          var p0 = { x: seg.a.x + (seg.b.x - seg.a.x) * (k / STEPS), y: seg.a.y + (seg.b.y - seg.a.y) * (k / STEPS) };
+          var p1 = { x: seg.a.x + (seg.b.x - seg.a.x) * ((k + 1) / STEPS), y: seg.a.y + (seg.b.y - seg.a.y) * ((k + 1) / STEPS) };
+          strokeSeg(p0, p1, REST * fade((p0.x + p1.x) / 2, (p0.y + p1.y) / 2));
+        }
+      }
+    }
+
+    /* the light running out to a pad */
+    for (var p = pulses.length - 1; p >= 0; p--) {
+      var pulse = pulses[p];
+      t = traces[pulse.i];
+      if (!t) { pulses.splice(p, 1); continue; }
+      var r = (now - pulse.start) / 1000 * SPEED;
+      if (r - STREAK > t.len + PAD) { pulses.splice(p, 1); continue; }
+      for (s = 0; s < t.segs.length; s++) {
+        var sg = t.segs[s];
+        if (sg.from + sg.len < r - STREAK || sg.from > r) continue;
+        var N = 8;
+        for (var q = 0; q < N; q++) {
+          var t0 = q / N, t1 = (q + 1) / N;
+          var lv = level(r, sg.from + sg.len * (t0 + t1) / 2);
+          if (lv < 0.03) continue;
+          var a = { x: sg.a.x + (sg.b.x - sg.a.x) * t0, y: sg.a.y + (sg.b.y - sg.a.y) * t0 };
+          var b = { x: sg.a.x + (sg.b.x - sg.a.x) * t1, y: sg.a.y + (sg.b.y - sg.a.y) * t1 };
+          var f = fade((a.x + b.x) / 2, (a.y + b.y) / 2) * lv * pulse.level;
+          strokeSeg(a, b, 0.10 * f, 4);            /* halo */
+          strokeSeg(a, b, 0.85 * f, 1);
+        }
+      }
+    }
+
+    /* pads fill as the light arrives, then drain */
+    var step = dt / FILL_MS;
+    for (i = 0; i < traces.length; i++) {
+      t = traces[i];
+      var target = 0;
+      for (p = 0; p < pulses.length; p++) {
+        if (pulses[p].i !== i) continue;
+        var pr = (now - pulses[p].start) / 1000 * SPEED;
+        if (pr >= t.len - PAD / 2 + PAD * 0.1 && pr - STREAK <= t.len + PAD * 0.1) {
+          if (pulses[p].level > target) target = pulses[p].level;
+        }
+      }
+      if (t.lit < target) t.lit = Math.min(target, t.lit + step);
+      else if (t.lit > target) t.lit = Math.max(target, t.lit - step);
+      drawPad(t, smooth(t.lit));
     }
   }
 
@@ -862,90 +961,39 @@
     var dt = now - lastFrame;
     if (dt < FRAME) return;
     lastFrame = now;
-
-    /* schedule: faster while typing */
+    /* The bar can shift after first paint (fonts, images, late layout).
+       Re-measure each frame and rebuild if it has actually moved. */
+    var live = docRect(bar);
+    if (Math.abs(live.t - barBox.t) > 1 || Math.abs(live.l - barBox.l) > 1 ||
+        Math.abs(live.r - barBox.r) > 1 || Math.abs(live.b - barBox.b) > 1) {
+      barBox = live; place(); build(); pulses = [];
+      return;
+    }
     var gap = now < typingUntil ? TYPING_GAP : IDLE_GAP;
-    if (now - lastPulse > gap) { lastPulse = now; firePulse(now < typingUntil ? TYPING_LEVEL : IDLE_LEVEL); }
-
-    ctx.clearRect(0, 0, W, H);
-
-    /* base hairlines, one path */
-    ctx.lineWidth = 1; ctx.strokeStyle = LINE; ctx.beginPath();
-    var i, e;
-    for (i = 0; i < edges.length; i++) {
-      ctx.moveTo(nodes[edges[i].a].x, nodes[edges[i].a].y);
-      ctx.lineTo(nodes[edges[i].b].x, nodes[edges[i].b].y);
-    }
-    ctx.stroke();
-
-    /* pulses */
-    var SEG = 9, p, k;
-    for (p = pulses.length - 1; p >= 0; p--) {
-      var pulse = pulses[p];
-      var r = (now - pulse.start) / 1000 * SPEED;
-      if (r - STREAK > maxDist + NODE_D) { pulses.splice(p, 1); continue; }
-      for (i = 0; i < edges.length; i++) {
-        e = edges[i];
-        var lo = Math.min(nodes[e.a].dist, nodes[e.b].dist);
-        var hi = lo + e.len;
-        if (hi < r - STREAK || lo > r) continue;      /* edge outside the band */
-        for (k = 0; k < SEG; k++) {
-          var t0 = k / SEG, t1 = (k + 1) / SEG;
-          var lv = level(r, distAt(e, (t0 + t1) / 2));
-          if (lv < 0.03) continue;
-          var ax = nodes[e.a].x + (nodes[e.b].x - nodes[e.a].x) * t0;
-          var ay = nodes[e.a].y + (nodes[e.b].y - nodes[e.a].y) * t0;
-          var bx = nodes[e.a].x + (nodes[e.b].x - nodes[e.a].x) * t1;
-          var by = nodes[e.a].y + (nodes[e.b].y - nodes[e.a].y) * t1;
-          var alpha = lv * pulse.level;
-          ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(bx, by);
-          ctx.strokeStyle = 'rgba(' + GREEN + ',' + (0.10 * alpha).toFixed(3) + ')';
-          ctx.lineWidth = 5; ctx.stroke();            /* halo, standing in for the streak's box-shadow */
-          ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(bx, by);
-          ctx.strokeStyle = 'rgba(' + GREEN + ',' + (0.85 * alpha).toFixed(3) + ')';
-          ctx.lineWidth = 1.4; ctx.stroke();
-        }
-      }
-    }
-
-    /* nodes: fill when the leading edge is ~10% in, drain ~10% past */
-    var step = dt / FILL_MS;
-    for (i = 0; i < nodes.length; i++) {
-      var n = nodes[i], target = 0;
-      for (p = 0; p < pulses.length; p++) {
-        var pr = (now - pulses[p].start) / 1000 * SPEED;
-        if (pr >= n.dist - NODE_R + NODE_D * 0.1 && pr - STREAK <= n.dist + NODE_D * 0.1) {
-          if (pulses[p].level > target) target = pulses[p].level;
-        }
-      }
-      if (n.lit < target) n.lit = Math.min(target, n.lit + step);
-      else if (n.lit > target) n.lit = Math.max(target, n.lit - step);
-      drawNode(n, smooth(n.lit));
-    }
+    if (now - lastPulse > gap) { lastPulse = now; firePulse(now < typingUntil ? TYPING_LEVEL : IDLE_LEVEL, false); }
+    paint(now, dt);
   }
 
+  function stop() { if (raf) { cancelAnimationFrame(raf); raf = null; } }
   function start() {
     if (raf || !wide.matches) return;
-    if (reduced.matches) { drawStatic(); return; }
-    lastFrame = 0; lastPulse = performance.now() - IDLE_GAP + 600;
+    lastFrame = 0; lastPulse = performance.now() - IDLE_GAP + 1200;
     raf = requestAnimationFrame(frame);
-  }
-  function stop() {
-    if (raf) { cancelAnimationFrame(raf); raf = null; }
   }
   function refresh() {
     stop();
-    ctx.clearRect(0, 0, W, H);
-    if (!wide.matches) return;
-    resize();
-    if (reduced.matches) drawStatic(); else start();
+    if (!wide.matches) { canvas.style.width = '0px'; canvas.style.height = '0px'; return; }
+    barBox = docRect(bar);
+    place();
+    build();
+    if (reduced.matches) { paint(performance.now(), 0); return; }   /* static board */
+    start();
   }
 
-  /* triggers */
   var input = document.querySelector('[data-prompt-input]');
-  if (input) input.addEventListener('input', function () { typingUntil = performance.now() + 2200; });
+  if (input) input.addEventListener('input', function () { typingUntil = performance.now() + 2500; });
   var send = document.querySelector('[data-prompt-send]');
-  if (send) send.addEventListener('click', function () { firePulse(SEND_LEVEL); lastPulse = performance.now(); });
+  if (send) send.addEventListener('click', function () { firePulse(SEND_LEVEL, true); lastPulse = performance.now(); });
 
   var rt;
   window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(refresh, 200); });
@@ -953,17 +1001,23 @@
   if (wide.addEventListener) wide.addEventListener('change', refresh); else wide.addListener(refresh);
   if (reduced.addEventListener) reduced.addEventListener('change', refresh);
 
-  window.prophetBackground = {
-    geometry: function (name) {
-      if (name !== 'spokes' && name !== 'constellation') return geometry;
-      geometry = name;
-      try { localStorage.setItem('prophet_bg', name); } catch (e) {}
-      refresh();
-      return geometry;
-    },
-    current: function () { return geometry; },
-    pulse: function (strength) { firePulse(strength || SEND_LEVEL); }
+  window.prophetBoard = {
+    pulse: function (s) { firePulse(s || SEND_LEVEL, false); },
+    all: function () { firePulse(SEND_LEVEL, true); },
+    rest: function (v) { REST = v; return REST; },
+    traces: function () { return traces.length; }
   };
 
-  refresh();
+  /* The bar moves as web fonts load and the layout settles, so rebuild on
+     every event that can shift it rather than trusting the first measurement. */
+  var settle;
+  function later() { clearTimeout(settle); settle = setTimeout(refresh, 120); }
+  window.addEventListener('load', later);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(later);
+  if (window.ResizeObserver) {
+    var ro = new ResizeObserver(later);
+    ro.observe(document.body);
+    if (bar.parentElement) ro.observe(bar.parentElement);
+  }
+  later();
 })();
