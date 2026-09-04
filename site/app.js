@@ -676,6 +676,8 @@
      30px wide. A climb has to zigzag inside it without going past the arrow,
      so its sideways steps are allowed to be shorter than a normal leg. */
   var MIN_JOG = 20;
+  var MAX_LEG = 300;   /* no single straight run longer than this: a long route
+                          has to be made of several legs, not one missile */
 
   var wide    = window.matchMedia('(min-width: 1024px)');
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -755,23 +757,37 @@
     return gone;
   }
 
-  /* One fresh route. Returns null if it could not be laid down.
-     Two shapes: a short run off the bottom edge, or a climb that leaves a
-     side edge, reaches the margin, then zigzags up in a column. */
-  var recent = [];                                    /* last few sides used */
+  /* ══ Route planner ══════════════════════════════════════
+     Owns route shape and variety, and nothing else. The rest of the board
+     just asks it for a route and draws it.
+
+       P1  No doubling back. Each axis moves one way only: a route picks one
+           horizontal direction and one vertical direction and never reverses
+           either. Doubling back is impossible by construction, not by check.
+       P2  Length is chosen first, from weighted classes, so runs are not all
+           long. Short and mid runs are the common case.
+       P3  Five families of shape, so routes are not all the same gesture.
+       P4  Never the same side of the bar three times running, and left and
+           right are equally weighted.
+       P5  Nothing goes past the carousel's arrows.
+     ═══════════════════════════════════════════════════════ */
+
+  var recent = [];                                    /* sides of recent routes */
+
+  function pickWeighted(items) {
+    var total = 0, i;
+    for (i = 0; i < items.length; i++) total += items[i].w;
+    var roll = Math.random() * total;
+    for (i = 0; i < items.length; i++) { roll -= items[i].w; if (roll <= 0) return items[i]; }
+    return items[items.length - 1];
+  }
 
   function pickSide() {
-    var opts = ['left', 'right', 'down'];
-    /* Never the same side three times running: that is what made it look
-       like five in a row down one margin. */
+    var opts = [{ k: 'left', w: 0.34 }, { k: 'right', w: 0.34 }, { k: 'down', w: 0.32 }];
     if (recent.length >= 2 && recent[0] === recent[1]) {
-      opts = opts.filter(function (s) { return s !== recent[0]; });
+      opts = opts.filter(function (o) { return o.k !== recent[0]; });
     }
-    var w = { left: 0.36, right: 0.36, down: 0.28 }, total = 0, i;
-    for (i = 0; i < opts.length; i++) total += w[opts[i]];
-    var roll = Math.random() * total;
-    for (i = 0; i < opts.length; i++) { roll -= w[opts[i]]; if (roll <= 0) break; }
-    return opts[Math.min(i, opts.length - 1)];
+    return pickWeighted(opts).k;
   }
 
   function remember(side) {
@@ -779,7 +795,7 @@
     if (recent.length > 3) recent.pop();
   }
 
-  function finish(pts) {
+  function finish(pts, side) {
     if (pts.length < 2) return null;
     var segs = [], len = 0;
     for (var p = 0; p < pts.length - 1; p++) {
@@ -788,79 +804,119 @@
       segs.push({ a: pts[p], b: pts[p + 1], from: len, len: L });
       len += L;
     }
-    if (!segs.length || len < 90) return null;
+    if (!segs.length || len < 80) return null;
+    remember(side);
     return { pts: pts, segs: segs, len: len, pad: pts[pts.length - 1] };
   }
 
+  /* A walker that can only ever move in its two chosen directions (P1). */
+  function walker(x, y, hDir, vDir, list) {
+    var pts = [{ x: x, y: y }];
+    return {
+      x: function () { return x; },
+      y: function () { return y; },
+      go: function (axis, want) {                     /* 'h' or 'v' */
+        want = Math.min(want, MAX_LEG);
+        var dx = axis === 'h' ? hDir : 0, dy = axis === 'v' ? vDir : 0;
+        var got = march(x, y, dx, dy, want, list);
+        if (got < MIN_JOG) return 0;
+        x += dx * got; y += dy * got;
+        pts.push({ x: x, y: y });
+        return got;
+      },
+      pts: function () { return pts; }
+    };
+  }
+
   function makeRoute() {
-    var w = barBox.r - barBox.l, h = barBox.b - barBox.t;
     var side = pickSide();
-    var pts, x, y, got;
+    var barW = barBox.r - barBox.l, barH = barBox.b - barBox.t;
 
-    if (side === 'down') {                            /* short run off the bottom */
-      x = barBox.l + w * rnd(0.10, 0.90); y = barBox.b;
-      pts = [{ x: x, y: y }];
-      got = march(x, y, 0, 1, rnd(46, 120), rects);
-      if (got < MIN_LEG) return null;
-      y += got; pts.push({ x: x, y: y });
-      var dir = Math.random() < 0.5 ? -1 : 1;
-      got = march(x, y, dir, 0, rnd(70, 240), offBar);
-      if (got >= MIN_LEG) { x += dir * got; pts.push({ x: x, y: y }); }
-      if (Math.random() < 0.45) {
-        got = march(x, y, 0, 1, rnd(50, 120), offBar);
-        if (got >= MIN_LEG) { y += got; pts.push({ x: x, y: y }); }
-      }
-      var r1 = finish(pts);
-      if (r1) remember(side);
-      return r1;
+    /* P2: how long this one wants to be, chosen before its shape */
+    var size = pickWeighted([
+      { k: 'short', w: 0.30, span: [90, 200] },
+      { k: 'mid',   w: 0.34, span: [210, 380] },
+      { k: 'long',  w: 0.24, span: [390, 620] },
+      { k: 'tall',  w: 0.12, span: [640, 900] }
+    ]);
+    var budget = rnd(size.span[0], size.span[1]);
+
+    var startX, startY, hDir, vDir, w;
+
+    if (side === 'down') {
+      startX = barBox.l + barW * rnd(0.12, 0.88);
+      startY = barBox.b;
+      hDir = Math.random() < 0.5 ? -1 : 1;
+      vDir = 1;
+      w = walker(startX, startY, hDir, vDir, rects);
+      if (!w.go('v', Math.min(rnd(46, 110), budget))) return null;
+      w = walker(w.x(), w.y(), hDir, vDir, offBar);
+      w.go('h', rnd(70, Math.max(90, budget * 0.6)));
+      if (Math.random() < 0.4) w.go('v', rnd(46, 90));
+      var d = w.pts(); d.unshift({ x: startX, y: startY });
+      return finish(d, side);
     }
 
-    /* A climb. Reach a column in the margin, clear of the cards but well
-       inside the page, then zigzag up it. */
-    var out = side === 'left' ? -1 : 1;
-    var lane = side === 'left'
-      ? rnd(leftX + 6, colLeft - 6)                   /* between the arrow's edge and the cards */
-      : rnd(colRight + 6, rightX - 6);
-    x = side === 'left' ? barBox.l : barBox.r;
-    y = barBox.t + h * rnd(0.34, 0.66);
-    pts = [{ x: x, y: y }];
+    /* side exits: out into the margin, then up */
+    hDir = side === 'left' ? -1 : 1;
+    vDir = -1;
+    startX = side === 'left' ? barBox.l : barBox.r;
+    startY = barBox.t + barH * rnd(0.34, 0.66);
+    w = walker(startX, startY, hDir, vDir, rects);
 
-    got = march(x, y, out, 0, Math.abs(lane - x), rects);
-    if (got < MIN_LEG) return null;
-    x += out * got; y = y; pts.push({ x: x, y: y });
+    /* P3: five families. Which are possible depends on the budget. */
+    var fam = pickWeighted(
+      budget < 210 ? [{ k: 'stub', w: 1 }]
+    : budget < 390 ? [{ k: 'elbow', w: 0.55 }, { k: 'runner', w: 0.45 }]
+    : budget < 640 ? [{ k: 'elbow', w: 0.3 }, { k: 'terrace', w: 0.45 }, { k: 'runner', w: 0.25 }]
+                   : [{ k: 'riser', w: 1 }]
+    ).k;
 
-    /* zigzag: up a chunk, jog sideways, up again. Every vertical leg goes
-       up, so the route can never work its way back toward the bar. */
-    var target = headroom * rnd(0.26, 1.02);
-    var climbed = 0, jog = Math.random() < 0.5 ? -1 : 1, steps = 0, detours = 0;
-    while (climbed < target && steps < 9) {
-      var wantUp = Math.min(rnd(85, 165), target - climbed);   /* short enough that a tall climb must jog */
-      if (wantUp < MIN_LEG) break;
-      got = march(x, y, 0, -1, wantUp, offBar);
+    var lane = side === 'left' ? rnd(leftX + 6, colLeft - 8) : rnd(colRight + 8, rightX - 6);
+    var toLane = Math.abs(lane - startX);
+    var used = 0, got;
 
-      if (got < MIN_LEG) {                            /* something in the way */
-        if (detours >= 2) break;
-        var away = march(x, y, out, 0, rnd(20, 34), offBar);   /* step aside */
-        if (away < MIN_JOG) break;
-        x += out * away; pts.push({ x: x, y: y });
-        detours++; steps++;
-        continue;                                     /* and try climbing again */
-      }
-
-      y -= got; climbed += got; pts.push({ x: x, y: y });
-      steps++;
-      if (climbed >= target - MIN_LEG) break;
-      var wantJog = rnd(MIN_JOG, 30);
-      got = march(x, y, jog, 0, wantJog, offBar);
-      if (got < MIN_JOG) { jog = -jog; got = march(x, y, jog, 0, wantJog, offBar); }
-      if (got < MIN_JOG) break;
-      x += jog * got; pts.push({ x: x, y: y });
-      jog = -jog;                                     /* zigzag, not a drift */
-      steps++;
+    if (fam === 'stub') {                             /* barely leaves the bar */
+      got = w.go('h', Math.min(budget * rnd(0.55, 0.85), toLane));
+      if (!got) return null;
+      w.go('v', budget - got);
+      return finish(w.pts(), side);
     }
-    var r2 = finish(pts);
-    if (r2) remember(side);
-    return r2;
+
+    if (fam === 'runner') {                           /* mostly sideways */
+      got = w.go('h', Math.min(budget * rnd(0.7, 0.9), toLane));
+      if (!got) return null;
+      used = got;
+      w.go('v', Math.max(MIN_LEG, budget - used));
+      return finish(w.pts(), side);
+    }
+
+    if (fam === 'elbow') {                            /* out, then straight up */
+      got = w.go('h', toLane);
+      if (!got) return null;
+      used = got;
+      w.go('v', Math.max(MIN_LEG, budget - used));
+      return finish(w.pts(), side);
+    }
+
+    /* terrace and riser both climb the channel in steps. Every step moves the
+       same way horizontally, so the route never comes back on itself. */
+    got = w.go('h', toLane);
+    if (!got) return null;
+    used = got;
+    var steps = fam === 'terrace' ? 2 : 3;
+    for (var s = 0; s < steps && used < budget - MIN_LEG; s++) {
+      var rise = Math.min(rnd(110, 190), budget - used);
+      got = w.go('v', rise);
+      if (!got) break;
+      used += got;
+      if (used >= budget - MIN_LEG) break;
+      got = w.go('h', rnd(MIN_JOG, 28));              /* a small step, same way */
+      if (!got) break;
+      used += got;
+    }
+    if (used < budget - MIN_LEG) w.go('v', budget - used);
+    return finish(w.pts(), side);
   }
 
   function measure() {
