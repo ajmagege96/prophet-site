@@ -1143,7 +1143,8 @@ ul, ol { list-style: none; }
   }
   .filters::-webkit-scrollbar { display: none; }
   .filters__tag { flex: 0 0 auto; min-height: 34px; padding: 0 12px; display: inline-flex; align-items: center; }
-  .vote-btn, .vote__btn { min-height: 34px; padding: 0 12px; display: inline-flex; align-items: center; justify-content: center; gap: 4px; }
+  /* same height as desktop: padding only, no min-height */
+  .vote-btn, .vote__btn { min-height: 0; padding: 4px 12px; display: inline-flex; align-items: center; justify-content: center; gap: 4px; }
   .range__tab, .seg__opt { min-height: 32px; display: inline-flex; align-items: center; justify-content: center; }
   .range { gap: 6px; }
   .range__tab { padding: 0 6px; }
@@ -1199,7 +1200,7 @@ ul, ol { list-style: none; }
   .prow__bottom, .prow__side > .prow__meta { justify-content: flex-end; text-align: right; }
   .prow__state, .prow__bottom { font-size: 8.5px; }
   .prow__state { gap: 3px; }
-  .prow__side .vote__btn { font-size: 9px; padding: 0 10px; }
+  .prow__side .vote__btn { font-size: 9px; padding: 4px 10px; }
   .prow__bottom { gap: 3px 8px; }
   .prow__q { font-size: 13px; }
   .prow__thesis { font-size: 11px; }
