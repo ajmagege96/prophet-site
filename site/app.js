@@ -832,86 +832,91 @@
     var side = pickSide();
     var barW = barBox.r - barBox.l, barH = barBox.b - barBox.t;
 
-    /* P2: how long this one wants to be, chosen before its shape */
+    /* P2: length first, then a shape that fits it. Weighted so short and mid
+       runs are the common case and a tall climb is rare. */
     var size = pickWeighted([
-      { k: 'short', w: 0.30, span: [90, 200] },
-      { k: 'mid',   w: 0.34, span: [210, 380] },
-      { k: 'long',  w: 0.24, span: [390, 620] },
-      { k: 'tall',  w: 0.12, span: [640, 900] }
+      { k: 'short', w: 0.28, span: [90, 190] },
+      { k: 'mid',   w: 0.28, span: [200, 380] },
+      { k: 'long',  w: 0.26, span: [400, 600] },
+      { k: 'tall',  w: 0.18, span: [620, 880] }
     ]);
     var budget = rnd(size.span[0], size.span[1]);
-
-    var startX, startY, hDir, vDir, w;
+    var w, got, used = 0;
 
     if (side === 'down') {
-      startX = barBox.l + barW * rnd(0.12, 0.88);
-      startY = barBox.b;
-      hDir = Math.random() < 0.5 ? -1 : 1;
-      vDir = 1;
-      w = walker(startX, startY, hDir, vDir, rects);
-      if (!w.go('v', Math.min(rnd(46, 110), budget))) return null;
-      w = walker(w.x(), w.y(), hDir, vDir, offBar);
-      w.go('h', rnd(70, Math.max(90, budget * 0.6)));
-      if (Math.random() < 0.4) w.go('v', rnd(46, 90));
-      var d = w.pts(); d.unshift({ x: startX, y: startY });
+      /* The band under the bar is open all the way across. Use its whole
+         width and depth rather than dropping straight down every time. */
+      var sx = barBox.l + barW * rnd(0.06, 0.94);
+      var hd = Math.random() < 0.5 ? -1 : 1;
+      w = walker(sx, barBox.b, hd, 1, rects);
+      got = w.go('v', Math.min(rnd(40, 130), budget));
+      if (!got) return null;
+      used = got;
+      w = walker(w.x(), w.y(), hd, 1, offBar);
+      var ax = 'h', n = 1;
+      while (used < budget - MIN_LEG && n < 9) {
+        got = w.go(ax, Math.min(budget - used, rnd(80, 280)));
+        if (!got) break;
+        used += got; n++;
+        ax = ax === 'h' ? 'v' : 'h';
+      }
+      var d = w.pts(); d.unshift({ x: sx, y: barBox.b });
       return finish(d, side);
     }
 
-    /* side exits: out into the margin, then up */
-    hDir = side === 'left' ? -1 : 1;
-    vDir = -1;
-    startX = side === 'left' ? barBox.l : barBox.r;
-    startY = barBox.t + barH * rnd(0.34, 0.66);
+    /* Side exits. Up and down are both used: the band below the bar is as
+       open as the margin above it. */
+    var hDir = side === 'left' ? -1 : 1;
+    var goingUp = Math.random() < 0.58;
+    var vDir = goingUp ? -1 : 1;
+    var startX = side === 'left' ? barBox.l : barBox.r;
+    var startY = barBox.t + barH * rnd(0.28, 0.72);
     w = walker(startX, startY, hDir, vDir, rects);
-
-    /* P3: five families. Which are possible depends on the budget. */
-    var fam = pickWeighted(
-      budget < 210 ? [{ k: 'stub', w: 1 }]
-    : budget < 390 ? [{ k: 'elbow', w: 0.55 }, { k: 'runner', w: 0.45 }]
-    : budget < 640 ? [{ k: 'elbow', w: 0.3 }, { k: 'terrace', w: 0.45 }, { k: 'runner', w: 0.25 }]
-                   : [{ k: 'riser', w: 1 }]
-    ).k;
 
     var lane = side === 'left' ? rnd(leftX + 6, colLeft - 8) : rnd(colRight + 8, rightX - 6);
     var toLane = Math.abs(lane - startX);
-    var used = 0, got;
 
-    if (fam === 'stub') {                             /* barely leaves the bar */
-      got = w.go('h', Math.min(budget * rnd(0.55, 0.85), toLane));
-      if (!got) return null;
-      w.go('v', budget - got);
-      return finish(w.pts(), side);
-    }
+    /* Only a tall climb needs the channel by the cards. Everything else turns
+       at a point spread across the open margin, so runs do not all hug the
+       same line. */
+    var fam = pickWeighted(
+      budget < 200 ? [{ k: 'stub', w: 1 }]
+    : budget < 370 ? [{ k: 'elbow', w: 0.5 }, { k: 'runner', w: 0.5 }]
+    : budget < 580 ? [{ k: 'elbow', w: 0.34 }, { k: 'runner', w: 0.33 }, { k: 'terrace', w: 0.33 }]
+                   : [{ k: 'riser', w: 0.7 }, { k: 'terrace', w: 0.3 }]
+    ).k;
 
-    if (fam === 'runner') {                           /* mostly sideways */
-      got = w.go('h', Math.min(budget * rnd(0.7, 0.9), toLane));
-      if (!got) return null;
-      used = got;
-      w.go('v', Math.max(MIN_LEG, budget - used));
-      return finish(w.pts(), side);
-    }
-
-    if (fam === 'elbow') {                            /* out, then straight up */
-      got = w.go('h', toLane);
+    if (fam === 'stub' || fam === 'elbow' || fam === 'runner') {
+      /* Alternating legs, always in the two chosen directions, until the
+         length is used up. Long runs become staircases across the open
+         margin rather than stopping short. */
+      var first = fam === 'runner' ? rnd(0.55, 0.8) : (fam === 'stub' ? rnd(0.45, 0.75) : rnd(0.28, 0.5));
+      got = w.go('h', Math.min(budget * first, toLane));
       if (!got) return null;
       used = got;
-      w.go('v', Math.max(MIN_LEG, budget - used));
+      var axis = 'v', legs = 1;
+      while (used < budget - MIN_LEG && legs < 9) {
+        var want = Math.min(budget - used, rnd(70, 240));
+        got = w.go(axis, want);
+        if (!got) break;
+        used += got; legs++;
+        axis = axis === 'h' ? 'v' : 'h';
+      }
       return finish(w.pts(), side);
     }
 
-    /* terrace and riser both climb the channel in steps. Every step moves the
-       same way horizontally, so the route never comes back on itself. */
+    /* terrace and riser climb the channel in steps, every step the same way
+       horizontally so the route never comes back on itself */
     got = w.go('h', toLane);
     if (!got) return null;
     used = got;
     var steps = fam === 'terrace' ? 2 : 3;
     for (var s = 0; s < steps && used < budget - MIN_LEG; s++) {
-      var rise = Math.min(rnd(110, 190), budget - used);
-      got = w.go('v', rise);
+      got = w.go('v', Math.min(rnd(100, 180), budget - used));
       if (!got) break;
       used += got;
       if (used >= budget - MIN_LEG) break;
-      got = w.go('h', rnd(MIN_JOG, 28));              /* a small step, same way */
+      got = w.go('h', rnd(MIN_JOG, 28));
       if (!got) break;
       used += got;
     }

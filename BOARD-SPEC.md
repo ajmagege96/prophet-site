@@ -32,10 +32,13 @@ and nothing else; the rest of the board just asks it for a route and draws it.
 16. **No doubling back.** A route picks one horizontal and one vertical
     direction and can only move those two ways. Reversing is impossible by
     construction, not by a check afterwards.
-17. Length is chosen first, from weighted classes, so runs are not all long:
-    roughly 45% short, 35% mid, 14% long, 6% tall.
-18. Five families of shape — stub, elbow, runner, terrace, riser — so routes
-    are not all the same gesture.
+17. Length is chosen first, from weighted classes, so runs are not all long.
+    A route then adds legs until it reaches that length rather than stopping
+    after two and coming up short.
+18. Five families of shape — stub, elbow, runner, terrace, riser — and a
+    turn point spread across the open margin, so routes do not all hug the
+    same line. Side routes go down as often as up: the band under the bar is
+    as usable as the margin above it.
 19. Never the same side of the bar three times running; left, right and down
     are equally weighted.
 20. No single straight leg longer than 300px, so a long route is several
@@ -55,19 +58,25 @@ and nothing else; the rest of the board just asks it for a route and draws it.
 
 ---
 
-## Verified (773 sampled routes, 1440x1000)
+## Verified (718 sampled routes, 1440x1000)
 
 | Rule | Result |
 |---|---|
-| no doubling back | **0** across 773 routes |
+| no doubling back | **0** |
 | no diagonals | 0 |
-| never above the cards | 0 |
-| never off the page | 0 |
+| never above the cards, never off the page | 0, 0 |
 | never past the arrows | x 169-1271; arrows at 168 and 1272 |
 | ends on a pad | 0 missing |
-| fresh route each flash | 733 distinct out of 773 |
-| length spread | p10 112, median 212, p90 544, max 788 |
-| by class | 340 short, 275 mid, 107 long, 51 tall |
+| fresh route each flash | 700 distinct out of 718 |
+| length spread | p10 112, median 244, p90 476, max 792 |
+| by class | 285 short, 328 mid, 62 long, 43 tall |
 | no missiles | longest single leg 300px |
-| sides balanced | left 283, right 271, down 219; worst run 2 |
-| climbs go far | up to 568px |
+| sides balanced | left 238, right 242, down 238; worst run 2 |
+
+### Why climbs only happen in the side channels
+The takes feed and the cards together cover x 220-1220 for the full height of
+the hero. Anywhere between those, a trace going up runs into content within a
+few pixels. The only vertical corridors are the margins outside them. With the
+"never past the arrows" rule those margins are the 30px channels at 168-200 and
+1240-1272. Widening a climb means either allowing traces past the arrows, or
+letting them cross the feed.
