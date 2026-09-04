@@ -671,7 +671,7 @@
   var FRAME   = 1000 / 60;   /* 60fps: at 200px/s, 30fps reads as steps */
   var CLEAR   = 20;    /* keep this far off any content, pad included */
 
-  var IDLE_GAP = 3800, TYPING_GAP = 3800;   /* one steady beat, typing included */
+  var IDLE_GAP = 3000, TYPING_GAP = 3000;   /* one steady beat, typing included */
   var MAX_LIVE = 2;    /* the beat is slow, so one or two are moving */
   var IDLE_LEVEL = 0.72, TYPING_LEVEL = 0.85, SEND_LEVEL = 1;
   var PEAK = 0.62;     /* the roadmap streak peaks at 0.9; this is the same, dimmer */
