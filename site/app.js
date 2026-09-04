@@ -647,61 +647,60 @@
   });
 })();
 
-/* ── Circuit board around the prompt bar ──────────────── */
-/* Desktop only (1024px+). Traces leave the bar's frame at 90 degrees,
-   run straight, turn at right angles, and end in a small square pad.
-   No diagonals, no curves, no trace touches another. Everything stays
-   inside a ~250px band around the bar and fades to nothing at its edge.
-   A trace that would cross text or a card is cut short before it.
-   Light travels a trace from the bar to its pad, the pad fills, then
-   drains — the same fill/drain language as the roadmap timeline. */
+/* ── Circuit board behind the prompt bar ──────────────── */
+/* Desktop only (1024px+), home page only, decorative.
+ *
+ * Rebuilt so the failures that kept recurring are structurally impossible:
+ *   - ONE run exists at a time, because it is a single variable, not a list.
+ *   - The beat is its own timer. One tick = one flash = one run. There is no
+ *     condition, cap or return value it can fall through.
+ *   - A run always ends before the next tick, because MAX_LEN is derived
+ *     from the beat rather than guessed.
+ *
+ * Language is the roadmap timeline's: a 160px green streak at 200px/s and
+ * square pads that fill as the light lands and drain behind it.
+ */
 (function () {
   var canvas = document.querySelector('[data-board]');
   var bar = document.querySelector('.prompt-bar');
   if (!canvas || !bar || !canvas.getContext) return;
   var ctx = canvas.getContext('2d');
 
-  var GREEN = '16, 240, 95';
-  var BAND    = 900;   /* far enough to climb the margins to the header */
-  var REST    = 0;     /* invisible until a pulse runs over it */
-  var PAD     = 6;     /* square pad, px */
-  var SPEED   = 200;   /* px per second, as the roadmap streak */
-  var STREAK  = 160;   /* as .timeline__light height */
-  var FILL_MS = 400;   /* pad fill/drain, as the timeline dot */
-  var FRAME   = 1000 / 60;   /* 60fps: at 200px/s, 30fps reads as steps */
-  var CLEAR   = 20;    /* keep this far off any content, pad included */
+  var GREEN  = '16, 240, 95';
+  var BEAT   = 3000;   /* ms between flashes */
+  var SPEED  = 200;    /* px/s, the roadmap streak */
+  var STREAK = 160;    /* px, the roadmap streak length */
+  var DRAIN  = 300;    /* ms for a pad to fade once the light has passed */
+  var PADSZ  = 6;
+  var PEAK   = 0.62;   /* the roadmap peaks at 0.9; this is dimmer */
 
-  var IDLE_GAP = 3000, TYPING_GAP = 3000;   /* one steady beat, typing included */
-  var MAX_LIVE = 8;    /* high enough that a beat is never blocked */
-  /* A run lasts (len + STREAK + PAD) / SPEED. At a 3s beat, 434px is the
-     longest that is gone before the next flash, so only one is ever on
-     screen. Anything longer and two or three overlap. */
-  var MAX_LEN  = 400;   /* (400 + 166) / 200 = 2.83s, clear of the 3s beat */
-  var IDLE_LEVEL = 0.72, TYPING_LEVEL = 0.85, SEND_LEVEL = 1;
-  var PEAK = 0.62;     /* the roadmap streak peaks at 0.9; this is the same, dimmer */
+  /* The longest run that is completely gone before the next flash. */
+  var MAX_LEN = Math.floor(BEAT / 1000 * SPEED - STREAK - SPEED * DRAIN / 1000 - 20);
+
+  var BAND = 520, CLEAR = 20, MIN_LEG = 48;
 
   var wide    = window.matchMedia('(min-width: 1024px)');
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-  var traces = [], pulses = [], origin = { x: 0, y: 0 }, barBox = null, heroBox = null;
-  var raf = null, lastFrame = 0, nextBeat = 0, typingUntil = 0, lastStart = null;
+  var traces = [], run = null, origin = { x: 0, y: 0 };
+  var barBox = null, ceiling = 0, floorY = 0, beatTimer = null, raf = null, lastPick = -1;
 
   function docRect(el) {
     var r = el.getBoundingClientRect();
     return { l: r.left + scrollX, t: r.top + scrollY, r: r.right + scrollX, b: r.bottom + scrollY };
   }
   function grow(r, n) { return { l: r.l - n, t: r.t - n, r: r.r + n, b: r.b + n }; }
+  function rnd(a, b) { return a + Math.random() * (b - a); }
 
-  /* An element inside a scrolling box still reports its full rect even when
-     it is scrolled out of sight. Clip to every clipping ancestor so only the
-     part actually on screen counts as an obstacle. */
+  /* An element inside a scrolling box still reports its full rect when
+     scrolled out of sight, so clip to every clipping ancestor. */
   function visibleRect(el) {
     var r = docRect(el), p = el.parentElement;
     while (p && p !== document.body) {
-      var ov = getComputedStyle(p).overflow + getComputedStyle(p).overflowY + getComputedStyle(p).overflowX;
-      if (/hidden|auto|scroll/.test(ov)) {
-        var pr = docRect(p);
-        r = { l: Math.max(r.l, pr.l), t: Math.max(r.t, pr.t), r: Math.min(r.r, pr.r), b: Math.min(r.b, pr.b) };
+      var cs = getComputedStyle(p);
+      if (/hidden|auto|scroll/.test(cs.overflow + cs.overflowX + cs.overflowY)) {
+        var q = docRect(p);
+        r = { l: Math.max(r.l, q.l), t: Math.max(r.t, q.t), r: Math.min(r.r, q.r), b: Math.min(r.b, q.b) };
         if (r.r <= r.l || r.b <= r.t) return null;
       }
       p = p.parentElement;
@@ -709,434 +708,263 @@
     return r;
   }
 
-  /* Whole content regions are blocked, not just the text inside them, so a
-     trace never threads between two lines of a list. Small text elements are
-     added as well, to catch anything sitting on its own. */
-  var BLOCKS = '.feed, .takes, .thesis, .carousel, .filters, .below, .site-header, .site-footer, .panel, .pgroup';
-
-  function obstacles(band) {
-    var out = [], i, j, seen = [];
-    function push(el) {
-      if (!el || el === bar || bar.contains(el) || el.contains(bar)) return;
+  /* Whole content regions, not individual words, so a trace never threads
+     between two lines of a list. */
+  function obstacles() {
+    var out = [], seen = [], i, j;
+    function add(el) {
+      if (!el || el === bar || bar.contains(el) || el.contains(bar) || seen.indexOf(el) >= 0) return;
       if (el.closest && el.closest('[data-walkthrough]')) return;
-      if (seen.indexOf(el) >= 0) return;
       seen.push(el);
       var r = visibleRect(el);
-      if (!r) return;
-      if (r.r <= r.l || r.b <= r.t) return;
-      if (r.r < band.l || r.l > band.r || r.b < band.t || r.t > band.b) return;
-      out.push(grow(r, CLEAR));
+      if (r && r.r > r.l && r.b > r.t) out.push(grow(r, CLEAR));
     }
-    var blocks = document.querySelectorAll(BLOCKS);
-    for (i = 0; i < blocks.length; i++) push(blocks[i]);
-
+    var blocks = document.querySelectorAll('.feed, .takes, .thesis, .carousel, .filters, .below, .site-header, .site-footer');
+    for (i = 0; i < blocks.length; i++) add(blocks[i]);
     var all = document.body.querySelectorAll('*');
     for (i = 0; i < all.length; i++) {
-      var el = all[i];
-      if (el === canvas) continue;
-      for (j = 0; j < el.childNodes.length; j++) {
-        var n = el.childNodes[j];
-        if (n.nodeType === 3 && n.nodeValue.trim()) { push(el); break; }
+      if (all[i] === canvas) continue;
+      for (j = 0; j < all[i].childNodes.length; j++) {
+        var n = all[i].childNodes[j];
+        if (n.nodeType === 3 && n.nodeValue.trim()) { add(all[i]); break; }
       }
     }
     return out;
   }
 
-  /* How far a point sits outside the bar, used for the band fade */
-  function outset(x, y) {
-    var dx = Math.max(barBox.l - x, 0, x - barBox.r);
-    var dy = Math.max(barBox.t - y, 0, y - barBox.b);
-    return Math.max(dx, dy);
-  }
-
   function hits(x1, y1, x2, y2, rects) {
-    var lo = { x: Math.min(x1, x2), y: Math.min(y1, y2) };
-    var hi = { x: Math.max(x1, x2), y: Math.max(y1, y2) };
+    var lx = Math.min(x1, x2), hx = Math.max(x1, x2);
+    var ly = Math.min(y1, y2), hy = Math.max(y1, y2);
     for (var i = 0; i < rects.length; i++) {
       var r = rects[i];
-      if (hi.x >= r.l && lo.x <= r.r && hi.y >= r.t && lo.y <= r.b) return r;
+      if (hx >= r.l && lx <= r.r && hy >= r.t && ly <= r.b) return true;
     }
-    return null;
+    return false;
   }
 
-  /* Walk one axis-aligned run, stopping at the band edge or before content.
-     Returns how far it got. */
-  function runLength(x, y, dx, dy, want, rects) {
+  /* March one axis-aligned leg, stopping at the band, the hero, the cards or
+     before any content. Returns how far it actually got. */
+  function march(x, y, dx, dy, want, rects) {
     var step = 4, gone = 0;
     while (gone < want) {
       var nx = x + dx * (gone + step), ny = y + dy * (gone + step);
-      if (outset(nx, ny) > BAND) break;
-      if (heroBox && (ny < heroBox.t || ny > heroBox.b || nx < heroBox.l || nx > heroBox.r)) break;
+      if (ny < ceiling || ny > floorY) break;
+      var out = Math.max(barBox.l - nx, 0, nx - barBox.r, barBox.t - ny, ny - barBox.b);
+      if (out > BAND) break;
       if (hits(x + dx * gone, y + dy * gone, nx, ny, rects)) break;
       gone += step;
     }
     return gone;
   }
 
-  /* Keep traces apart so they never read as a connected web */
-  function tooClose(pts, others, gap) {
+  function apart(pts, others, gap) {
     for (var i = 0; i < pts.length - 1; i++) {
       for (var o = 0; o < others.length; o++) {
         var q = others[o].pts;
         for (var k = 0; k < q.length - 1; k++) {
-          var ax = Math.min(pts[i].x, pts[i + 1].x) - gap, bx = Math.max(pts[i].x, pts[i + 1].x) + gap;
-          var ay = Math.min(pts[i].y, pts[i + 1].y) - gap, by = Math.max(pts[i].y, pts[i + 1].y) + gap;
-          var cx = Math.min(q[k].x, q[k + 1].x), dx2 = Math.max(q[k].x, q[k + 1].x);
-          var cy = Math.min(q[k].y, q[k + 1].y), dy2 = Math.max(q[k].y, q[k + 1].y);
-          if (bx >= cx && ax <= dx2 && by >= cy && ay <= dy2) return true;
+          if (Math.max(pts[i].x, pts[i + 1].x) + gap >= Math.min(q[k].x, q[k + 1].x) &&
+              Math.min(pts[i].x, pts[i + 1].x) - gap <= Math.max(q[k].x, q[k + 1].x) &&
+              Math.max(pts[i].y, pts[i + 1].y) + gap >= Math.min(q[k].y, q[k + 1].y) &&
+              Math.min(pts[i].y, pts[i + 1].y) - gap <= Math.max(q[k].y, q[k + 1].y)) return false;
         }
       }
     }
-    return false;
+    return true;
   }
 
-  function buildOnce() {
-    var out = [];
-    barBox = docRect(bar);
-    var hero = bar.closest('.hero');
-    heroBox = hero ? grow(docRect(hero), -CLEAR) : null;   /* the board lives in the hero only */
-    var cards = document.querySelector('.carousel');       /* and never above the cards */
-    if (cards && heroBox) heroBox.t = Math.max(heroBox.t, docRect(cards).t);
-    var band = grow(barBox, BAND + 20);   /* origin is set by place(), not here */
-    var rects = obstacles(band);
-    /* After a trace has left the frame it must stay off it: without this a
-       run can turn early and travel along the bar's own edge. */
-    var away = rects.concat([grow(barBox, 18)]);
+  function makeTraces() {
+    var out = [], rects = obstacles();
+    var offBar = rects.concat([grow(barBox, 18)]);   /* nothing runs along the frame */
+    var w = barBox.r - barBox.l, h = barBox.b - barBox.t, i;
 
-    /* exit points on the bar's frame, each leaving at 90 degrees */
-    var starts = [], w = barBox.r - barBox.l, h = barBox.b - barBox.t, i;
-    function rnd(a, b) { return a + Math.random() * (b - a); }
-    /* How much room there is between the bar and the top of the cards, so
-       climbs can be anything from a short rise to the full height. */
-    var headroom = heroBox ? Math.max(80, barBox.t - heroBox.t - CLEAR) : 400;
-
-    var across = 15;
-    for (i = 0; i < across; i++) {
-      var fx = barBox.l + w * (0.09 + 0.82 * (i + 0.5) / across);   /* never off a corner */
-      starts.push({ x: fx, y: barBox.b, dx: 0, dy: 1, reach: rnd(34, 120) });
+    var starts = [];
+    for (i = 0; i < 13; i++) {                       /* bottom edge, clear of the corners */
+      starts.push({ x: barBox.l + w * (0.09 + 0.82 * (i + 0.5) / 13), y: barBox.b, dx: 0, dy: 1, first: rnd(40, 110) });
     }
-    /* Side runs head out to the page gutter first, then climb: the gutters
-       beside the content column are empty, so traces can travel the margins
-       all the way up to the header. */
-    for (i = 0; i < 9; i++) {
-      var fy = barBox.t + h * (0.34 + 0.32 * (i + 0.5) / 9);          /* middle of the edge only */
-      starts.push({ x: barBox.l, y: fy, dx: -1, dy: 0, reach: rnd(200, 370), up: i % 2 === 0, climb: headroom * rnd(0.22, 1) });
-      starts.push({ x: barBox.r, y: fy, dx: 1, dy: 0, reach: rnd(200, 370), up: i % 2 === 1, climb: headroom * rnd(0.22, 1) });
+    for (i = 0; i < 9; i++) {                        /* middle of the side edges only */
+      var fy = barBox.t + h * (0.34 + 0.32 * (i + 0.5) / 9);
+      starts.push({ x: barBox.l, y: fy, dx: -1, dy: 0, first: rnd(190, 250), up: i % 2 === 0 });
+      starts.push({ x: barBox.r, y: fy, dx: 1, dy: 0, first: rnd(190, 250), up: i % 2 === 1 });
     }
-    /* shuffle, so the order traces are laid down (and so which ones survive
-       the spacing check) differs on every build */
-    for (i = starts.length - 1; i > 0; i--) {
-      var sw = Math.floor(Math.random() * (i + 1)), tmp = starts[i];
-      starts[i] = starts[sw]; starts[sw] = tmp;
+    for (i = starts.length - 1; i > 0; i--) {        /* shuffle: a different board each load */
+      var s = Math.floor(Math.random() * (i + 1)), tmp = starts[i];
+      starts[i] = starts[s]; starts[s] = tmp;
     }
 
     for (i = 0; i < starts.length; i++) {
-      var s = starts[i], pts = [{ x: s.x, y: s.y }];
-      var x = s.x, y = s.y, dx = s.dx, dy = s.dy, ok = true, run = 0;
-      /* Mostly three legs, sometimes two, occasionally four. Every leg is
-         still 48px minimum, so extra legs read as corners, not wiggle. */
-      var legs = 2 + (Math.random() < 0.6 ? 1 : 0) + (Math.random() < 0.28 ? 1 : 0);
+      var st = starts[i], pts = [{ x: st.x, y: st.y }];
+      var x = st.x, y = st.y, dx = st.dx, dy = st.dy, total = 0, ok = true;
+      var legs = 2 + Math.floor(Math.random() * 3);  /* 2 to 4: corners, never a snake */
+
       for (var leg = 0; leg < legs; leg++) {
-        var want = leg === 0 ? s.reach : (s.climb && leg === 1 ? s.climb : rnd(55, 245));
-        want = Math.min(want, MAX_LEN - run);
-        if (want < 48) break;
-        var got = runLength(x, y, dx, dy, want, leg === 0 ? rects : away);
-        /* 44px minimum: a shorter run would land as a stub turn right before
-           the pad, which is the fidgety look. Ending here instead is cleaner. */
-        if (got < 48) { if (leg === 0) ok = false; break; }
-        x += dx * got; y += dy * got; run += got;
+        var want = leg === 0 ? st.first : rnd(60, 220);
+        want = Math.min(want, MAX_LEN - total);      /* a run must fit inside one beat */
+        if (want < MIN_LEG) break;
+        var got = march(x, y, dx, dy, want, leg === 0 ? rects : offBar);
+        if (got < MIN_LEG) { if (leg === 0) ok = false; break; }
+        x += dx * got; y += dy * got; total += got;
         pts.push({ x: x, y: y });
-        if (leg < legs - 1) {                        /* right-angle turn only */
+        if (leg < legs - 1) {                         /* right angle, nothing else */
           var turn = Math.random() < 0.5 ? 1 : -1;
-          if (leg === 0 && s.up !== undefined) turn = s.up ? -1 : 1;   /* send half the side runs upward */
-          var ndx = dy * turn, ndy = -dx * turn;
-          dx = ndx; dy = ndy;
+          if (leg === 0 && st.up !== undefined) turn = st.up ? -1 : 1;
+          var ndx = dy * turn; dy = -dx * turn; dx = ndx;
         }
       }
-      if (!ok || pts.length < 2) continue;
-      if (tooClose(pts, out, 5)) continue;
+      if (!ok || pts.length < 2 || !apart(pts, out, 7)) continue;
 
-      var len = 0, segs = [];
+      var segs = [], len = 0;
       for (var p = 0; p < pts.length - 1; p++) {
         var L = Math.abs(pts[p + 1].x - pts[p].x) + Math.abs(pts[p + 1].y - pts[p].y);
         segs.push({ a: pts[p], b: pts[p + 1], from: len, len: L });
         len += L;
       }
-      out.push({ pts: pts, segs: segs, len: len, pad: pts[pts.length - 1], lit: 0 });
+      out.push({ pts: pts, segs: segs, len: len, pad: pts[pts.length - 1] });
     }
     return out;
   }
 
-  /* The spacing check and the random shuffle mean some layouts come out
-     sparse. Try a few and keep the fullest. */
   function build() {
-    var best = [];
+    barBox = docRect(bar);
+    var hero = bar.closest('.hero');
+    var hb = hero ? grow(docRect(hero), -CLEAR) : null;
+    var cards = document.querySelector('.carousel');
+    ceiling = cards ? docRect(cards).t : (hb ? hb.t : 0);      /* never above the cards */
+    floorY = hb ? hb.b : barBox.b + BAND;
+
+    var best = [];                                   /* keep the fullest of a few attempts */
     for (var a = 0; a < 8; a++) {
-      var got = buildOnce();
+      var got = makeTraces();
       if (got.length > best.length) best = got;
-      if (best.length >= 9) break;
+      if (best.length >= 8) break;
     }
     traces = best;
-  }
 
-  function drawBox() {
-    var band = grow(barBox, BAND + 20);
-    if (heroBox) {
-      band = { l: Math.max(band.l, heroBox.l - 4), t: Math.max(band.t, heroBox.t - 4),
-               r: Math.min(band.r, heroBox.r + 4), b: Math.min(band.b, heroBox.b + 4) };
-    }
-    return band;
-  }
-
-  function place() {
-    var band = drawBox();
-    canvas.style.left = band.l + 'px';
-    canvas.style.top = band.t + 'px';
-    canvas.style.width = (band.r - band.l) + 'px';
-    canvas.style.height = (band.b - band.t) + 'px';
+    var box = { l: barBox.l - BAND, t: Math.max(ceiling - 12, barBox.t - BAND),
+                r: barBox.r + BAND, b: Math.min(floorY + 12, barBox.b + BAND) };
+    canvas.style.left = box.l + 'px';
+    canvas.style.top = box.t + 'px';
+    canvas.style.width = (box.r - box.l) + 'px';
+    canvas.style.height = (box.b - box.t) + 'px';
     var dpr = Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width = Math.floor((band.r - band.l) * dpr);
-    canvas.height = Math.floor((band.b - band.t) * dpr);
+    canvas.width = Math.round((box.r - box.l) * dpr);
+    canvas.height = Math.round((box.b - box.t) * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    origin = { x: band.l, y: band.t };
+    origin = { x: box.l, y: box.t };
   }
 
-  /* No distance fade. Fading by distance dimmed the far end of a long run,
-     so it looked like it petered out instead of landing on its pad. Every
-     trace now reads at full strength and ends on a square. */
-  function fade() { return 1; }
-  function level(r, d) {
+  /* ── the beat: one tick, one flash, one run. Nothing else touches it. ── */
+  function beat() {
+    if (!traces.length) return;
+    var i = traces.length === 1 ? 0
+          : (lastPick + 1 + Math.floor(Math.random() * (traces.length - 1))) % traces.length;
+    lastPick = i;
+    run = { i: i, start: performance.now() };         /* one variable: never two */
+    bar.classList.add('prompt-bar--pulse');
+    setTimeout(function () { bar.classList.remove('prompt-bar--pulse'); }, 900);
+  }
+
+  function profile(r, d) {                            /* transparent -> green -> transparent */
     var u = (r - d) / STREAK;
     return (u <= 0 || u >= 1) ? 0 : Math.sin(Math.PI * u);
   }
-  function smooth(v) { return v * v * (3 - 2 * v); }
 
-  function firePulse(strength, all) {
-    if (!traces.length) return false;
-    var picks = [];
-    if (all) { for (var i = 0; i < traces.length; i++) picks.push(i); }
-    else {
-      if (pulses.length >= MAX_LIVE) return false;   /* let the board breathe */
-      var live = [], z;
-      for (z = 0; z < pulses.length; z++) live.push(pulses[z].i);
-      var free = [];
-      for (z = 0; z < traces.length; z++) if (live.indexOf(z) < 0) free.push(z);
-      if (!free.length) return false;
-      free.sort(function (a, b) { return (traces[a].used || 0) - (traces[b].used || 0); });
-      /* Drop anything starting near the last one: two runs leaving the same
-         side one after the other read as a chase and pull the eye. */
-      var apart = free;
-      if (lastStart) {
-        apart = free.filter(function (k) {
-          var p0 = traces[k].pts[0];
-          return Math.abs(p0.x - lastStart.x) + Math.abs(p0.y - lastStart.y) > 260;
-        });
-        if (!apart.length) apart = free;
-      }
-      var pool = apart.slice(0, Math.max(1, Math.ceil(apart.length / 2)));   /* least recently used half */
-      var pick = pool[Math.floor(Math.random() * pool.length)];
-      traces[pick].used = performance.now();
-      lastStart = traces[pick].pts[0];
-      picks.push(pick);                               /* one at a time */
-    }
-    for (var p = 0; p < picks.length; p++) {
-      pulses.push({ i: picks[p], start: performance.now(), level: strength });
-    }
-    /* The flash and the trace are one event: the bar beats, and something
-       leaves it. Same beat whether or not you are typing. */
-    bar.classList.add('prompt-bar--pulse');
-    setTimeout(function () { bar.classList.remove('prompt-bar--pulse'); }, 900);
-    return true;                                    /* the beat needs to know it fired */
+  function padLevel(r, len) {
+    var lands = len - PADSZ / 2 + PADSZ * 0.1;        /* leading edge ~10% in */
+    var leaves = len + PADSZ * 0.1 + STREAK;          /* trailing edge ~10% past */
+    if (r < lands) return 0;
+    if (r <= leaves) return Math.min(1, (r - lands) / (SPEED * 0.15));
+    var v = 1 - (r - leaves) / (SPEED * DRAIN / 1000);
+    return v > 0 ? v : 0;
   }
 
-  function strokeSeg(a, b, alpha, wideLine) {
-    if (alpha <= 0.004) return;
-    ctx.beginPath();
-    ctx.moveTo(a.x - origin.x, a.y - origin.y);
-    ctx.lineTo(b.x - origin.x, b.y - origin.y);
-    ctx.strokeStyle = 'rgba(' + GREEN + ',' + alpha.toFixed(3) + ')';
-    ctx.lineWidth = wideLine || 1;
-    ctx.stroke();
-  }
-
-  function drawPad(t, lit) {
-    var f = fade(t.pad.x, t.pad.y);
-    if (f <= 0 || (lit <= 0.02 && REST <= 0)) return;
-    var x = t.pad.x - origin.x - PAD / 2, y = t.pad.y - origin.y - PAD / 2;
-    ctx.save();
-    if (lit > 0.02) {
-      ctx.shadowColor = 'rgba(' + GREEN + ', 0.5)';
-      ctx.shadowBlur = 10;
-      ctx.fillStyle = 'rgba(' + GREEN + ',' + (PEAK * lit * f).toFixed(3) + ')';
-      ctx.fillRect(x, y, PAD, PAD);
-    }
-    ctx.strokeStyle = 'rgba(' + GREEN + ',' + ((REST + PEAK * 0.8 * lit) * f).toFixed(3) + ')';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(x + 0.5, y + 0.5, PAD - 1, PAD - 1);
-    ctx.restore();
-  }
-
-  function paint(now, dt) {
+  function draw(now) {
+    raf = requestAnimationFrame(draw);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    var i, s, t;
+    if (!run) return;
+    var t = traces[run.i];
+    if (!t) { run = null; return; }
+    var r = (now - run.start) / 1000 * SPEED;
+    if (r > t.len + STREAK + SPEED * DRAIN / 1000 + 10) { run = null; return; }
 
-    /* Nothing is drawn at rest: a trace only exists while light is on it. */
-    if (REST > 0) {
-      for (i = 0; i < traces.length; i++) {
-        t = traces[i];
-        for (s = 0; s < t.segs.length; s++) {
-          strokeSeg(t.segs[s].a, t.segs[s].b, REST * fade(t.segs[s].a.x, t.segs[s].a.y));
-        }
-      }
-    }
-
-    /* The streak: one stroke per segment with a gradient along it, so the
-       light reads as continuous instead of stepped, plus a real blur for
-       the roadmap's 0 0 10px glow. */
     ctx.save();
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
-    for (var p = pulses.length - 1; p >= 0; p--) {
-      var pulse = pulses[p];
-      t = traces[pulse.i];
-      if (!t) { pulses.splice(p, 1); continue; }
-      var r = (now - pulse.start) / 1000 * SPEED;
-      if (r - STREAK > t.len + PAD) { pulses.splice(p, 1); continue; }
+    ctx.shadowColor = 'rgba(' + GREEN + ', 0.5)';
+    ctx.shadowBlur = 10;
 
-      for (s = 0; s < t.segs.length; s++) {
-        var sg = t.segs[s];
-        if (sg.from + sg.len < r - STREAK || sg.from > r) continue;
-        var g = ctx.createLinearGradient(sg.a.x - origin.x, sg.a.y - origin.y,
-                                         sg.b.x - origin.x, sg.b.y - origin.y);
-        var any = false, STOPS = 10;
-        for (var q = 0; q <= STOPS; q++) {
-          var tt = q / STOPS;
-          var lv = level(r, sg.from + sg.len * tt);
-          var f = lv * pulse.level * fade(sg.a.x + (sg.b.x - sg.a.x) * tt,
-                                          sg.a.y + (sg.b.y - sg.a.y) * tt);
-          if (f > 0.01) any = true;
-          g.addColorStop(tt, 'rgba(' + GREEN + ',' + (PEAK * f).toFixed(3) + ')');
-        }
-        if (!any) continue;
-        ctx.shadowColor = 'rgba(' + GREEN + ', 0.5)';
-        ctx.shadowBlur = 10;
-        ctx.strokeStyle = g;
-        ctx.lineWidth = 2.5;
-        ctx.beginPath();
-        ctx.moveTo(sg.a.x - origin.x, sg.a.y - origin.y);
-        ctx.lineTo(sg.b.x - origin.x, sg.b.y - origin.y);
-        ctx.stroke();
+    for (var s = 0; s < t.segs.length; s++) {
+      var sg = t.segs[s];
+      if (sg.from + sg.len < r - STREAK || sg.from > r) continue;
+      var g = ctx.createLinearGradient(sg.a.x - origin.x, sg.a.y - origin.y,
+                                       sg.b.x - origin.x, sg.b.y - origin.y);
+      var any = false;
+      for (var k = 0; k <= 10; k++) {
+        var lv = profile(r, sg.from + sg.len * (k / 10));
+        if (lv > 0.01) any = true;
+        g.addColorStop(k / 10, 'rgba(' + GREEN + ',' + (PEAK * lv).toFixed(3) + ')');
       }
+      if (!any) continue;
+      ctx.strokeStyle = g;
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(sg.a.x - origin.x, sg.a.y - origin.y);
+      ctx.lineTo(sg.b.x - origin.x, sg.b.y - origin.y);
+      ctx.stroke();
+    }
+
+    var lit = padLevel(r, t.len);
+    if (lit > 0.01) {
+      var e = lit * lit * (3 - 2 * lit);
+      var px = t.pad.x - origin.x - PADSZ / 2, py = t.pad.y - origin.y - PADSZ / 2;
+      ctx.fillStyle = 'rgba(' + GREEN + ',' + (PEAK * e).toFixed(3) + ')';
+      ctx.fillRect(px, py, PADSZ, PADSZ);
+      ctx.strokeStyle = 'rgba(' + GREEN + ',' + (PEAK * 0.9 * e).toFixed(3) + ')';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(px + 0.5, py + 0.5, PADSZ - 1, PADSZ - 1);
     }
     ctx.restore();
-
-    /* pads fill as the light arrives, then drain */
-    var step = dt / FILL_MS;
-    for (i = 0; i < traces.length; i++) {
-      t = traces[i];
-      var target = 0;
-      for (p = 0; p < pulses.length; p++) {
-        if (pulses[p].i !== i) continue;
-        var pr = (now - pulses[p].start) / 1000 * SPEED;
-        if (pr >= t.len - PAD / 2 + PAD * 0.1 && pr - STREAK <= t.len + PAD * 0.1) {
-          if (pulses[p].level > target) target = pulses[p].level;
-        }
-      }
-      if (t.lit < target) t.lit = Math.min(target, t.lit + step);
-      else if (t.lit > target) t.lit = Math.max(target, t.lit - step);
-      drawPad(t, smooth(t.lit));
-    }
   }
 
-  function frame(now) {
-    raf = requestAnimationFrame(frame);
-    var dt = now - lastFrame;
-    if (dt < FRAME) return;
-    lastFrame = now;
-    /* The bar can shift after first paint (fonts, images, late layout).
-       Re-measure each frame and rebuild if it has actually moved. */
-    var live = docRect(bar);
-    if (Math.abs(live.t - barBox.t) > 2 || Math.abs(live.l - barBox.l) > 2 ||
-        Math.abs(live.r - barBox.r) > 2 || Math.abs(live.b - barBox.b) > 2) {
-      barBox = live; place(); build(); pulses = [];
-      return;
-    }
-    /* Retire finished runs before the beat. paint() used to do this after,
-       so a run that had just ended still counted against the cap, blocked
-       the flash, and the beat advanced anyway: one skipped beat became a
-       six second gap. */
-    for (var q = pulses.length - 1; q >= 0; q--) {
-      var pt = traces[pulses[q].i];
-      if (!pt || (now - pulses[q].start) / 1000 * SPEED - STREAK > pt.len + PAD) pulses.splice(q, 1);
-    }
-
-    /* A metronome on a fixed grid. It is never reset by a restart, a
-       rebuild or a resize. If a beat somehow cannot fire it retries on the
-       next frame rather than skipping a whole interval. */
-    if (!nextBeat) nextBeat = now + IDLE_GAP;
-    if (now >= nextBeat && firePulse(IDLE_LEVEL, false)) {
-      nextBeat += IDLE_GAP;
-      if (nextBeat <= now) nextBeat = now + IDLE_GAP;   /* after a hidden tab */
-    }
-    paint(now, dt);
+  function stop() {
+    if (beatTimer) { clearInterval(beatTimer); beatTimer = null; }
+    if (raf) { cancelAnimationFrame(raf); raf = null; }
+    run = null;
   }
 
-  function stop() { if (raf) { cancelAnimationFrame(raf); raf = null; } }
-  function start() {
-    if (raf || !wide.matches) return;
-    lastFrame = 0;
-    raf = requestAnimationFrame(frame);
-  }
-  function refresh() {
+  function startUp() {
     stop();
-    if (!wide.matches) { canvas.style.width = '0px'; canvas.style.height = '0px'; return; }
-    barBox = docRect(bar);
-    place();
+    if (!wide.matches || reduced.matches) { canvas.style.width = '0px'; canvas.style.height = '0px'; return; }
     build();
-    pulses = [];                      /* old pulses index the old traces */
-    if (reduced.matches) { paint(performance.now(), 0); return; }   /* static board */
-    start();
+    if (!traces.length) return;
+    /* Only the timer fires beats. Kicking one off here too meant a second
+       init (fonts, load) produced two flashes back to back. */
+    beatTimer = setInterval(beat, BEAT);
+    raf = requestAnimationFrame(draw);
   }
 
-  var input = document.querySelector('[data-prompt-input]');
-  if (input) input.addEventListener('input', function () { typingUntil = performance.now() + 2500; });
-  var send = document.querySelector('[data-prompt-send]');
-  if (send) send.addEventListener('click', function () { firePulse(SEND_LEVEL, true); });
-
-  var rt;
-  window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(refresh, 200); });
-  document.addEventListener('visibilitychange', function () { document.hidden ? stop() : start(); });
-  if (wide.addEventListener) wide.addEventListener('change', refresh); else wide.addListener(refresh);
-  if (reduced.addEventListener) reduced.addEventListener('change', refresh);
-
-  window.prophetBoard = {
-    pulse: function (s) { firePulse(s || SEND_LEVEL, false); },
-    all: function () { firePulse(SEND_LEVEL, true); },
-    rest: function (v) { REST = v; return REST; },
-    tune: function (o) {
-      if (!o) return { speed: SPEED, streak: STREAK, gap: IDLE_GAP, live: MAX_LIVE, rest: REST };
-      if (o.speed) SPEED = o.speed;
-      if (o.streak) STREAK = o.streak;
-      if (o.gap) IDLE_GAP = o.gap;
-      if (o.live) MAX_LIVE = o.live;
-      if (o.rest !== undefined) REST = o.rest;
-      return { speed: SPEED, streak: STREAK, gap: IDLE_GAP, live: MAX_LIVE, rest: REST };
-    },
-    traces: function () { return traces.length; },
-    live: function () { return pulses.length; }
-  };
-
-  /* The bar moves as web fonts load and the layout settles, so rebuild on
-     every event that can shift it rather than trusting the first measurement. */
   var settle;
-  function later() { clearTimeout(settle); settle = setTimeout(refresh, 120); }
+  function later() { clearTimeout(settle); settle = setTimeout(startUp, 150); }
+
+  window.addEventListener('resize', later);
   window.addEventListener('load', later);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(later);
-  if (window.ResizeObserver) {
-    /* Only the bar's own wrapper. Observing document.body meant resizing our
-       canvas re-triggered a rebuild, in a loop. */
-    var ro = new ResizeObserver(later);
-    if (bar.parentElement) ro.observe(bar.parentElement);
-  }
+  if (wide.addEventListener) wide.addEventListener('change', later);
+  if (reduced.addEventListener) reduced.addEventListener('change', later);
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) stop(); else later();
+  });
+
+  window.prophetBoard = {
+    traces: function () { return traces.length; },
+    maxLen: function () { return MAX_LEN; },
+    set: function (o) {
+      if (o && o.speed) SPEED = o.speed;
+      if (o && o.beat) BEAT = o.beat;
+      MAX_LEN = Math.floor(BEAT / 1000 * SPEED - STREAK - SPEED * DRAIN / 1000 - 20);
+      later();
+      return { beat: BEAT, speed: SPEED, maxLen: MAX_LEN };
+    }
+  };
+
   later();
 })();
