@@ -671,7 +671,7 @@
   var FRAME   = 1000 / 60;   /* 60fps: at 200px/s, 30fps reads as steps */
   var CLEAR   = 20;    /* keep this far off any content, pad included */
 
-  var IDLE_GAP = 3600, TYPING_GAP = 3600;   /* one steady beat, typing included */
+  var IDLE_GAP = 4600, TYPING_GAP = 4600;   /* one steady beat, typing included */
   var MAX_LIVE = 2;    /* the beat is slow, so one or two are moving */
   var IDLE_LEVEL = 0.72, TYPING_LEVEL = 0.85, SEND_LEVEL = 1;
   var PEAK = 0.62;     /* the roadmap streak peaks at 0.9; this is the same, dimmer */
@@ -814,10 +814,10 @@
     /* Side runs head out to the page gutter first, then climb: the gutters
        beside the content column are empty, so traces can travel the margins
        all the way up to the header. */
-    for (i = 0; i < 11; i++) {
-      var fy = barBox.t + h * (0.18 + 0.64 * (i + 0.5) / 11);        /* never off a corner */
-      starts.push({ x: barBox.l, y: fy, dx: -1, dy: 0, reach: rnd(240, 360), up: i % 2 === 0, climb: headroom * rnd(0.22, 1) });
-      starts.push({ x: barBox.r, y: fy, dx: 1, dy: 0, reach: rnd(240, 360), up: i % 2 === 1, climb: headroom * rnd(0.22, 1) });
+    for (i = 0; i < 9; i++) {
+      var fy = barBox.t + h * (0.34 + 0.32 * (i + 0.5) / 9);          /* middle of the edge only */
+      starts.push({ x: barBox.l, y: fy, dx: -1, dy: 0, reach: rnd(200, 370), up: i % 2 === 0, climb: headroom * rnd(0.22, 1) });
+      starts.push({ x: barBox.r, y: fy, dx: 1, dy: 0, reach: rnd(200, 370), up: i % 2 === 1, climb: headroom * rnd(0.22, 1) });
     }
     /* shuffle, so the order traces are laid down (and so which ones survive
        the spacing check) differs on every build */
@@ -846,7 +846,7 @@
         }
       }
       if (!ok || pts.length < 2) continue;
-      if (tooClose(pts, out, 7)) continue;
+      if (tooClose(pts, out, 5)) continue;
 
       var len = 0, segs = [];
       for (var p = 0; p < pts.length - 1; p++) {
