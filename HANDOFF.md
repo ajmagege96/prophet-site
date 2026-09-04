@@ -106,6 +106,7 @@ Everything is progressive: with JS off, every page still renders and reads.
 | List panels | Filter tags, row dropdowns, and vote popups on Prophecies. | Nothing for display. The vote buttons are **UI only** — wire them to your vote endpoint. |
 | Record range tabs | Highlights the selected 1W/1M/3M/1Y/ALL tab. | **Visual only.** You filter the bars server-side and mark the selected tab `range__tab--on`. |
 | $PROPHET price chart | Draws the area chart, x-axis and price tag from JSON. Redraws on resize. | `{{token.chart_series}}` (JSON array of prices, oldest first) and `{{token.chart_ticks}}` (JSON array of axis labels). |
+| Background pulse field | Decorative canvas behind all content, desktop only (1024px+). Pulses leave the prompt bar and travel the lines. **Nothing to wire.** Two geometries switch via `window.prophetBackground.geometry('spokes'\|'constellation')` or `?bg=`; the choice is remembered in `localStorage` under `prophet_bg`. 30fps cap, pauses on hidden tabs, static under `prefers-reduced-motion`. | Nothing. Purely decorative; safe to delete with its `<canvas data-bg>` element. |
 | Price / MCap toggle | Highlights the selected mode. | **Visual only.** Serve the matching series. |
 
 ---

@@ -646,3 +646,324 @@
     for (var i = 0; i < opts.length; i++) opts[i].classList.toggle('seg__opt--on', opts[i] === btn);
   });
 })();
+
+/* ── Background pulse field ───────────────────────────── */
+/* Desktop only (1024px+). Same visual language as the roadmap timeline:
+   1px hairlines, 10px dots, a long green streak travelling the line, each
+   dot filling when the streak's leading edge is ~10% into it and draining
+   when the trailing edge is ~10% past. The prompt bar is the source.
+
+   Two geometries, switchable live:
+     window.prophetBackground.geometry('spokes' | 'constellation')
+   or append ?bg=spokes / ?bg=constellation to the URL. The choice is
+   remembered per browser so you can compare across pages. */
+(function () {
+  var canvas = document.querySelector('[data-bg]');
+  if (!canvas || !canvas.getContext) return;
+  var ctx = canvas.getContext('2d');
+
+  /* Values lifted from the roadmap timeline so the two read as one system */
+  var GREEN   = '16, 240, 95';
+  var LINE    = 'rgba(242, 240, 230, 0.15)';
+  var SPEED   = 200;   /* px per second, as the timeline streak */
+  var STREAK  = 160;   /* streak length, as .timeline__light height */
+  var NODE_D  = 10;    /* dot diameter, as .timeline__dot */
+  var NODE_R  = NODE_D / 2;
+  var FILL_MS = 400;   /* fill/drain, as the dot's 0.4s transition */
+  var FRAME   = 1000 / 30;   /* 30fps cap */
+
+  var IDLE_GAP = 4000, TYPING_GAP = 1100;
+  var IDLE_LEVEL = 0.45, TYPING_LEVEL = 0.6, SEND_LEVEL = 1;
+
+  var wide    = window.matchMedia('(min-width: 1024px)');
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  var W = 0, H = 0, dpr = 1;
+  var nodes = [], edges = [], maxDist = 0;
+  var pulses = [], raf = null, lastFrame = 0, lastPulse = 0, typingUntil = 0;
+
+  var promptBar  = document.querySelector('.prompt-bar');
+  var promptWrap = document.querySelector('.prompt-bar-wrap');
+
+  /* ── geometry choice ── */
+  function stored() {
+    var q = (location.search.match(/[?&]bg=(spokes|constellation)/) || [])[1];
+    if (q) { try { localStorage.setItem('prophet_bg', q); } catch (e) {} return q; }
+    try { return localStorage.getItem('prophet_bg') || 'spokes'; } catch (e) { return 'spokes'; }
+  }
+  var geometry = stored();
+
+  /* ── source point: the prompt bar, else low centre ── */
+  function sourcePoint() {
+    var el = promptWrap || promptBar;
+    if (el) {
+      var r = el.getBoundingClientRect();
+      if (r.width) return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    }
+    return { x: W / 2, y: H * 0.78 };
+  }
+
+  function addNode(x, y) { nodes.push({ x: x, y: y, dist: Infinity, lit: 0 }); return nodes.length - 1; }
+  function addEdge(a, b) {
+    var dx = nodes[a].x - nodes[b].x, dy = nodes[a].y - nodes[b].y;
+    edges.push({ a: a, b: b, len: Math.sqrt(dx * dx + dy * dy) });
+  }
+
+  /* (a) spokes radiating from the source, nodes spaced along each */
+  function buildSpokes(src) {
+    var SPOKES = 20, STEP = 118, EDGE = Math.max(W, H) * 1.1;
+    addNode(src.x, src.y);
+    for (var s = 0; s < SPOKES; s++) {
+      var a = (s / SPOKES) * Math.PI * 2 + (s % 3) * 0.045;   /* jitter, so it never reads as a fan */
+      var prev = 0;
+      for (var d = STEP * (0.75 + (s % 4) * 0.12); d < EDGE; d += STEP * (0.9 + (s % 5) * 0.07)) {
+        var x = src.x + Math.cos(a) * d, y = src.y + Math.sin(a) * d;
+        if (x < -60 || x > W + 60 || y < -60 || y > H + 60) break;
+        var n = addNode(x, y);
+        addEdge(prev, n);
+        prev = n;
+      }
+    }
+  }
+
+  /* (b) irregular constellation: scattered points, joined to near neighbours */
+  function buildConstellation(src) {
+    var MIN = 128, MAX_LINK = 250, TRIES = 900;
+    addNode(src.x, src.y);
+    for (var t = 0; t < TRIES; t++) {
+      var x = -40 + Math.random() * (W + 80), y = -40 + Math.random() * (H + 80), ok = true;
+      for (var i = 0; i < nodes.length; i++) {
+        var dx = nodes[i].x - x, dy = nodes[i].y - y;
+        if (dx * dx + dy * dy < MIN * MIN) { ok = false; break; }
+      }
+      if (ok) addNode(x, y);
+    }
+    var seen = {};
+    for (var n = 0; n < nodes.length; n++) {
+      var near = [];
+      for (var m = 0; m < nodes.length; m++) {
+        if (m === n) continue;
+        var ex = nodes[m].x - nodes[n].x, ey = nodes[m].y - nodes[n].y;
+        var L = Math.sqrt(ex * ex + ey * ey);
+        if (L <= MAX_LINK) near.push({ i: m, L: L });
+      }
+      near.sort(function (p, q) { return p.L - q.L; });
+      var links = n === 0 ? 4 : 2 + (n % 2);        /* uneven degree, no repeating pattern */
+      for (var k = 0; k < Math.min(links, near.length); k++) {
+        var a = Math.min(n, near[k].i), b = Math.max(n, near[k].i), key = a + ':' + b;
+        if (!seen[key]) { seen[key] = 1; addEdge(a, b); }
+      }
+    }
+  }
+
+  /* Dijkstra from the source: every node gets its distance along the lines,
+     which is what the wavefront rides on. Branching at junctions is implicit. */
+  function measure() {
+    var adj = [], i;
+    for (i = 0; i < nodes.length; i++) adj.push([]);
+    for (i = 0; i < edges.length; i++) {
+      adj[edges[i].a].push({ to: edges[i].b, len: edges[i].len });
+      adj[edges[i].b].push({ to: edges[i].a, len: edges[i].len });
+    }
+    nodes[0].dist = 0;
+    var queue = [0];
+    while (queue.length) {
+      var best = 0;
+      for (i = 1; i < queue.length; i++) if (nodes[queue[i]].dist < nodes[queue[best]].dist) best = i;
+      var u = queue.splice(best, 1)[0];
+      for (i = 0; i < adj[u].length; i++) {
+        var v = adj[u][i], nd = nodes[u].dist + v.len;
+        if (nd < nodes[v.to].dist) { nodes[v.to].dist = nd; queue.push(v.to); }
+      }
+    }
+    /* drop anything the wavefront could never reach */
+    var keep = [], map = {};
+    for (i = 0; i < nodes.length; i++) if (nodes[i].dist < Infinity) { map[i] = keep.length; keep.push(nodes[i]); }
+    var kept = [];
+    for (i = 0; i < edges.length; i++) {
+      if (map[edges[i].a] !== undefined && map[edges[i].b] !== undefined) {
+        kept.push({ a: map[edges[i].a], b: map[edges[i].b], len: edges[i].len });
+      }
+    }
+    nodes = keep; edges = kept;
+    maxDist = 0;
+    for (i = 0; i < nodes.length; i++) if (nodes[i].dist > maxDist) maxDist = nodes[i].dist;
+  }
+
+  function build() {
+    nodes = []; edges = [];
+    var src = sourcePoint();
+    if (geometry === 'constellation') buildConstellation(src); else buildSpokes(src);
+    measure();
+  }
+
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = window.innerWidth; H = window.innerHeight;
+    canvas.width = Math.floor(W * dpr); canvas.height = Math.floor(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    build();
+  }
+
+  /* Distance along the lines at a point on an edge. Where two branches meet
+     the shorter route wins, so a cycle lights from both ends. */
+  function distAt(e, t) {
+    var da = nodes[e.a].dist + t * e.len;
+    var db = nodes[e.b].dist + (1 - t) * e.len;
+    return da < db ? da : db;
+  }
+
+  /* Streak profile: transparent → green → transparent, as the timeline's gradient */
+  function level(r, d) {
+    var u = (r - d) / STREAK;
+    return (u <= 0 || u >= 1) ? 0 : Math.sin(Math.PI * u);
+  }
+
+  function smooth(v) { return v * v * (3 - 2 * v); }   /* ease-in-out, as the dot transition */
+
+  function firePulse(strength) {
+    pulses.push({ start: performance.now(), level: strength });
+    if (promptBar) {
+      promptBar.classList.add('prompt-bar--pulse');
+      setTimeout(function () { promptBar.classList.remove('prompt-bar--pulse'); }, 260);
+    }
+  }
+
+  function drawStatic() {
+    ctx.clearRect(0, 0, W, H);
+    ctx.lineWidth = 1; ctx.strokeStyle = LINE; ctx.beginPath();
+    for (var i = 0; i < edges.length; i++) {
+      ctx.moveTo(nodes[edges[i].a].x, nodes[edges[i].a].y);
+      ctx.lineTo(nodes[edges[i].b].x, nodes[edges[i].b].y);
+    }
+    ctx.stroke();
+    for (var n = 0; n < nodes.length; n++) drawNode(nodes[n], 0.18);
+  }
+
+  function drawNode(n, lit) {
+    ctx.beginPath();
+    ctx.arc(n.x, n.y, NODE_R, 0, Math.PI * 2);
+    ctx.fillStyle = lit > 0.02 ? 'rgba(' + GREEN + ',' + (0.9 * lit).toFixed(3) + ')' : '#151B26';
+    ctx.fill();
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(' + GREEN + ',' + (0.2 + 0.7 * lit).toFixed(3) + ')';
+    ctx.stroke();
+    if (lit > 0.02) {                                  /* the dot's soft halo */
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, NODE_R + 4, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(' + GREEN + ',' + (0.28 * lit).toFixed(3) + ')';
+      ctx.lineWidth = 3;
+      ctx.stroke();
+    }
+  }
+
+  function frame(now) {
+    raf = requestAnimationFrame(frame);
+    var dt = now - lastFrame;
+    if (dt < FRAME) return;
+    lastFrame = now;
+
+    /* schedule: faster while typing */
+    var gap = now < typingUntil ? TYPING_GAP : IDLE_GAP;
+    if (now - lastPulse > gap) { lastPulse = now; firePulse(now < typingUntil ? TYPING_LEVEL : IDLE_LEVEL); }
+
+    ctx.clearRect(0, 0, W, H);
+
+    /* base hairlines, one path */
+    ctx.lineWidth = 1; ctx.strokeStyle = LINE; ctx.beginPath();
+    var i, e;
+    for (i = 0; i < edges.length; i++) {
+      ctx.moveTo(nodes[edges[i].a].x, nodes[edges[i].a].y);
+      ctx.lineTo(nodes[edges[i].b].x, nodes[edges[i].b].y);
+    }
+    ctx.stroke();
+
+    /* pulses */
+    var SEG = 9, p, k;
+    for (p = pulses.length - 1; p >= 0; p--) {
+      var pulse = pulses[p];
+      var r = (now - pulse.start) / 1000 * SPEED;
+      if (r - STREAK > maxDist + NODE_D) { pulses.splice(p, 1); continue; }
+      for (i = 0; i < edges.length; i++) {
+        e = edges[i];
+        var lo = Math.min(nodes[e.a].dist, nodes[e.b].dist);
+        var hi = lo + e.len;
+        if (hi < r - STREAK || lo > r) continue;      /* edge outside the band */
+        for (k = 0; k < SEG; k++) {
+          var t0 = k / SEG, t1 = (k + 1) / SEG;
+          var lv = level(r, distAt(e, (t0 + t1) / 2));
+          if (lv < 0.03) continue;
+          var ax = nodes[e.a].x + (nodes[e.b].x - nodes[e.a].x) * t0;
+          var ay = nodes[e.a].y + (nodes[e.b].y - nodes[e.a].y) * t0;
+          var bx = nodes[e.a].x + (nodes[e.b].x - nodes[e.a].x) * t1;
+          var by = nodes[e.a].y + (nodes[e.b].y - nodes[e.a].y) * t1;
+          var alpha = lv * pulse.level;
+          ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(bx, by);
+          ctx.strokeStyle = 'rgba(' + GREEN + ',' + (0.10 * alpha).toFixed(3) + ')';
+          ctx.lineWidth = 5; ctx.stroke();            /* halo, standing in for the streak's box-shadow */
+          ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(bx, by);
+          ctx.strokeStyle = 'rgba(' + GREEN + ',' + (0.85 * alpha).toFixed(3) + ')';
+          ctx.lineWidth = 1.4; ctx.stroke();
+        }
+      }
+    }
+
+    /* nodes: fill when the leading edge is ~10% in, drain ~10% past */
+    var step = dt / FILL_MS;
+    for (i = 0; i < nodes.length; i++) {
+      var n = nodes[i], target = 0;
+      for (p = 0; p < pulses.length; p++) {
+        var pr = (now - pulses[p].start) / 1000 * SPEED;
+        if (pr >= n.dist - NODE_R + NODE_D * 0.1 && pr - STREAK <= n.dist + NODE_D * 0.1) {
+          if (pulses[p].level > target) target = pulses[p].level;
+        }
+      }
+      if (n.lit < target) n.lit = Math.min(target, n.lit + step);
+      else if (n.lit > target) n.lit = Math.max(target, n.lit - step);
+      drawNode(n, smooth(n.lit));
+    }
+  }
+
+  function start() {
+    if (raf || !wide.matches) return;
+    if (reduced.matches) { drawStatic(); return; }
+    lastFrame = 0; lastPulse = performance.now() - IDLE_GAP + 600;
+    raf = requestAnimationFrame(frame);
+  }
+  function stop() {
+    if (raf) { cancelAnimationFrame(raf); raf = null; }
+  }
+  function refresh() {
+    stop();
+    ctx.clearRect(0, 0, W, H);
+    if (!wide.matches) return;
+    resize();
+    if (reduced.matches) drawStatic(); else start();
+  }
+
+  /* triggers */
+  var input = document.querySelector('[data-prompt-input]');
+  if (input) input.addEventListener('input', function () { typingUntil = performance.now() + 2200; });
+  var send = document.querySelector('[data-prompt-send]');
+  if (send) send.addEventListener('click', function () { firePulse(SEND_LEVEL); lastPulse = performance.now(); });
+
+  var rt;
+  window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(refresh, 200); });
+  document.addEventListener('visibilitychange', function () { document.hidden ? stop() : start(); });
+  if (wide.addEventListener) wide.addEventListener('change', refresh); else wide.addListener(refresh);
+  if (reduced.addEventListener) reduced.addEventListener('change', refresh);
+
+  window.prophetBackground = {
+    geometry: function (name) {
+      if (name !== 'spokes' && name !== 'constellation') return geometry;
+      geometry = name;
+      try { localStorage.setItem('prophet_bg', name); } catch (e) {}
+      refresh();
+      return geometry;
+    },
+    current: function () { return geometry; },
+    pulse: function (strength) { firePulse(strength || SEND_LEVEL); }
+  };
+
+  refresh();
+})();
