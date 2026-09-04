@@ -662,17 +662,17 @@
   var ctx = canvas.getContext('2d');
 
   var GREEN = '16, 240, 95';
-  var BAND    = 500;   /* how far the board reaches from the bar */
+  var BAND    = 300;   /* how far the board reaches from the bar */
   var REST    = 0.05;  /* trace opacity at rest */
   var PAD     = 6;     /* square pad, px */
-  var SPEED   = 42;    /* px per second: slow enough to follow */
-  var STREAK  = 150;   /* long streak, so the run reads at this speed */
+  var SPEED   = 200;   /* px per second, as the roadmap streak */
+  var STREAK  = 160;   /* as .timeline__light height */
   var FILL_MS = 400;   /* pad fill/drain, as the timeline dot */
   var FRAME   = 1000 / 30;
   var CLEAR   = 20;    /* keep this far off any content, pad included */
 
-  var IDLE_GAP = 1000, TYPING_GAP = 450;
-  var MAX_LIVE = 3;    /* two to three moving at any moment, never the board */
+  var IDLE_GAP = 1800, TYPING_GAP = 700;
+  var MAX_LIVE = 2;    /* about one running at any moment */
   var IDLE_LEVEL = 0.55, TYPING_LEVEL = 0.7, SEND_LEVEL = 1;
 
   var wide    = window.matchMedia('(min-width: 1024px)');
@@ -795,22 +795,22 @@
     var across = 11;
     for (i = 0; i < across; i++) {
       var fx = barBox.l + w * (i + 0.5) / across;
-      starts.push({ x: fx, y: barBox.b, dx: 0, dy: 1, reach: 40 + (i % 4) * 34 });
+      starts.push({ x: fx, y: barBox.b, dx: 0, dy: 1, reach: 36 + (i % 4) * 26 });
     }
     /* Side runs head out to the page gutter first, then climb: the gutters
        beside the content column are empty, so traces can travel up there. */
     for (i = 0; i < 3; i++) {
       var fy = barBox.t + h * (i + 0.5) / 3;
-      starts.push({ x: barBox.l, y: fy, dx: -1, dy: 0, reach: 250 + i * 60, up: i % 2 === 0 });
-      starts.push({ x: barBox.r, y: fy, dx: 1, dy: 0, reach: 250 + i * 60, up: i % 2 === 1 });
+      starts.push({ x: barBox.l, y: fy, dx: -1, dy: 0, reach: 250 + i * 26, up: i % 2 === 0 });
+      starts.push({ x: barBox.r, y: fy, dx: 1, dy: 0, reach: 250 + i * 26, up: i % 2 === 1 });
     }
 
     for (i = 0; i < starts.length; i++) {
       var s = starts[i], pts = [{ x: s.x, y: s.y }];
       var x = s.x, y = s.y, dx = s.dx, dy = s.dy, ok = true;
-      var legs = 3 + (i % 3);                       /* 3 to 5 legs, uneven by design */
+      var legs = 2 + (i % 3);                       /* 2 to 4 legs, uneven by design */
       for (var leg = 0; leg < legs; leg++) {
-        var want = leg === 0 ? s.reach : (s.up !== undefined && leg === 1 ? 260 + (i % 3) * 90 : 70 + ((i + leg) % 5) * 52);
+        var want = leg === 0 ? s.reach : (s.up !== undefined && leg === 1 ? 110 + (i % 3) * 45 : 44 + ((i + leg) % 5) * 32);
         var got = runLength(x, y, dx, dy, want, rects);
         if (got < 20) { if (leg === 0) ok = false; break; }
         x += dx * got; y += dy * got;
