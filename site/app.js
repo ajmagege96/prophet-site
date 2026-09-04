@@ -672,7 +672,7 @@
   var CLEAR   = 20;    /* keep this far off any content, pad included */
 
   var IDLE_GAP = 3000, TYPING_GAP = 3000;   /* one steady beat, typing included */
-  var MAX_LIVE = 2;    /* the beat is slow, so one or two are moving */
+  var MAX_LIVE = 4;    /* headroom, so the cap never eats a beat */
   var IDLE_LEVEL = 0.72, TYPING_LEVEL = 0.85, SEND_LEVEL = 1;
   var PEAK = 0.62;     /* the roadmap streak peaks at 0.9; this is the same, dimmer */
 
@@ -906,16 +906,16 @@
   function smooth(v) { return v * v * (3 - 2 * v); }
 
   function firePulse(strength, all) {
-    if (!traces.length) return;
+    if (!traces.length) return false;
     var picks = [];
     if (all) { for (var i = 0; i < traces.length; i++) picks.push(i); }
     else {
-      if (pulses.length >= MAX_LIVE) return;         /* let the board breathe */
+      if (pulses.length >= MAX_LIVE) return false;   /* let the board breathe */
       var live = [], z;
       for (z = 0; z < pulses.length; z++) live.push(pulses[z].i);
       var free = [];
       for (z = 0; z < traces.length; z++) if (live.indexOf(z) < 0) free.push(z);
-      if (!free.length) return;
+      if (!free.length) return false;
       free.sort(function (a, b) { return (traces[a].used || 0) - (traces[b].used || 0); });
       /* Drop anything starting near the last one: two runs leaving the same
          side one after the other read as a chase and pull the eye. */
@@ -1055,7 +1055,10 @@
       return;
     }
     var gap = now < typingUntil ? TYPING_GAP : IDLE_GAP;
-    if (now - lastPulse > gap) { lastPulse = now; firePulse(now < typingUntil ? TYPING_LEVEL : IDLE_LEVEL, false); }
+    /* Advance the beat only when a pulse really fired. Setting lastPulse
+       unconditionally let a blocked beat pass silently, which stretched the
+       interval between flashes to a multiple of the gap. */
+    if (now - lastPulse > gap && firePulse(now < typingUntil ? TYPING_LEVEL : IDLE_LEVEL, false)) lastPulse = now;
     paint(now, dt);
   }
 
