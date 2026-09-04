@@ -731,6 +731,7 @@ ul, ol { list-style: none; }
 .prow__thesis { font-size: 12px; line-height: 1.45; opacity: 0.75; }
 .prow__label { font-size: 9px; opacity: 0.6; margin-right: 4px; }
 .prow__num { color: var(--offwhite); opacity: 1; font-weight: 500; }
+/* column-reverse: the meta row sits on top, the badge row underneath */
 .prow__side { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
 /* bottom-right meta row: parent not dimmed so the green reads at full strength */
 .prow__bottom { justify-content: flex-end; opacity: 1; }
@@ -740,6 +741,7 @@ ul, ol { list-style: none; }
 .prow__state--vote { color: var(--purple-text); }
 .prow__meta { font-size: 11px; opacity: 0.45; white-space: nowrap; }
 .prow__row { display: flex; align-items: center; gap: 10px; }
+.prow__row .vote { order: -1; }   /* Vote sits left of the badge */
 .prow__side .vote { margin-left: auto; }
 .prow__side .vote__pop { right: 0; }
 .prow__outcome { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 2px 8px; border: 1px solid currentColor; border-radius: 2px; }
@@ -844,10 +846,10 @@ ul, ol { list-style: none; }
 .token__grid { display: grid; gap: 12px; }
 .tchart { display: flex; flex-direction: column; gap: 10px; padding: 12px 14px; }
 .tchart__head { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 12px; }
-.tchart__now { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px; }
+.tchart__now { display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px; }
 .tchart__price { font-size: 24px; font-weight: 500; letter-spacing: -0.01em; }
 .tchart__change { font-size: 13px; }
-.tchart__pair { flex-basis: 100%; font-size: 9px; opacity: 0.45; }
+.tchart__pair { flex-basis: 100%; font-size: 9px; opacity: 0.45; margin-top: -3px; }
 .tchart__controls { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
 .tchart__controls .range { position: static; margin: 0; gap: 12px; }
 .tchart__plot { height: 190px; }
@@ -869,7 +871,7 @@ ul, ol { list-style: none; }
 .seg__opt--on { opacity: 1; color: var(--green); }
 
 /* Swap */
-.swap { display: flex; flex-direction: column; gap: 7px; padding: 12px 14px; position: relative; }
+.swap { display: flex; flex-direction: column; justify-content: center; gap: 7px; padding: 12px 14px; position: relative; }
 .swap__title { font-size: 10px; opacity: 0.5; }
 .swap__field { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--outline); border-radius: 4px; }
 .swap__field--out { opacity: 0.7; }
@@ -1076,7 +1078,7 @@ ul, ol { list-style: none; }
   .panel { padding: 24px 48px 24px; gap: 20px; }
   .prow { grid-template-columns: 40px 1fr auto; align-items: start; padding: 14px 16px; }
   .prow__img { width: 40px; height: 40px; }
-  .prow__side { grid-column: auto; flex-direction: column; align-items: flex-end; gap: 6px; min-width: 200px; }
+  .prow__side { grid-column: auto; flex-direction: column-reverse; align-items: flex-end; gap: 6px; min-width: 200px; }
   .prow__side:has(.vote) { gap: 12px; }
   .prow__side .vote { margin-left: 0; }
 
@@ -1161,10 +1163,19 @@ ul, ol { list-style: none; }
   .prompt-bar__input { font-size: 16px; }   /* 16px stops iOS zooming on focus */
   .prompt-bar__send { width: 40px; height: 40px; margin: -6px -6px -6px 0; }
 
-  /* ── List rows: everything on the right edge stays on the right ── */
-  .prow { padding: 12px; }
-  .prow__side { gap: 8px; align-items: flex-end; }
-  .prow__row, .prow__bottom, .prow__side > .prow__meta { width: 100%; justify-content: flex-end; text-align: right; }
+  /* ── List rows: right column beside the text, meta row on top ── */
+  .prow { grid-template-columns: 34px minmax(0, 1fr) auto; padding: 12px 10px; gap: 8px; align-items: start; }
+  .prow__img { width: 34px; height: 34px; }
+  /* The side column dissolves into the grid: its meta line sits top-right
+     beside the question, and the badge row spans the full width below. */
+  .prow__side { display: contents; }
+  .prow__bottom, .prow__side > .prow__meta { grid-column: 3; grid-row: 1; align-self: start; white-space: nowrap; }
+  .prow__row { grid-column: 1 / -1; justify-content: flex-start; padding-top: 2px; }
+  .prow__bottom, .prow__side > .prow__meta { justify-content: flex-end; text-align: right; }
+  .prow__state, .prow__bottom { font-size: 9px; }
+  .prow__bottom { gap: 3px 8px; }
+  .prow__q { font-size: 13px; }
+  .prow__thesis { font-size: 11px; }
 
   /* ── Tokenomics table: one block per stream ── */
   .doors thead { display: none; }
@@ -1184,13 +1195,13 @@ ul, ol { list-style: none; }
   /* ── Record ── */
   .panel--record { padding-top: 28px; }
   .pnl { gap: 18px; }
-  .edge { margin-top: 44px; gap: 7px; padding: 0 10px 16px; }
-  .edge__col { width: 11px; }
-  .edge__bar { width: 11px; }
+  .edge { margin-top: 44px; gap: 14px; padding: 0 6px 16px; }   /* same gap as desktop */
+  .edge__col { width: 14px; }
+  .edge__bar { width: 14px; }
   .edge__val { font-size: 9px; }
   .edge__axis { top: auto; bottom: -2px; }   /* dates below the bars, never colliding */
-  .edge__axis--l { left: 10px; }
-  .edge__axis--r { right: 10px; }
+  .edge__axis--l { left: 6px; }
+  .edge__axis--r { right: 6px; }
   /* Calls · Wins · Losses centred on one row, Win rate · Edge centred under it */
   .stats { display: grid; grid-template-columns: repeat(6, auto); justify-content: center; gap: 12px 12px; }
   .stats__label { white-space: nowrap; }
@@ -1207,7 +1218,7 @@ ul, ol { list-style: none; }
   .tchart  { order: 2; }
   .trades  { order: 3; }
   .swap    { order: 4; }
-  .panel--token .pgroup__title { order: 5; text-align: center; }
+  .panel--token .pgroup__title { order: 5; }
   .wallets { order: 6; }
   .token__line { order: 7; justify-content: center; margin-top: 10px; }
 
@@ -1217,13 +1228,13 @@ ul, ol { list-style: none; }
   .tchart { padding: 12px 10px; }
   .tchart__head { flex-wrap: nowrap; align-items: center; gap: 6px; }
   .tchart__now { flex: 0 0 auto; gap: 5px; }
-  .tchart__price { font-size: 15px; }
+  .tchart__price { font-size: 18px; }
   .tchart__change { font-size: 10px; }
   .tchart__pair { display: none; }
   .tchart__controls { flex: 1 1 auto; min-width: 0; flex-direction: row; justify-content: flex-end; align-items: center; gap: 6px; }
-  .seg__opt { font-size: 8px; padding: 0 5px; letter-spacing: 0.04em; }
-  .tchart__controls .range { gap: 2px; }
-  .tchart__controls .range__tab { padding: 0 3px; font-size: 9px; letter-spacing: 0.04em; }
+  .seg__opt { font-size: 8px; padding: 0 4px; letter-spacing: 0.02em; }
+  .tchart__controls .range { gap: 1px; }
+  .tchart__controls .range__tab { padding: 0 2px; font-size: 8.5px; letter-spacing: 0.02em; }
   .tchart__plot { height: 180px; }
 
   .swap__field { min-height: 46px; }
