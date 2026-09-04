@@ -73,9 +73,9 @@ ul, ol { list-style: none; }
 /* The bar's frame glows for a moment as each pulse leaves it */
 .prompt-bar { transition: border-color 0.5s ease-out, box-shadow 0.5s ease-out; }
 .prompt-bar--pulse {
-  border-color: rgba(16, 240, 95, 0.32);
-  box-shadow: 0 0 10px 0 rgba(16, 240, 95, 0.10);
-  transition: border-color 0.12s ease-out, box-shadow 0.12s ease-out;
+  border-color: rgba(16, 240, 95, 0.22);
+  box-shadow: 0 0 10px 0 rgba(16, 240, 95, 0.07);
+  transition: border-color 0.5s ease-in-out, box-shadow 0.5s ease-in-out;
 }
 
 /* ── Header ───────────────────────────────────────────── */
@@ -1002,7 +1002,7 @@ ul, ol { list-style: none; }
   z-index: 2;
   left: -28px; top: 3px;
   width: 10px; height: 10px;
-  border-radius: 50%;
+  border-radius: 1px;
   border: 1px solid var(--green);
   background: var(--navy);        /* covers the line so the streak is never seen inside */
   box-shadow: 0 0 0 0 rgba(16, 240, 95, 0);

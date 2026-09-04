@@ -680,7 +680,7 @@
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
 
   var traces = [], pulses = [], origin = { x: 0, y: 0 }, barBox = null, heroBox = null;
-  var raf = null, lastFrame = 0, lastPulse = 0, typingUntil = 0;
+  var raf = null, lastFrame = 0, lastPulse = 0, typingUntil = 0, lastStart = null;
 
   function docRect(el) {
     var r = el.getBoundingClientRect();
@@ -791,6 +791,8 @@
     barBox = docRect(bar);
     var hero = bar.closest('.hero');
     heroBox = hero ? grow(docRect(hero), -CLEAR) : null;   /* the board lives in the hero only */
+    var cards = document.querySelector('.carousel');       /* and never above the cards */
+    if (cards && heroBox) heroBox.t = Math.max(heroBox.t, docRect(cards).t);
     var band = grow(barBox, BAND + 20);   /* origin is set by place(), not here */
     var rects = obstacles(band);
     /* After a trace has left the frame it must stay off it: without this a
@@ -824,13 +826,13 @@
     for (i = 0; i < starts.length; i++) {
       var s = starts[i], pts = [{ x: s.x, y: s.y }];
       var x = s.x, y = s.y, dx = s.dx, dy = s.dy, ok = true;
-      var legs = 2 + Math.floor(Math.random() * 3);   /* 2 to 4 legs: turns read as corners, not a snake */
+      var legs = 2 + Math.floor(Math.random() * 2);   /* 2 or 3 legs: a corner or two, never a snake */
       for (var leg = 0; leg < legs; leg++) {
         var want = leg === 0 ? s.reach : (s.climb && leg === 1 ? s.climb : rnd(60, 200));
         var got = runLength(x, y, dx, dy, want, leg === 0 ? rects : away);
         /* 44px minimum: a shorter run would land as a stub turn right before
            the pad, which is the fidgety look. Ending here instead is cleaner. */
-        if (got < 34) { if (leg === 0) ok = false; break; }
+        if (got < 48) { if (leg === 0) ok = false; break; }
         x += dx * got; y += dy * got;
         pts.push({ x: x, y: y });
         if (leg < legs - 1) {                        /* right-angle turn only */
@@ -910,16 +912,30 @@
       for (z = 0; z < traces.length; z++) if (live.indexOf(z) < 0) free.push(z);
       if (!free.length) return;
       free.sort(function (a, b) { return (traces[a].used || 0) - (traces[b].used || 0); });
-      var pool = free.slice(0, Math.max(1, Math.ceil(free.length / 2)));   /* least recently used half */
+      /* Drop anything starting near the last one: two runs leaving the same
+         side one after the other read as a chase and pull the eye. */
+      var apart = free;
+      if (lastStart) {
+        apart = free.filter(function (k) {
+          var p0 = traces[k].pts[0];
+          return Math.abs(p0.x - lastStart.x) + Math.abs(p0.y - lastStart.y) > 260;
+        });
+        if (!apart.length) apart = free;
+      }
+      var pool = apart.slice(0, Math.max(1, Math.ceil(apart.length / 2)));   /* least recently used half */
       var pick = pool[Math.floor(Math.random() * pool.length)];
       traces[pick].used = performance.now();
+      lastStart = traces[pick].pts[0];
       picks.push(pick);                               /* one at a time */
     }
     for (var p = 0; p < picks.length; p++) {
       pulses.push({ i: picks[p], start: performance.now(), level: strength });
     }
+    /* No glow while typing: a blink under the cursor every second is the
+       most distracting thing on the page. */
+    if (performance.now() < typingUntil) return;
     bar.classList.add('prompt-bar--pulse');
-    setTimeout(function () { bar.classList.remove('prompt-bar--pulse'); }, 240);
+    setTimeout(function () { bar.classList.remove('prompt-bar--pulse'); }, 700);
   }
 
   function strokeSeg(a, b, alpha, wideLine) {
