@@ -671,7 +671,7 @@
   var FRAME   = 1000 / 60;   /* 60fps: at 200px/s, 30fps reads as steps */
   var CLEAR   = 20;    /* keep this far off any content, pad included */
 
-  var IDLE_GAP = 4600, TYPING_GAP = 4600;   /* one steady beat, typing included */
+  var IDLE_GAP = 3800, TYPING_GAP = 3800;   /* one steady beat, typing included */
   var MAX_LIVE = 2;    /* the beat is slow, so one or two are moving */
   var IDLE_LEVEL = 0.72, TYPING_LEVEL = 0.85, SEND_LEVEL = 1;
   var PEAK = 0.62;     /* the roadmap streak peaks at 0.9; this is the same, dimmer */
@@ -829,9 +829,11 @@
     for (i = 0; i < starts.length; i++) {
       var s = starts[i], pts = [{ x: s.x, y: s.y }];
       var x = s.x, y = s.y, dx = s.dx, dy = s.dy, ok = true;
-      var legs = 2 + Math.floor(Math.random() * 2);   /* 2 or 3 legs: a corner or two, never a snake */
+      /* Mostly three legs, sometimes two, occasionally four. Every leg is
+         still 48px minimum, so extra legs read as corners, not wiggle. */
+      var legs = 2 + (Math.random() < 0.6 ? 1 : 0) + (Math.random() < 0.28 ? 1 : 0);
       for (var leg = 0; leg < legs; leg++) {
-        var want = leg === 0 ? s.reach : (s.climb && leg === 1 ? s.climb : rnd(60, 200));
+        var want = leg === 0 ? s.reach : (s.climb && leg === 1 ? s.climb : rnd(55, 245));
         var got = runLength(x, y, dx, dy, want, leg === 0 ? rects : away);
         /* 44px minimum: a shorter run would land as a stub turn right before
            the pad, which is the fidgety look. Ending here instead is cleaner. */
