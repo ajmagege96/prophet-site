@@ -672,8 +672,8 @@
   var CLEAR   = 20;    /* keep this far off any content, pad included */
 
   var IDLE_GAP = 3000, TYPING_GAP = 3000;   /* one steady beat, typing included */
-  var MAX_LIVE = 1;    /* exactly one run on screen at a time */
-  var MAX_LEN  = 380;  /* (380 + 166) / 200 = 2.73s, a clear margin before the next beat */
+  var MAX_LIVE = 3;    /* headroom: a long run must never block the beat */
+  var MAX_LEN  = 900;  /* full length, so climbs can reach the top of the cards */
   var IDLE_LEVEL = 0.72, TYPING_LEVEL = 0.85, SEND_LEVEL = 1;
   var PEAK = 0.62;     /* the roadmap streak peaks at 0.9; this is the same, dimmer */
 
@@ -835,7 +835,7 @@
       var legs = 2 + (Math.random() < 0.6 ? 1 : 0) + (Math.random() < 0.28 ? 1 : 0);
       for (var leg = 0; leg < legs; leg++) {
         var want = leg === 0 ? s.reach : (s.climb && leg === 1 ? s.climb : rnd(55, 245));
-        want = Math.min(want, MAX_LEN - run);         /* stay inside one beat */
+        want = Math.min(want, MAX_LEN - run);
         if (want < 48) break;
         var got = runLength(x, y, dx, dy, want, leg === 0 ? rects : away);
         /* 44px minimum: a shorter run would land as a stub turn right before
