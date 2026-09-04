@@ -671,8 +671,8 @@
   var FRAME   = 1000 / 60;   /* 60fps: at 200px/s, 30fps reads as steps */
   var CLEAR   = 20;    /* keep this far off any content, pad included */
 
-  var IDLE_GAP = 1600, TYPING_GAP = 700;
-  var MAX_LIVE = 3;    /* they overlap, so one is always on screen */
+  var IDLE_GAP = 2600, TYPING_GAP = 2600;   /* one steady beat, typing included */
+  var MAX_LIVE = 2;    /* the beat is slow, so one or two are moving */
   var IDLE_LEVEL = 0.72, TYPING_LEVEL = 0.85, SEND_LEVEL = 1;
   var PEAK = 0.62;     /* the roadmap streak peaks at 0.9; this is the same, dimmer */
 
@@ -802,19 +802,22 @@
     /* exit points on the bar's frame, each leaving at 90 degrees */
     var starts = [], w = barBox.r - barBox.l, h = barBox.b - barBox.t, i;
     function rnd(a, b) { return a + Math.random() * (b - a); }
+    /* How much room there is between the bar and the top of the cards, so
+       climbs can be anything from a short rise to the full height. */
+    var headroom = heroBox ? Math.max(80, barBox.t - heroBox.t - CLEAR) : 400;
 
     var across = 15;
     for (i = 0; i < across; i++) {
-      var fx = barBox.l + w * (i + 0.5) / across;
+      var fx = barBox.l + w * (0.09 + 0.82 * (i + 0.5) / across);   /* never off a corner */
       starts.push({ x: fx, y: barBox.b, dx: 0, dy: 1, reach: rnd(34, 120) });
     }
     /* Side runs head out to the page gutter first, then climb: the gutters
        beside the content column are empty, so traces can travel the margins
        all the way up to the header. */
     for (i = 0; i < 11; i++) {
-      var fy = barBox.t + h * (i + 0.5) / 11;
-      starts.push({ x: barBox.l, y: fy, dx: -1, dy: 0, reach: rnd(240, 360), up: i % 2 === 0, climb: rnd(120, 720) });
-      starts.push({ x: barBox.r, y: fy, dx: 1, dy: 0, reach: rnd(240, 360), up: i % 2 === 1, climb: rnd(120, 720) });
+      var fy = barBox.t + h * (0.18 + 0.64 * (i + 0.5) / 11);        /* never off a corner */
+      starts.push({ x: barBox.l, y: fy, dx: -1, dy: 0, reach: rnd(240, 360), up: i % 2 === 0, climb: headroom * rnd(0.22, 1) });
+      starts.push({ x: barBox.r, y: fy, dx: 1, dy: 0, reach: rnd(240, 360), up: i % 2 === 1, climb: headroom * rnd(0.22, 1) });
     }
     /* shuffle, so the order traces are laid down (and so which ones survive
        the spacing check) differs on every build */
@@ -931,9 +934,8 @@
     for (var p = 0; p < picks.length; p++) {
       pulses.push({ i: picks[p], start: performance.now(), level: strength });
     }
-    /* No glow while typing: a blink under the cursor every second is the
-       most distracting thing on the page. */
-    if (performance.now() < typingUntil) return;
+    /* The flash and the trace are one event: the bar beats, and something
+       leaves it. Same beat whether or not you are typing. */
     bar.classList.add('prompt-bar--pulse');
     setTimeout(function () { bar.classList.remove('prompt-bar--pulse'); }, 700);
   }
