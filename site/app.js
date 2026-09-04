@@ -671,7 +671,7 @@
   var PEAK   = 0.50;   /* the roadmap peaks at 0.9; this is dimmer */
   var MAX_LEN = 950;   /* long enough to climb to the cards; short enough that
                           no more than two are ever travelling at once */
-  var CLEAR = 20, MIN_LEG = 48;
+  var CLEAR = 20, CARD_CLEAR = 8, MIN_LEG = 48;
   /* The channel between the carousel's arrow and its cards is only about
      30px wide. A climb has to zigzag inside it without going past the arrow,
      so its sideways steps are allowed to be shorter than a normal leg. */
@@ -719,7 +719,11 @@
       if (el.closest && el.closest('[data-walkthrough]')) return;
       seen.push(el);
       var r = visibleRect(el);
-      if (r && r.r > r.l && r.b > r.t) out.push(grow(r, CLEAR));
+      /* The cards sit right against the side channels, so their clearance is
+         what sets the channel's width. Tighter here buys climbing room; every
+         other block keeps the full margin. */
+      var pad = el.classList && el.classList.contains('carousel__card') ? CARD_CLEAR : CLEAR;
+      if (r && r.r > r.l && r.b > r.t) out.push(grow(r, pad));
     }
     var blocks = document.querySelectorAll('.feed, .takes, .thesis, .carousel__card, .carousel__arrow, .filters, .below, .site-header, .site-footer');
     for (i = 0; i < blocks.length; i++) add(blocks[i]);

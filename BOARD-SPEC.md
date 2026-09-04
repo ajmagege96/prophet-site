@@ -78,7 +78,9 @@ The cards and the takes feed cover the middle of the hero, and rule 7 forbids
 drawing over them, so the free space is three regions: the band under the bar
 (full width, ~110px deep), the two blocks flanking the bar below the feed
 (~220x220 each), and the two side channels between the arrows and the cards
-(~32px wide, but tall). Routes are spread across all of them. A long route is
+(~44px wide, but tall — the cards carry a
+reduced 8px clearance so the channel is as wide as it can be without
+crossing them). Routes are spread across all of them. A long route is
 sent to the band most often, because that is the only region wide enough to
 spend the length. Measured over 705 routes: p10 112px, median 272, p90 584,
 max 788; 30% short, 43% mid, 23% long, 4% tall; 0 doubling back, 0 diagonals,
