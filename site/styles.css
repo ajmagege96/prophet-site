@@ -73,8 +73,8 @@ ul, ol { list-style: none; }
 /* The bar's frame glows for a moment as each pulse leaves it */
 .prompt-bar { transition: border-color 0.5s ease-out, box-shadow 0.5s ease-out; }
 .prompt-bar--pulse {
-  border-color: rgba(16, 240, 95, 0.22);
-  box-shadow: 0 0 10px 0 rgba(16, 240, 95, 0.07);
+  border-color: rgba(16, 240, 95, 0.36);
+  box-shadow: 0 0 12px 0 rgba(16, 240, 95, 0.13);
   transition: border-color 0.5s ease-in-out, box-shadow 0.5s ease-in-out;
 }
 

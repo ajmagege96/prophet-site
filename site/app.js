@@ -668,14 +668,24 @@
 
   var GREEN  = '16, 240, 95';
   var BEAT   = 3000;   /* ms between flashes */
-  var SPEED  = 200;    /* px/s, the roadmap streak */
   var STREAK = 160;    /* px, the roadmap streak length */
   var DRAIN  = 300;    /* ms for a pad to fade once the light has passed */
   var PADSZ  = 6;
-  var PEAK   = 0.62;   /* the roadmap peaks at 0.9; this is dimmer */
+  var PEAK   = 0.50;   /* the roadmap peaks at 0.9; this is dimmer */
 
-  /* The longest run that is completely gone before the next flash. */
-  var MAX_LEN = Math.floor(BEAT / 1000 * SPEED - STREAK - SPEED * DRAIN / 1000 - 20);
+  /* Every run takes the same time, whatever its length: a long trace simply
+     carries its light faster. That is what lets runs be long and varied while
+     still being one at a time, since each is always gone before the next
+     flash. Speed is clamped so nothing crawls or darts. */
+  var TRAVEL   = 2.4;  /* seconds of travel, before the pad drains */
+  var MIN_SPD  = 200;  /* the roadmap's own speed */
+  var MAX_SPD  = 340;
+  var MAX_LEN  = Math.floor(MAX_SPD * TRAVEL - STREAK);
+
+  function speedFor(len) {
+    var v = (len + STREAK) / TRAVEL;
+    return v < MIN_SPD ? MIN_SPD : (v > MAX_SPD ? MAX_SPD : v);
+  }
 
   var BAND = 520, CLEAR = 20, MIN_LEG = 48;
 
@@ -797,7 +807,7 @@
       var legs = 2 + Math.floor(Math.random() * 3);  /* 2 to 4: corners, never a snake */
 
       for (var leg = 0; leg < legs; leg++) {
-        var want = leg === 0 ? st.first : rnd(60, 220);
+        var want = leg === 0 ? st.first : rnd(70, 320);
         want = Math.min(want, MAX_LEN - total);      /* a run must fit inside one beat */
         if (want < MIN_LEG) break;
         var got = march(x, y, dx, dy, want, leg === 0 ? rects : offBar);
@@ -818,7 +828,7 @@
         segs.push({ a: pts[p], b: pts[p + 1], from: len, len: L });
         len += L;
       }
-      out.push({ pts: pts, segs: segs, len: len, pad: pts[pts.length - 1] });
+      out.push({ pts: pts, segs: segs, len: len, pad: pts[pts.length - 1], speed: speedFor(len) });
     }
     return out;
   }
@@ -868,12 +878,12 @@
     return (u <= 0 || u >= 1) ? 0 : Math.sin(Math.PI * u);
   }
 
-  function padLevel(r, len) {
+  function padLevel(r, len, spd) {
     var lands = len - PADSZ / 2 + PADSZ * 0.1;        /* leading edge ~10% in */
     var leaves = len + PADSZ * 0.1 + STREAK;          /* trailing edge ~10% past */
     if (r < lands) return 0;
-    if (r <= leaves) return Math.min(1, (r - lands) / (SPEED * 0.15));
-    var v = 1 - (r - leaves) / (SPEED * DRAIN / 1000);
+    if (r <= leaves) return Math.min(1, (r - lands) / (spd * 0.15));
+    var v = 1 - (r - leaves) / (spd * DRAIN / 1000);
     return v > 0 ? v : 0;
   }
 
@@ -883,8 +893,8 @@
     if (!run) return;
     var t = traces[run.i];
     if (!t) { run = null; return; }
-    var r = (now - run.start) / 1000 * SPEED;
-    if (r > t.len + STREAK + SPEED * DRAIN / 1000 + 10) { run = null; return; }
+    var r = (now - run.start) / 1000 * t.speed;
+    if (r > t.len + STREAK + t.speed * DRAIN / 1000 + 10) { run = null; return; }
 
     ctx.save();
     ctx.lineCap = 'round';
@@ -912,7 +922,7 @@
       ctx.stroke();
     }
 
-    var lit = padLevel(r, t.len);
+    var lit = padLevel(r, t.len, t.speed);
     if (lit > 0.01) {
       var e = lit * lit * (3 - 2 * lit);
       var px = t.pad.x - origin.x - PADSZ / 2, py = t.pad.y - origin.y - PADSZ / 2;
@@ -958,11 +968,12 @@
     traces: function () { return traces.length; },
     maxLen: function () { return MAX_LEN; },
     set: function (o) {
-      if (o && o.speed) SPEED = o.speed;
       if (o && o.beat) BEAT = o.beat;
-      MAX_LEN = Math.floor(BEAT / 1000 * SPEED - STREAK - SPEED * DRAIN / 1000 - 20);
+      if (o && o.travel) TRAVEL = o.travel;
+      if (o && o.peak) PEAK = o.peak;
+      MAX_LEN = Math.floor(MAX_SPD * TRAVEL - STREAK);
       later();
-      return { beat: BEAT, speed: SPEED, maxLen: MAX_LEN };
+      return { beat: BEAT, travel: TRAVEL, peak: PEAK, maxLen: MAX_LEN };
     }
   };
 
