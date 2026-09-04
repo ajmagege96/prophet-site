@@ -673,7 +673,7 @@
 
   var IDLE_GAP = 3000, TYPING_GAP = 3000;   /* one steady beat, typing included */
   var MAX_LIVE = 1;    /* exactly one run on screen at a time */
-  var MAX_LEN  = 430;  /* (430 + 160) / 200 = 2.95s, so it lands before the next beat */
+  var MAX_LEN  = 380;  /* (380 + 166) / 200 = 2.73s, a clear margin before the next beat */
   var IDLE_LEVEL = 0.72, TYPING_LEVEL = 0.85, SEND_LEVEL = 1;
   var PEAK = 0.62;     /* the roadmap streak peaks at 0.9; this is the same, dimmer */
 
@@ -1057,11 +1057,20 @@
       barBox = live; place(); build(); pulses = [];
       return;
     }
+    /* Retire finished runs before the beat. paint() used to do this after,
+       so a run that had just ended still counted against the cap, blocked
+       the flash, and the beat advanced anyway: one skipped beat became a
+       six second gap. */
+    for (var q = pulses.length - 1; q >= 0; q--) {
+      var pt = traces[pulses[q].i];
+      if (!pt || (now - pulses[q].start) / 1000 * SPEED - STREAK > pt.len + PAD) pulses.splice(q, 1);
+    }
+
     /* A metronome on a fixed grid. It is never reset by a restart, a
-       rebuild or a resize, which is what made the flashing irregular. */
+       rebuild or a resize. If a beat somehow cannot fire it retries on the
+       next frame rather than skipping a whole interval. */
     if (!nextBeat) nextBeat = now + IDLE_GAP;
-    if (now >= nextBeat) {
-      firePulse(IDLE_LEVEL, false);
+    if (now >= nextBeat && firePulse(IDLE_LEVEL, false)) {
       nextBeat += IDLE_GAP;
       if (nextBeat <= now) nextBeat = now + IDLE_GAP;   /* after a hidden tab */
     }
