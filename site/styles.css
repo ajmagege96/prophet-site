@@ -741,7 +741,6 @@ ul, ol { list-style: none; }
 .prow__state--vote { color: var(--purple-text); }
 .prow__meta { font-size: 11px; opacity: 0.45; white-space: nowrap; }
 .prow__row { display: flex; align-items: center; gap: 10px; }
-.prow__row .vote { order: -1; }   /* Vote sits left of the badge */
 .prow__side .vote { margin-left: auto; }
 .prow__side .vote__pop { right: 0; }
 .prow__outcome { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 2px 8px; border: 1px solid currentColor; border-radius: 2px; }
@@ -1166,11 +1165,32 @@ ul, ol { list-style: none; }
   /* ── List rows: right column beside the text, meta row on top ── */
   .prow { grid-template-columns: 34px minmax(0, 1fr) auto; padding: 12px 10px; gap: 8px; align-items: start; }
   .prow__img { width: 34px; height: 34px; }
-  /* The side column dissolves into the grid: its meta line sits top-right
-     beside the question, and the badge row spans the full width below. */
-  .prow__side { display: contents; }
-  .prow__bottom, .prow__side > .prow__meta { grid-column: 3; grid-row: 1; align-self: start; white-space: nowrap; }
-  .prow__row { grid-column: 1 / -1; justify-content: flex-start; padding-top: 2px; }
+  /* Two rows. Row 1: image + text. Row 2: the vote block on the left,
+     the live meta on the right. */
+  .prow { grid-template-columns: 34px minmax(0, 1fr); }
+  .prow__main { grid-column: 2; grid-row: 1; }
+  .prow__side {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .prow__row { flex: 0 1 auto; min-width: 0; justify-content: flex-start; }
+  .prow__row .vote { order: -1; }            /* Vote leftmost in that block */
+  .prow__state { white-space: normal; }      /* may wrap so the meta keeps its place */
+  .prow__bottom { flex: 0 0 auto; white-space: nowrap; }
+  .prow__drop { grid-column: 1 / -1; }
+
+  /* Record: timestamp top-right on row 1, called + WON/LOST bottom-right */
+  .panel--record .prow { grid-template-columns: 34px minmax(0, 1fr) auto; }
+  .panel--record .prow__main { grid-column: 2 / 3; grid-row: 1; }
+  .panel--record .prow__side { display: contents; }
+  .panel--record .prow__side > .prow__meta { grid-column: 3; grid-row: 1; justify-self: end; align-self: start; white-space: nowrap; }
+  .panel--record .prow__row { grid-column: 2 / -1; grid-row: 2; justify-content: flex-end; }
   .prow__bottom, .prow__side > .prow__meta { justify-content: flex-end; text-align: right; }
   .prow__state, .prow__bottom { font-size: 9px; }
   .prow__bottom { gap: 3px 8px; }
@@ -1195,11 +1215,13 @@ ul, ol { list-style: none; }
   /* ── Record ── */
   .panel--record { padding-top: 28px; }
   .pnl { gap: 18px; }
-  .edge { margin-top: 44px; gap: 14px; padding: 0 6px 16px; }   /* same gap as desktop */
+  /* No vertical padding here: .edge::before sits at 50% of this box, so any
+     padding-bottom would push the baseline below the bars' own centre line. */
+  .edge { margin: 44px 0 34px; gap: 14px; padding: 0 6px; }
   .edge__col { width: 14px; }
   .edge__bar { width: 14px; }
   .edge__val { font-size: 9px; }
-  .edge__axis { top: auto; bottom: -2px; }   /* dates below the bars, never colliding */
+  .edge__axis { top: auto; bottom: -20px; }   /* dates below the bars, never colliding */
   .edge__axis--l { left: 6px; }
   .edge__axis--r { right: 6px; }
   /* Calls · Wins · Losses centred on one row, Win rate · Edge centred under it */
@@ -1228,13 +1250,13 @@ ul, ol { list-style: none; }
   .tchart { padding: 12px 10px; }
   .tchart__head { flex-wrap: nowrap; align-items: center; gap: 6px; }
   .tchart__now { flex: 0 0 auto; gap: 5px; }
-  .tchart__price { font-size: 18px; }
+  .tchart__price { font-size: 17px; }
   .tchart__change { font-size: 10px; }
   .tchart__pair { display: none; }
   .tchart__controls { flex: 1 1 auto; min-width: 0; flex-direction: row; justify-content: flex-end; align-items: center; gap: 6px; }
   .seg__opt { font-size: 8px; padding: 0 4px; letter-spacing: 0.02em; }
-  .tchart__controls .range { gap: 1px; }
-  .tchart__controls .range__tab { padding: 0 2px; font-size: 8.5px; letter-spacing: 0.02em; }
+  .tchart__controls .range { gap: 4px; }
+  .tchart__controls .range__tab { padding: 0 3px; font-size: 10px; letter-spacing: 0.04em; }
   .tchart__plot { height: 180px; }
 
   .swap__field { min-height: 46px; }
