@@ -672,7 +672,11 @@
   var CLEAR   = 20;    /* keep this far off any content, pad included */
 
   var IDLE_GAP = 3000, TYPING_GAP = 3000;   /* one steady beat, typing included */
-  var MAX_LIVE = 8;    /* high enough that a beat is never blocked; runs just overlap */
+  var MAX_LIVE = 8;    /* high enough that a beat is never blocked */
+  /* A run lasts (len + STREAK + PAD) / SPEED. At a 3s beat, 434px is the
+     longest that is gone before the next flash, so only one is ever on
+     screen. Anything longer and two or three overlap. */
+  var MAX_LEN  = 430;
   var IDLE_LEVEL = 0.72, TYPING_LEVEL = 0.85, SEND_LEVEL = 1;
   var PEAK = 0.62;     /* the roadmap streak peaks at 0.9; this is the same, dimmer */
 
@@ -828,18 +832,19 @@
 
     for (i = 0; i < starts.length; i++) {
       var s = starts[i], pts = [{ x: s.x, y: s.y }];
-      var x = s.x, y = s.y, dx = s.dx, dy = s.dy, ok = true;
+      var x = s.x, y = s.y, dx = s.dx, dy = s.dy, ok = true, run = 0;
       /* Mostly three legs, sometimes two, occasionally four. Every leg is
          still 48px minimum, so extra legs read as corners, not wiggle. */
       var legs = 2 + (Math.random() < 0.6 ? 1 : 0) + (Math.random() < 0.28 ? 1 : 0);
       for (var leg = 0; leg < legs; leg++) {
         var want = leg === 0 ? s.reach : (s.climb && leg === 1 ? s.climb : rnd(55, 245));
+        want = Math.min(want, MAX_LEN - run);
         if (want < 48) break;
         var got = runLength(x, y, dx, dy, want, leg === 0 ? rects : away);
         /* 44px minimum: a shorter run would land as a stub turn right before
            the pad, which is the fidgety look. Ending here instead is cleaner. */
         if (got < 48) { if (leg === 0) ok = false; break; }
-        x += dx * got; y += dy * got;
+        x += dx * got; y += dy * got; run += got;
         pts.push({ x: x, y: y });
         if (leg < legs - 1) {                        /* right-angle turn only */
           var turn = Math.random() < 0.5 ? 1 : -1;
@@ -1087,6 +1092,7 @@
     barBox = docRect(bar);
     place();
     build();
+    pulses = [];                      /* old pulses index the old traces */
     if (reduced.matches) { paint(performance.now(), 0); return; }   /* static board */
     start();
   }
