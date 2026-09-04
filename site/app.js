@@ -663,7 +663,7 @@
   var ctx = canvas.getContext('2d');
 
   var GREEN  = '16, 240, 95';
-  var BEAT   = 3000;   /* ms between flashes */
+  var BEAT   = 2600;   /* ms between flashes */
   var SPEED  = 200;    /* px/s, the roadmap's own speed */
   var STREAK = 160;    /* px, the roadmap streak length */
   var DRAIN  = 300;    /* ms for a pad to fade once the light has passed */
@@ -672,6 +672,10 @@
   var MAX_LEN = 950;   /* long enough to climb to the cards; short enough that
                           no more than two are ever travelling at once */
   var CLEAR = 20, MIN_LEG = 48;
+  /* The channel between the carousel's arrow and its cards is only about
+     30px wide. A climb has to zigzag inside it without going past the arrow,
+     so its sideways steps are allowed to be shorter than a normal leg. */
+  var MIN_JOG = 20;
 
   var wide    = window.matchMedia('(min-width: 1024px)');
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -815,8 +819,8 @@
        inside the page, then zigzag up it. */
     var out = side === 'left' ? -1 : 1;
     var lane = side === 'left'
-      ? rnd(colLeft - 46, colLeft - 8)                /* just inside the arrow */
-      : rnd(colRight + 8, colRight + 46);
+      ? rnd(leftX + 6, colLeft - 6)                   /* between the arrow's edge and the cards */
+      : rnd(colRight + 6, rightX - 6);
     x = side === 'left' ? barBox.l : barBox.r;
     y = barBox.t + h * rnd(0.34, 0.66);
     pts = [{ x: x, y: y }];
@@ -830,14 +834,14 @@
     var target = headroom * rnd(0.26, 1.02);
     var climbed = 0, jog = Math.random() < 0.5 ? -1 : 1, steps = 0, detours = 0;
     while (climbed < target && steps < 9) {
-      var wantUp = Math.min(rnd(90, 210), target - climbed);
+      var wantUp = Math.min(rnd(85, 165), target - climbed);   /* short enough that a tall climb must jog */
       if (wantUp < MIN_LEG) break;
       got = march(x, y, 0, -1, wantUp, offBar);
 
       if (got < MIN_LEG) {                            /* something in the way */
         if (detours >= 2) break;
-        var away = march(x, y, out, 0, rnd(56, 96), offBar);   /* step outward */
-        if (away < MIN_LEG) break;
+        var away = march(x, y, out, 0, rnd(20, 34), offBar);   /* step aside */
+        if (away < MIN_JOG) break;
         x += out * away; pts.push({ x: x, y: y });
         detours++; steps++;
         continue;                                     /* and try climbing again */
@@ -846,10 +850,10 @@
       y -= got; climbed += got; pts.push({ x: x, y: y });
       steps++;
       if (climbed >= target - MIN_LEG) break;
-      var wantJog = rnd(MIN_LEG, 92);
+      var wantJog = rnd(MIN_JOG, 30);
       got = march(x, y, jog, 0, wantJog, offBar);
-      if (got < MIN_LEG) { jog = -jog; got = march(x, y, jog, 0, wantJog, offBar); }
-      if (got < MIN_LEG) break;
+      if (got < MIN_JOG) { jog = -jog; got = march(x, y, jog, 0, wantJog, offBar); }
+      if (got < MIN_JOG) break;
       x += jog * got; pts.push({ x: x, y: y });
       jog = -jog;                                     /* zigzag, not a drift */
       steps++;
@@ -870,12 +874,14 @@
        its arrows are. Cards and arrows are separate obstacles, so a route can
        use the gutter between them and step around an arrow. */
     var cr = cards ? docRect(cards) : null;
-    colLeft  = cr ? cr.l + 40 : (hb ? hb.l : 0);
-    colRight = cr ? cr.r - 40 : (hb ? hb.r : 0);
+    colLeft  = cr ? cr.l + 52 : (hb ? hb.l : 0);   /* arrow width plus its gap */
+    colRight = cr ? cr.r - 52 : (hb ? hb.r : 0);
     /* Stay off the page corners: the lane sits just outside the cards, not
        out at the viewport edge. */
-    leftX   = Math.max(hb ? hb.l : 0, colLeft - 96);   /* room to step around an arrow */
-    rightX  = Math.min(hb ? hb.r : 1e9, colRight + 96);
+    /* Hard limit: nothing goes past the carousel's outer edge, where the
+       arrows are. */
+    leftX   = cr ? cr.l : (hb ? hb.l : 0);
+    rightX  = cr ? cr.r : (hb ? hb.r : 1e9);
     headroom = Math.max(120, barBox.t - ceiling);
 
     rects = obstacles();

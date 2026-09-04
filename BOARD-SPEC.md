@@ -28,8 +28,11 @@ at the bottom.
 15. A fresh route is generated for every flash. Not a fixed set on rotation.
 16. Climbs zigzag up their lane. Not a single straight line.
 17. Never the same side of the bar three times running.
-18. Lanes sit just inside the carousel's arrows, stepping outward only to
-    get around one. Not out at the page corner.
+18. Nothing ever goes past the carousel's arrows. The lane is the channel
+    between an arrow and the cards, about 30px wide, so a climb's sideways
+    steps are 20-30px rather than a full leg.
+19. A tall climb always zigzags: a single vertical leg is capped at 165px,
+    so anything taller has to step at least once.
 
 ## Look
 16. Invisible at rest. A trace exists only while light is on it.
@@ -44,18 +47,18 @@ at the bottom.
 
 ---
 
-## Verified (385 sampled routes + a live run, 1440x1000)
+## Verified (378 sampled routes + a live run, 1440x1000)
 
 | Rule | Result |
 |---|---|
-| steady 3s beat, one trace each | gaps 3000ms, one route per flash |
+| beat, one trace each | 2.6s, one route per flash |
 | no diagonals | 0 |
-| 2-4 legs minimum 48px, zigzag climbs | legs 2-11, 0 under 48px, 94% zigzag |
 | ends on a pad | 0 missing |
-| climbs reach the cards | 676px against a 687px gap |
+| never past the arrows | x 169-1271; arrows at 168 and 1272 |
 | never above the cards | 0 points |
 | never off the page | 0 points |
-| fresh route each flash | 385 distinct out of 385 |
-| no side three times running | worst run 2 |
-| lanes inside the arrows | x 113-1327; arrows at 168 and 1272 |
-| lengths | 348-1140px, median 756 |
+| climbs go far | up to 568px, stopping below the arrow |
+| tall climbs zigzag | vertical legs capped at 165px; 69% of routes zigzag |
+| fresh route each flash | 374 distinct out of 378 |
+| left and right both used | left 187, right 191, worst run of one side 2 |
+| lengths | 292-904px, median 580 |
