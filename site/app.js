@@ -662,16 +662,16 @@
   var ctx = canvas.getContext('2d');
 
   var GREEN = '16, 240, 95';
-  var BAND    = 250;   /* how far the board reaches from the bar */
+  var BAND    = 340;   /* how far the board reaches from the bar */
   var REST    = 0.05;  /* trace opacity at rest */
   var PAD     = 6;     /* square pad, px */
-  var SPEED   = 200;   /* px per second, as the timeline streak */
-  var STREAK  = 70;    /* shorter streak: these runs are short */
+  var SPEED   = 70;    /* px per second: slow enough to follow */
+  var STREAK  = 95;    /* long streak, so the run reads at this speed */
   var FILL_MS = 400;   /* pad fill/drain, as the timeline dot */
   var FRAME   = 1000 / 30;
-  var CLEAR   = 16;    /* keep this far off any content */
+  var CLEAR   = 20;    /* keep this far off any content, pad included */
 
-  var IDLE_GAP = 5000, TYPING_GAP = 1400;
+  var IDLE_GAP = 1700, TYPING_GAP = 700;
   var IDLE_LEVEL = 0.55, TYPING_LEVEL = 0.7, SEND_LEVEL = 1;
 
   var wide    = window.matchMedia('(min-width: 1024px)');
@@ -760,7 +760,6 @@
     while (gone < want) {
       var nx = x + dx * (gone + step), ny = y + dy * (gone + step);
       if (outset(nx, ny) > BAND) break;
-      if (ny < barBox.t) break;          /* never rise past the bar: the feed is up there */
       if (hits(x + dx * gone, y + dy * gone, nx, ny, rects)) break;
       gone += step;
     }
@@ -792,29 +791,32 @@
 
     /* exit points on the bar's frame, each leaving at 90 degrees */
     var starts = [], w = barBox.r - barBox.l, h = barBox.b - barBox.t, i;
-    var across = 9;
+    var across = 11;
     for (i = 0; i < across; i++) {
       var fx = barBox.l + w * (i + 0.5) / across;
-      starts.push({ x: fx, y: barBox.b, dx: 0, dy: 1 });
+      starts.push({ x: fx, y: barBox.b, dx: 0, dy: 1, reach: 30 + (i % 4) * 22 });
     }
-    for (i = 0; i < 2; i++) {
-      var fy = barBox.t + h * (i + 0.5) / 2;
-      starts.push({ x: barBox.l, y: fy, dx: -1, dy: 0 });
-      starts.push({ x: barBox.r, y: fy, dx: 1, dy: 0 });
+    /* Side runs head out to the page gutter first, then climb: the gutters
+       beside the content column are empty, so traces can travel up there. */
+    for (i = 0; i < 3; i++) {
+      var fy = barBox.t + h * (i + 0.5) / 3;
+      starts.push({ x: barBox.l, y: fy, dx: -1, dy: 0, reach: 250 + i * 45, up: i % 2 === 0 });
+      starts.push({ x: barBox.r, y: fy, dx: 1, dy: 0, reach: 250 + i * 45, up: i % 2 === 1 });
     }
 
     for (i = 0; i < starts.length; i++) {
       var s = starts[i], pts = [{ x: s.x, y: s.y }];
       var x = s.x, y = s.y, dx = s.dx, dy = s.dy, ok = true;
-      var legs = 2 + (i % 2);                       /* 2 or 3 legs, uneven by design */
+      var legs = 2 + (i % 3);                       /* 2 to 4 legs, uneven by design */
       for (var leg = 0; leg < legs; leg++) {
-        var want = leg === 0 ? 34 + (i % 4) * 16 : 26 + ((i + leg) % 5) * 15;
+        var want = leg === 0 ? s.reach : (s.up !== undefined && leg === 1 ? 150 + (i % 3) * 60 : 40 + ((i + leg) % 5) * 34);
         var got = runLength(x, y, dx, dy, want, rects);
         if (got < 20) { if (leg === 0) ok = false; break; }
         x += dx * got; y += dy * got;
         pts.push({ x: x, y: y });
         if (leg < legs - 1) {                        /* right-angle turn only */
           var turn = ((i + leg) % 2) ? 1 : -1;
+          if (leg === 0 && s.up !== undefined) turn = s.up ? -1 : 1;   /* send half the side runs upward */
           var ndx = dy * turn, ndy = -dx * turn;
           dx = ndx; dy = ndy;
         }
@@ -861,7 +863,7 @@
     var picks = [];
     if (all) { for (var i = 0; i < traces.length; i++) picks.push(i); }
     else {
-      var n = 1 + (Math.random() < 0.4 ? 1 : 0);     /* one or two, never all */
+      var n = 2 + Math.floor(Math.random() * 3);     /* two to four, never all */
       while (picks.length < n) {
         var k = Math.floor(Math.random() * traces.length);
         if (picks.indexOf(k) < 0) picks.push(k);
