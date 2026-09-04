@@ -671,7 +671,7 @@
   var FRAME   = 1000 / 60;   /* 60fps: at 200px/s, 30fps reads as steps */
   var CLEAR   = 20;    /* keep this far off any content, pad included */
 
-  var IDLE_GAP = 1200, TYPING_GAP = 550;
+  var IDLE_GAP = 1600, TYPING_GAP = 700;
   var MAX_LIVE = 3;    /* they overlap, so one is always on screen */
   var IDLE_LEVEL = 0.72, TYPING_LEVEL = 0.85, SEND_LEVEL = 1;
   var PEAK = 0.62;     /* the roadmap streak peaks at 0.9; this is the same, dimmer */
@@ -786,13 +786,16 @@
     return false;
   }
 
-  function build() {
-    traces = [];
+  function buildOnce() {
+    var out = [];
     barBox = docRect(bar);
     var hero = bar.closest('.hero');
     heroBox = hero ? grow(docRect(hero), -CLEAR) : null;   /* the board lives in the hero only */
     var band = grow(barBox, BAND + 20);   /* origin is set by place(), not here */
     var rects = obstacles(band);
+    /* After a trace has left the frame it must stay off it: without this a
+       run can turn early and travel along the bar's own edge. */
+    var away = rects.concat([grow(barBox, 18)]);
 
     /* exit points on the bar's frame, each leaving at 90 degrees */
     var starts = [], w = barBox.r - barBox.l, h = barBox.b - barBox.t, i;
@@ -801,7 +804,7 @@
     var across = 15;
     for (i = 0; i < across; i++) {
       var fx = barBox.l + w * (i + 0.5) / across;
-      starts.push({ x: fx, y: barBox.b, dx: 0, dy: 1, reach: rnd(30, 120) });
+      starts.push({ x: fx, y: barBox.b, dx: 0, dy: 1, reach: rnd(34, 120) });
     }
     /* Side runs head out to the page gutter first, then climb: the gutters
        beside the content column are empty, so traces can travel the margins
@@ -821,11 +824,13 @@
     for (i = 0; i < starts.length; i++) {
       var s = starts[i], pts = [{ x: s.x, y: s.y }];
       var x = s.x, y = s.y, dx = s.dx, dy = s.dy, ok = true;
-      var legs = 2 + Math.floor(Math.random() * 5);   /* 2 to 6 legs: every route differs */
+      var legs = 2 + Math.floor(Math.random() * 3);   /* 2 to 4 legs: turns read as corners, not a snake */
       for (var leg = 0; leg < legs; leg++) {
-        var want = leg === 0 ? s.reach : (s.climb && leg === 1 ? s.climb : rnd(40, 190));
-        var got = runLength(x, y, dx, dy, want, rects);
-        if (got < 16) { if (leg === 0) ok = false; break; }
+        var want = leg === 0 ? s.reach : (s.climb && leg === 1 ? s.climb : rnd(60, 200));
+        var got = runLength(x, y, dx, dy, want, leg === 0 ? rects : away);
+        /* 44px minimum: a shorter run would land as a stub turn right before
+           the pad, which is the fidgety look. Ending here instead is cleaner. */
+        if (got < 34) { if (leg === 0) ok = false; break; }
         x += dx * got; y += dy * got;
         pts.push({ x: x, y: y });
         if (leg < legs - 1) {                        /* right-angle turn only */
@@ -836,7 +841,7 @@
         }
       }
       if (!ok || pts.length < 2) continue;
-      if (tooClose(pts, traces, 7)) continue;
+      if (tooClose(pts, out, 7)) continue;
 
       var len = 0, segs = [];
       for (var p = 0; p < pts.length - 1; p++) {
@@ -844,8 +849,21 @@
         segs.push({ a: pts[p], b: pts[p + 1], from: len, len: L });
         len += L;
       }
-      traces.push({ pts: pts, segs: segs, len: len, pad: pts[pts.length - 1], lit: 0 });
+      out.push({ pts: pts, segs: segs, len: len, pad: pts[pts.length - 1], lit: 0 });
     }
+    return out;
+  }
+
+  /* The spacing check and the random shuffle mean some layouts come out
+     sparse. Try a few and keep the fullest. */
+  function build() {
+    var best = [];
+    for (var a = 0; a < 8; a++) {
+      var got = buildOnce();
+      if (got.length > best.length) best = got;
+      if (best.length >= 9) break;
+    }
+    traces = best;
   }
 
   function drawBox() {
