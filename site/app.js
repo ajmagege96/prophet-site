@@ -672,8 +672,9 @@
   var CLEAR   = 20;    /* keep this far off any content, pad included */
 
   var IDLE_GAP = 3000, TYPING_GAP = 3000;   /* one steady beat, typing included */
-  var MAX_LIVE = 3;    /* headroom: a long run must never block the beat */
-  var MAX_LEN  = 900;  /* full length, so climbs can reach the top of the cards */
+  var MAX_LIVE = 1;    /* exactly one run on screen */
+  var MAX_LEN  = 410;  /* one run on screen and a 3s beat caps a run at 434px:
+                          (410 + 160 + 6) / 200 = 2.88s, landing before the next beat */
   var IDLE_LEVEL = 0.72, TYPING_LEVEL = 0.85, SEND_LEVEL = 1;
   var PEAK = 0.62;     /* the roadmap streak peaks at 0.9; this is the same, dimmer */
 
