@@ -82,3 +82,22 @@
 | `{{update.text}}`, `{{update.ago}}` | Chain: each update (`<!-- repeat: update -->`) |
 | `{{entry.resolved_side}}` / `{{entry.resolved_side_upper}}`, `{{entry.resolved_pct}}` | Chain: how the market resolved and its closing % |
 | `{{entry.lesson}}` | Chain: the lesson |
+
+### $PROPHET page
+| Variable | Description |
+|---|---|
+| `{{token.price}}`, `{{token.price_change}}` | Live price and 24h change (change colors green up / red down) |
+| `{{token.market_cap}}`, `{{token.market_cap_change}}` | Market cap and its 24h change |
+| `{{token.volume_24h}}`, `{{token.volume_change}}` | Volume and its 24h change |
+| `{{token.liquidity}}` | Liquidity |
+| `{{token.holders}}`, `{{token.holders_change}}` | Holders and the 24h change in holders |
+| `{{token.fees_earned}}` | Fees earned, in dollars, shown green |
+| `{{token.chart_ticks}}` | JSON array of x-axis labels for the selected range: clock times on 5M–1D, dates on 1W and longer |
+| `{{token.chart_series}}` | JSON array of prices, oldest first; app.js draws the green area chart, an x-axis of relative times, and the live price tagged beside the last point |
+| `{{swap_slippage}}`, `{{swap_impact}}` | Swap meta line, left: slip and price impact |
+| `{{swap_sol_balance}}` | The viewer's SOL balance, right of the swap meta line (e.g. "2.41 SOL") |
+| `{{trade.side}}`, `{{trade.amount}}` | Live-trades strip (`<!-- repeat: trade -->`): `buy` / `sell` and the amount |
+| `{{wallet_war_chest_url}}`, `{{wallet_rewards_url}}`, `{{wallet_burn_url}}`, `{{wallet_pools_url}}` | Explorer links for the four public wallets; shown as labels, never as addresses |
+| `{{wallet_war_chest_value}}`, `{{wallet_rewards_value}}`, `{{wallet_pools_value}}` | Live balances, green |
+| `{{wallet_burn_value}}` | Tokens burned, red (e.g. "8.4M"); the "$PROPHET" ticker after it stays gray, then a red flame icon |
+| `{{pool_last_week}}` | Last week's reward pool; the line reads "paid to the community" |

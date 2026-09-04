@@ -558,3 +558,74 @@
     for (var i = 0; i < tabs.length; i++) tabs[i].classList.toggle('range__tab--on', tabs[i] === btn);
   });
 })();
+
+/* ── $PROPHET price chart ─────────────────────────────── */
+/* Draws {{token.chart_series}} (JSON array, oldest first) as a filled green
+   area with an x-axis of relative times and the live price tagged on the
+   y-axis beside the last point. Redraws on resize. */
+(function () {
+  var box = document.querySelector('[data-token-chart]');
+  if (!box) return;
+  var raw = box.getAttribute('data-series') || '';
+  if (!raw || (/^\{\{/).test(raw)) raw = box.getAttribute('data-mock-series') || '[]';
+  var s = [];
+  try { s = JSON.parse(raw); } catch (e) {}
+  if (s.length < 2) return;
+  var price = box.getAttribute('data-price') || '';
+  if (!price || (/^\{\{/).test(price)) price = box.getAttribute('data-mock-price') || '';
+  /* Axis labels come from the server per range ({{token.chart_ticks}}, JSON array);
+     for a 1D range these are clock times, for longer ranges dates. */
+  var ticksRaw = box.getAttribute('data-ticks') || '';
+  if (!ticksRaw || (/^\{\{/).test(ticksRaw)) ticksRaw = box.getAttribute('data-mock-ticks') || '[]';
+  var TICKS = [];
+  try { TICKS = JSON.parse(ticksRaw); } catch (e) {}
+  if (!TICKS.length) TICKS = [''];
+
+  function draw() {
+    var W = box.clientWidth || 600, H = box.clientHeight || 190;
+    var RP = 69, BP = 18, TP = 6;              /* room for the price tag and the x-axis */
+    var lo = Math.min.apply(null, s), hi = Math.max.apply(null, s);
+    if (hi === lo) hi = lo + 1;
+    var pad = (hi - lo) * 0.12; lo -= pad; hi += pad;
+    function x(i) { return (W - RP) * (i / (s.length - 1)); }
+    function y(v) { return TP + (H - BP - TP) * (1 - (v - lo) / (hi - lo)); }
+    var d = s.map(function (v, i) { return (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(v).toFixed(1); }).join(' ');
+    var base = H - BP;
+    var area = d + ' L' + x(s.length - 1).toFixed(1) + ' ' + base + ' L0 ' + base + ' Z';
+    var lx = x(s.length - 1), ly = y(s[s.length - 1]);
+
+    var ticks = '';
+    for (var t = 0; t < TICKS.length; t++) {
+      var tx = (W - RP) * (t / (TICKS.length - 1));
+      var anchor = t === 0 ? 'start' : (t === TICKS.length - 1 ? 'end' : 'middle');
+      ticks += '<text class="tchart__axis" x="' + tx.toFixed(1) + '" y="' + (H - 4) + '" text-anchor="' + anchor + '">' + TICKS[t] + '</text>';
+    }
+
+    box.innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '">' +
+      '<defs><linearGradient id="pfade" x1="0" y1="0" x2="0" y2="1">' +
+      '<stop offset="0%" stop-color="rgba(16,240,95,0.18)"/><stop offset="100%" stop-color="rgba(16,240,95,0)"/>' +
+      '</linearGradient></defs>' +
+      '<path class="tchart__fill" d="' + area + '"/>' +
+      '<line class="tchart__guide" x1="0" x2="' + (W - RP + 2) + '" y1="' + ly.toFixed(1) + '" y2="' + ly.toFixed(1) + '"/>' +
+      '<path class="tchart__line" d="' + d + '"/>' +
+      '<circle class="tchart__last" cx="' + lx.toFixed(1) + '" cy="' + ly.toFixed(1) + '" r="3.5"/>' +
+      '<rect class="tchart__tagbox" x="' + (W - RP + 11) + '" y="' + (ly - 9).toFixed(1) + '" width="' + (RP - 13) + '" height="18" rx="3"/>' +
+      '<text class="tchart__tag" x="' + (W - RP + 11 + (RP - 13) / 2) + '" y="' + (ly + 3.5).toFixed(1) + '" text-anchor="middle">' + price + '</text>' +
+      ticks + '</svg>';
+  }
+  draw();
+  var t2;
+  window.addEventListener('resize', function () { clearTimeout(t2); t2 = setTimeout(draw, 120); });
+})();
+
+/* ── $PROPHET: Price / MCap toggle ────────────────────── */
+(function () {
+  var seg = document.querySelector('[data-mode]');
+  if (!seg) return;
+  seg.addEventListener('click', function (e) {
+    var btn = e.target.closest('[data-mode-opt]');
+    if (!btn) return;
+    var opts = seg.querySelectorAll('[data-mode-opt]');
+    for (var i = 0; i < opts.length; i++) opts[i].classList.toggle('seg__opt--on', opts[i] === btn);
+  });
+})();
