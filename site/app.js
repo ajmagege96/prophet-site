@@ -678,6 +678,7 @@
 
   var runs = [], rects = [], offBar = [], origin = { x: 0, y: 0 };
   var barBox = null, ceiling = 0, floorY = 0, leftX = 0, rightX = 0, headroom = 0;
+  var colLeft = 0, colRight = 0;   /* the cards' edges: a climb lane sits outside these */
   var beatTimer = null, raf = null;
 
   function docRect(el) {
@@ -714,7 +715,7 @@
       var r = visibleRect(el);
       if (r && r.r > r.l && r.b > r.t) out.push(grow(r, CLEAR));
     }
-    var blocks = document.querySelectorAll('.feed, .takes, .thesis, .carousel, .filters, .below, .site-header, .site-footer');
+    var blocks = document.querySelectorAll('.feed, .takes, .thesis, .carousel__card, .carousel__arrow, .filters, .below, .site-header, .site-footer');
     for (i = 0; i < blocks.length; i++) add(blocks[i]);
     var all = document.body.querySelectorAll('*');
     for (i = 0; i < all.length; i++) {
@@ -750,53 +751,112 @@
     return gone;
   }
 
-  /* One fresh route. Returns null if it could not be laid down. */
-  function makeRoute() {
-    var w = barBox.r - barBox.l, h = barBox.b - barBox.t;
-    var side = Math.random();
-    var st;
-    if (side < 0.30) {                                  /* down from the bottom edge */
-      st = { x: barBox.l + w * rnd(0.10, 0.90), y: barBox.b, dx: 0, dy: 1, first: rnd(46, 120) };
-    } else {                                            /* out of a side edge, then climb */
-      var left = side < 0.65;
-      st = { x: left ? barBox.l : barBox.r, y: barBox.t + h * rnd(0.34, 0.66),
-             dx: left ? -1 : 1, dy: 0, first: rnd(195, 265),
-             climb: headroom * rnd(0.5, 1.05), up: Math.random() < 0.72 };
+  /* One fresh route. Returns null if it could not be laid down.
+     Two shapes: a short run off the bottom edge, or a climb that leaves a
+     side edge, reaches the margin, then zigzags up in a column. */
+  var recent = [];                                    /* last few sides used */
+
+  function pickSide() {
+    var opts = ['left', 'right', 'down'];
+    /* Never the same side three times running: that is what made it look
+       like five in a row down one margin. */
+    if (recent.length >= 2 && recent[0] === recent[1]) {
+      opts = opts.filter(function (s) { return s !== recent[0]; });
     }
+    var w = { left: 0.36, right: 0.36, down: 0.28 }, total = 0, i;
+    for (i = 0; i < opts.length; i++) total += w[opts[i]];
+    var roll = Math.random() * total;
+    for (i = 0; i < opts.length; i++) { roll -= w[opts[i]]; if (roll <= 0) break; }
+    return opts[Math.min(i, opts.length - 1)];
+  }
 
-    var pts = [{ x: st.x, y: st.y }];
-    var x = st.x, y = st.y, dx = st.dx, dy = st.dy, total = 0, lastTurn = 0;
-    var legs = 2 + Math.floor(Math.random() * 3);       /* 2 to 4 */
+  function remember(side) {
+    recent.unshift(side);
+    if (recent.length > 3) recent.pop();
+  }
 
-    for (var leg = 0; leg < legs; leg++) {
-      var want = leg === 0 ? st.first : (st.climb && leg === 1 ? st.climb : rnd(90, 300));
-      want = Math.min(want, MAX_LEN - total);
-      if (want < MIN_LEG) break;
-      var got = march(x, y, dx, dy, want, leg === 0 ? rects : offBar);
-      if (got < MIN_LEG) { if (leg === 0) return null; break; }
-      x += dx * got; y += dy * got; total += got;
-      pts.push({ x: x, y: y });
-
-      if (leg < legs - 1) {
-        /* Turns alternate, so a route can never make two turns the same way
-           and double back on itself. */
-        var turn;
-        if (leg === 0 && st.up !== undefined) turn = st.up ? -1 : 1;
-        else if (lastTurn) turn = -lastTurn;
-        else turn = Math.random() < 0.5 ? 1 : -1;
-        lastTurn = turn;
-        var ndx = dy * turn; dy = -dx * turn; dx = ndx;
-      }
-    }
-    if (pts.length < 2 || total < 90) return null;
-
+  function finish(pts) {
+    if (pts.length < 2) return null;
     var segs = [], len = 0;
     for (var p = 0; p < pts.length - 1; p++) {
       var L = Math.abs(pts[p + 1].x - pts[p].x) + Math.abs(pts[p + 1].y - pts[p].y);
+      if (L < 1) continue;
       segs.push({ a: pts[p], b: pts[p + 1], from: len, len: L });
       len += L;
     }
+    if (!segs.length || len < 90) return null;
     return { pts: pts, segs: segs, len: len, pad: pts[pts.length - 1] };
+  }
+
+  function makeRoute() {
+    var w = barBox.r - barBox.l, h = barBox.b - barBox.t;
+    var side = pickSide();
+    var pts, x, y, got;
+
+    if (side === 'down') {                            /* short run off the bottom */
+      x = barBox.l + w * rnd(0.10, 0.90); y = barBox.b;
+      pts = [{ x: x, y: y }];
+      got = march(x, y, 0, 1, rnd(46, 120), rects);
+      if (got < MIN_LEG) return null;
+      y += got; pts.push({ x: x, y: y });
+      var dir = Math.random() < 0.5 ? -1 : 1;
+      got = march(x, y, dir, 0, rnd(70, 240), offBar);
+      if (got >= MIN_LEG) { x += dir * got; pts.push({ x: x, y: y }); }
+      if (Math.random() < 0.45) {
+        got = march(x, y, 0, 1, rnd(50, 120), offBar);
+        if (got >= MIN_LEG) { y += got; pts.push({ x: x, y: y }); }
+      }
+      var r1 = finish(pts);
+      if (r1) remember(side);
+      return r1;
+    }
+
+    /* A climb. Reach a column in the margin, clear of the cards but well
+       inside the page, then zigzag up it. */
+    var out = side === 'left' ? -1 : 1;
+    var lane = side === 'left'
+      ? rnd(colLeft - 46, colLeft - 8)                /* just inside the arrow */
+      : rnd(colRight + 8, colRight + 46);
+    x = side === 'left' ? barBox.l : barBox.r;
+    y = barBox.t + h * rnd(0.34, 0.66);
+    pts = [{ x: x, y: y }];
+
+    got = march(x, y, out, 0, Math.abs(lane - x), rects);
+    if (got < MIN_LEG) return null;
+    x += out * got; y = y; pts.push({ x: x, y: y });
+
+    /* zigzag: up a chunk, jog sideways, up again. Every vertical leg goes
+       up, so the route can never work its way back toward the bar. */
+    var target = headroom * rnd(0.26, 1.02);
+    var climbed = 0, jog = Math.random() < 0.5 ? -1 : 1, steps = 0, detours = 0;
+    while (climbed < target && steps < 9) {
+      var wantUp = Math.min(rnd(90, 210), target - climbed);
+      if (wantUp < MIN_LEG) break;
+      got = march(x, y, 0, -1, wantUp, offBar);
+
+      if (got < MIN_LEG) {                            /* something in the way */
+        if (detours >= 2) break;
+        var away = march(x, y, out, 0, rnd(56, 96), offBar);   /* step outward */
+        if (away < MIN_LEG) break;
+        x += out * away; pts.push({ x: x, y: y });
+        detours++; steps++;
+        continue;                                     /* and try climbing again */
+      }
+
+      y -= got; climbed += got; pts.push({ x: x, y: y });
+      steps++;
+      if (climbed >= target - MIN_LEG) break;
+      var wantJog = rnd(MIN_LEG, 92);
+      got = march(x, y, jog, 0, wantJog, offBar);
+      if (got < MIN_LEG) { jog = -jog; got = march(x, y, jog, 0, wantJog, offBar); }
+      if (got < MIN_LEG) break;
+      x += jog * got; pts.push({ x: x, y: y });
+      jog = -jog;                                     /* zigzag, not a drift */
+      steps++;
+    }
+    var r2 = finish(pts);
+    if (r2) remember(side);
+    return r2;
   }
 
   function measure() {
@@ -806,8 +866,16 @@
     var cards = document.querySelector('.carousel');
     ceiling = cards ? docRect(cards).t : (hb ? hb.t : 0);   /* never above the cards */
     floorY  = hb ? hb.b : barBox.b + 400;
-    leftX   = hb ? hb.l : 0;
-    rightX  = hb ? hb.r : document.documentElement.clientWidth;
+    /* The lane sits just inside the carousel's own outer edge, which is where
+       its arrows are. Cards and arrows are separate obstacles, so a route can
+       use the gutter between them and step around an arrow. */
+    var cr = cards ? docRect(cards) : null;
+    colLeft  = cr ? cr.l + 40 : (hb ? hb.l : 0);
+    colRight = cr ? cr.r - 40 : (hb ? hb.r : 0);
+    /* Stay off the page corners: the lane sits just outside the cards, not
+       out at the viewport edge. */
+    leftX   = Math.max(hb ? hb.l : 0, colLeft - 96);   /* room to step around an arrow */
+    rightX  = Math.min(hb ? hb.r : 1e9, colRight + 96);
     headroom = Math.max(120, barBox.t - ceiling);
 
     rects = obstacles();
@@ -855,8 +923,6 @@
     ctx.save();
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
-    ctx.shadowColor = 'rgba(' + GREEN + ', 0.5)';
-    ctx.shadowBlur = 10;
 
     for (var n = runs.length - 1; n >= 0; n--) {
       var t = runs[n].t;
@@ -868,18 +934,26 @@
         if (sg.from + sg.len < r - STREAK || sg.from > r) continue;
         var g = ctx.createLinearGradient(sg.a.x - origin.x, sg.a.y - origin.y,
                                          sg.b.x - origin.x, sg.b.y - origin.y);
+        var gGlow = ctx.createLinearGradient(sg.a.x - origin.x, sg.a.y - origin.y,
+                                             sg.b.x - origin.x, sg.b.y - origin.y);
         var any = false;
-        for (var k = 0; k <= 10; k++) {
-          var lv = profile(r, sg.from + sg.len * (k / 10));
+        for (var k = 0; k <= 8; k++) {
+          var lv = profile(r, sg.from + sg.len * (k / 8));
           if (lv > 0.01) any = true;
-          g.addColorStop(k / 10, 'rgba(' + GREEN + ',' + (PEAK * lv).toFixed(3) + ')');
+          g.addColorStop(k / 8, 'rgba(' + GREEN + ',' + (PEAK * lv).toFixed(3) + ')');
+          gGlow.addColorStop(k / 8, 'rgba(' + GREEN + ',' + (PEAK * lv * 0.16).toFixed(3) + ')');
         }
         if (!any) continue;
-        ctx.strokeStyle = g;
-        ctx.lineWidth = 2.5;
+        /* Glow as a wide faint stroke under a thin bright one. A canvas
+           shadowBlur here costs several ms a frame and was the lag. */
         ctx.beginPath();
         ctx.moveTo(sg.a.x - origin.x, sg.a.y - origin.y);
         ctx.lineTo(sg.b.x - origin.x, sg.b.y - origin.y);
+        ctx.strokeStyle = gGlow;
+        ctx.lineWidth = 9;
+        ctx.stroke();
+        ctx.strokeStyle = g;
+        ctx.lineWidth = 2;
         ctx.stroke();
       }
 
@@ -887,6 +961,8 @@
       if (lit > 0.01) {
         var e = lit * lit * (3 - 2 * lit);
         var px = t.pad.x - origin.x - PADSZ / 2, py = t.pad.y - origin.y - PADSZ / 2;
+        ctx.fillStyle = 'rgba(' + GREEN + ',' + (PEAK * e * 0.18).toFixed(3) + ')';
+        ctx.fillRect(px - 4, py - 4, PADSZ + 8, PADSZ + 8);
         ctx.fillStyle = 'rgba(' + GREEN + ',' + (PEAK * e).toFixed(3) + ')';
         ctx.fillRect(px, py, PADSZ, PADSZ);
         ctx.strokeStyle = 'rgba(' + GREEN + ',' + (PEAK * 0.9 * e).toFixed(3) + ')';

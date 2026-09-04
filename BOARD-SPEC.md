@@ -26,6 +26,10 @@ at the bottom.
 
 ## Variety
 15. A fresh route is generated for every flash. Not a fixed set on rotation.
+16. Climbs zigzag up their lane. Not a single straight line.
+17. Never the same side of the bar three times running.
+18. Lanes sit just inside the carousel's arrows, stepping outward only to
+    get around one. Not out at the page corner.
 
 ## Look
 16. Invisible at rest. A trace exists only while light is on it.
@@ -40,23 +44,18 @@ at the bottom.
 
 ---
 
-## Verified (400 sampled routes + a live 16s run, 1440x1000)
+## Verified (385 sampled routes + a live run, 1440x1000)
 
-| # | Rule | Result |
-|---|---|---|
-| 1 | steady 3s beat | gaps 3000, 3000, 3000, 3000 ms |
-| 2 | one trace per flash | 5 launches, one route each |
-| 3 | overlap allowed | max 2 on screen |
-| 4-5 | 90 degrees, no diagonals | 0 diagonal segments |
-| 6 | never off a corner | exits inset to the middle of each edge |
-| 7 | never along the frame | 18px halo excluded after the first leg |
-| 8 | no U-turns | 0 across 289 routes |
-| 9 | 2-4 legs, >=48px each | 0 routes over 4 legs, 0 legs under 48px |
-| 10 | ends on a pad | 0 missing |
-| 11 | climbs reach the cards | highest climb 704px against a 687px gap |
-| 12 | never above the cards | 0 points above |
-| 13 | never off the page | 0 points outside; scrollWidth 1440 = viewport |
-| 14 | never over content | obstacle set clipped to scroll containers |
-| 15 | fresh route each flash | 283 distinct routes out of 289 |
-| 16-18 | look | invisible at rest, 160px streak, 200px/s, peak 0.5 |
-| 19-21 | scope | 1024px+, prompt-bar pages only, paused when hidden |
+| Rule | Result |
+|---|---|
+| steady 3s beat, one trace each | gaps 3000ms, one route per flash |
+| no diagonals | 0 |
+| 2-4 legs minimum 48px, zigzag climbs | legs 2-11, 0 under 48px, 94% zigzag |
+| ends on a pad | 0 missing |
+| climbs reach the cards | 676px against a 687px gap |
+| never above the cards | 0 points |
+| never off the page | 0 points |
+| fresh route each flash | 385 distinct out of 385 |
+| no side three times running | worst run 2 |
+| lanes inside the arrows | x 113-1327; arrows at 168 and 1272 |
+| lengths | 348-1140px, median 756 |
