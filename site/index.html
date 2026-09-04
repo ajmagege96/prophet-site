@@ -86,7 +86,7 @@
         <!-- repeat: market — server loop replaces this <template>; browsers don't render it.
              market.state is only rendered when it is not plain "open"; every listed market is open.
              market.filter_state drives the tags above the carousel: none | vote | called.
-             The state badge sits top-right. Vote: vote open · <span class="tally tally--yes|no">62% YES</span> · <span class="votes">[vote icon]{{market.vote_count}}</span>.
+             The state badge sits top-right. Vote: vote open · <span class="tally tally--yes|no">62% yes</span> · <span class="votes">[vote icon]{{market.vote_count}}</span> · <span class="timer">[clock]{{market.vote_time_left}}</span>.
              Called: called <span class="tally tally--yes|no">YES</span> <span class="conviction">[star icon]N</span> (no dot). -->
         <template>
         <div class="carousel__card outline" data-card data-state="{{market.filter_state}}" data-slug="{{market.slug}}" data-stance="{{market.thesis_stance}}" data-thesis="{{market.thesis}}" data-contributors="{{market.contributors_json}}">
@@ -95,7 +95,7 @@
             <span class="carousel__state">{{market.state}}</span>
           </div>
           <p class="carousel__question">{{market.question}}</p>
-          <span class="carousel__yes heading">{{market.yes_pct}}<small>yes</small></span>
+          <span class="carousel__yes heading">{{market.yes_pct}}<small>YES</small></span>
           <span class="carousel__meta"><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>{{market.volume}}</span><span title="ends in"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>{{market.ends_in}}</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>{{market.take_count}}</span></span>
         </div>
         </template>
@@ -106,7 +106,7 @@
             <img class="carousel__img" src="https://polymarket-upload.s3.us-east-2.amazonaws.com/BTC+fullsize.png" alt="" loading="lazy">
           </div>
           <p class="carousel__question">Will Bitcoin exceed $100K?</p>
-          <span class="carousel__yes heading">72%<small>yes</small></span>
+          <span class="carousel__yes heading">72%<small>YES</small></span>
           <span class="carousel__meta"><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>$4.1M</span><span title="ends in"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>3mo</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>184</span></span>
         </div>
 
@@ -115,7 +115,7 @@
             <img class="carousel__img" src="https://polymarket-upload.s3.us-east-2.amazonaws.com/fed-decision-in-september-762-c4RyWuxRPo1L.jpg" alt="" loading="lazy">
           </div>
           <p class="carousel__question">Will the Fed cut rates at the next meeting?</p>
-          <span class="carousel__yes heading">38%<small>yes</small></span>
+          <span class="carousel__yes heading">38%<small>YES</small></span>
           <span class="carousel__meta"><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>$2.8M</span><span title="ends in"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>12d</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>97</span></span>
         </div>
 
@@ -124,7 +124,7 @@
             <img class="carousel__img" src="https://polymarket-upload.s3.us-east-2.amazonaws.com/ETH+fullsize.jpg" alt="" loading="lazy">
           </div>
           <p class="carousel__question">Will Ethereum flip Bitcoin in market cap?</p>
-          <span class="carousel__yes heading">8%<small>yes</small></span>
+          <span class="carousel__yes heading">8%<small>YES</small></span>
           <span class="carousel__meta"><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>$610K</span><span title="ends in"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>1y</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>43</span></span>
         </div>
 
@@ -133,7 +133,7 @@
             <img class="carousel__img" src="https://polymarket-upload.s3.us-east-2.amazonaws.com/january-inflation-annual-vp5qkgK2R7Et.jpg" alt="" loading="lazy">
           </div>
           <p class="carousel__question">Will US inflation fall below 3%?</p>
-          <span class="carousel__yes heading">61%<small>yes</small></span>
+          <span class="carousel__yes heading">61%<small>YES</small></span>
           <span class="carousel__meta"><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>$1.2M</span><span title="ends in"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>2mo</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>156</span></span>
         </div>
 
@@ -142,7 +142,7 @@
             <img class="carousel__img" src="https://polymarket-upload.s3.us-east-2.amazonaws.com/gold-logo-0d00c80498.png" alt="" loading="lazy">
           </div>
           <p class="carousel__question">Will gold reach a new all-time high?</p>
-          <span class="carousel__yes heading">55%<small>yes</small></span>
+          <span class="carousel__yes heading">55%<small>YES</small></span>
           <span class="carousel__meta"><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>$890K</span><span title="ends in"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>4mo</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>78</span></span>
         </div>
 
@@ -151,7 +151,7 @@
             <img class="carousel__img" src="https://polymarket-upload.s3.us-east-2.amazonaws.com/s-and-p-500-1e40af6979.png" alt="" loading="lazy">
           </div>
           <p class="carousel__question">Will the S&amp;P 500 close above 6000?</p>
-          <span class="carousel__yes heading">44%<small>yes</small></span>
+          <span class="carousel__yes heading">44%<small>YES</small></span>
           <span class="carousel__meta"><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>$3.3M</span><span title="ends in"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>6w</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>201</span></span>
         </div>
 
@@ -160,7 +160,7 @@
             <img class="carousel__img" src="https://polymarket-upload.s3.us-east-2.amazonaws.com/SOL-logo.png" alt="" loading="lazy">
           </div>
           <p class="carousel__question">Will a spot Solana ETF be approved?</p>
-          <span class="carousel__yes heading">29%<small>yes</small></span>
+          <span class="carousel__yes heading">29%<small>YES</small></span>
           <span class="carousel__meta"><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>$1.9M</span><span title="ends in"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>5mo</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>62</span></span>
         </div>
 
@@ -169,7 +169,7 @@
             <img class="carousel__img" src="https://polymarket-upload.s3.us-east-2.amazonaws.com/china-invades-taiwan-in-2025-CCSd9dX2mrea.jpg" alt="" loading="lazy">
           </div>
           <p class="carousel__question">Will China announce a new stimulus package?</p>
-          <span class="carousel__yes heading">51%<small>yes</small></span>
+          <span class="carousel__yes heading">51%<small>YES</small></span>
           <span class="carousel__meta"><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>$420K</span><span title="ends in"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>3w</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>31</span></span>
         </div>
 
@@ -179,27 +179,27 @@
             <span class="carousel__state carousel__state--called">called <span class="tally tally--no">NO</span> <span class="conviction" title="conviction"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"/></svg>2</span></span>
           </div>
           <p class="carousel__question">Will oil prices exceed $100 per barrel?</p>
-          <span class="carousel__yes heading">18%<small>yes</small></span>
+          <span class="carousel__yes heading">18%<small>YES</small></span>
           <span class="carousel__meta"><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>$760K</span><span title="ends in"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>7mo</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>22</span></span>
         </div>
 
         <div class="carousel__card outline" data-card data-state="vote" data-slug="sec-exchange" data-stance="yes" data-thesis="The SEC has approved every exchange that met the custody bar this cycle, and this one meets it. The remaining objections are procedural rather than substantive. Timing is the only real risk, not the outcome." data-contributors="[{&quot;user&quot;: &quot;delta_k&quot;, &quot;claim&quot;: &quot;Custody structure mirrors the two already approved&quot;, &quot;xp&quot;: 11}, {&quot;user&quot;: &quot;ines&quot;, &quot;claim&quot;: &quot;Public comment period closed without a formal objection&quot;, &quot;xp&quot;: 4}]">
           <div class="carousel__top">
             <img class="carousel__img" src="https://polymarket-upload.s3.us-east-2.amazonaws.com/coinbase-stock-d8abe3f599.png" alt="" loading="lazy">
-            <span class="carousel__state carousel__state--vote">vote open · <span class="tally tally--yes">62% YES</span> · <span class="votes" title="votes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><polyline points="8 12.5 11 15.5 16 9.5"/></svg>128</span></span>
+            <span class="carousel__state carousel__state--vote">vote open · <span class="tally tally--yes">62% yes</span> · <span class="votes" title="votes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><polyline points="8 12.5 11 15.5 16 9.5"/></svg>128</span> · <span class="timer" title="time left"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>2d</span></span>
           </div>
           <p class="carousel__question">Will the SEC approve a new crypto exchange?</p>
-          <span class="carousel__yes heading">34%<small>yes</small></span>
+          <span class="carousel__yes heading">34%<small>YES</small></span>
           <span class="carousel__meta"><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>$540K</span><span title="ends in"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>9w</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>88</span></span></span>
         </div>
 
         <div class="carousel__card outline" data-card data-state="vote" data-slug="dxy-100" data-stance="no" data-thesis="Rate-cut pricing is already in the dollar, so the index holds 100 unless the Fed surprises dovish. Relative growth still favors the US and the alternatives are weak. A break below needs a catalyst that isn&#x27;t on the calendar yet." data-contributors="[{&quot;user&quot;: &quot;tessellate&quot;, &quot;claim&quot;: &quot;Euro-area PMIs keep undershooting&quot;, &quot;xp&quot;: 7}, {&quot;user&quot;: &quot;bram_o&quot;, &quot;claim&quot;: &quot;Futures already price two cuts; little left to remove&quot;, &quot;xp&quot;: 3}]">
           <div class="carousel__top">
             <img class="carousel__img" src="https://polymarket-upload.s3.us-east-2.amazonaws.com/us-canada-diplomatic-agreement-to-lower-tariffs-by-august-31-dHLeCIoNnnOg.jpg" alt="" loading="lazy">
-            <span class="carousel__state carousel__state--vote">vote open · <span class="tally tally--no">55% NO</span> · <span class="votes" title="votes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><polyline points="8 12.5 11 15.5 16 9.5"/></svg>74</span></span>
+            <span class="carousel__state carousel__state--vote">vote open · <span class="tally tally--no">55% no</span> · <span class="votes" title="votes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><polyline points="8 12.5 11 15.5 16 9.5"/></svg>74</span> · <span class="timer" title="time left"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>14h</span></span>
           </div>
           <p class="carousel__question">Will the US dollar index drop below 100?</p>
-          <span class="carousel__yes heading">41%<small>yes</small></span>
+          <span class="carousel__yes heading">41%<small>YES</small></span>
           <span class="carousel__meta"><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>$980K</span><span title="ends in"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>5mo</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>114</span></span></span>
         </div>
 
@@ -209,7 +209,7 @@
             <span class="carousel__state carousel__state--called">called <span class="tally tally--yes">YES</span> <span class="conviction" title="conviction"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"/></svg>3</span></span>
           </div>
           <p class="carousel__question">Will MicroStrategy buy more Bitcoin?</p>
-          <span class="carousel__yes heading">91%<small>yes</small></span>
+          <span class="carousel__yes heading">91%<small>YES</small></span>
           <span class="carousel__meta"><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>$2.2M</span><span title="ends in"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>3w</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>312</span></span>
         </div>
       </div>

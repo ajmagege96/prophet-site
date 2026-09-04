@@ -10,6 +10,20 @@
   });
 })();
 
+/* ── Preview fill ─────────────────────────────────────── */
+/* Any element with data-mock whose text is still an unfilled {{variable}}
+   shows the mock value so the page previews from disk. */
+(function () {
+  var els = document.querySelectorAll('[data-mock]');
+  for (var i = 0; i < els.length; i++) {
+    if ((/^\{\{/).test(els[i].textContent.trim())) {
+      els[i].textContent = els[i].getAttribute('data-mock');
+      var mc = els[i].getAttribute('data-mock-class');
+      if (mc) { els[i].className = els[i].className.replace(/stats__num--\{\{[^}]*\}\}/, '').trim() + ' ' + mc; }
+    }
+  }
+})();
+
 /* ── Contract address copy button ─────────────────────── */
 /* Shows first 6 … last 6 of {{contract_address}}; click copies the full
    address and the pill reads "copied" for a moment. */
@@ -530,5 +544,17 @@
     for (var i = 0; i < wraps.length; i++) {
       if (!wraps[i].contains(e.target)) wraps[i].querySelector('[data-vote-pop]').hidden = true;
     }
+  });
+})();
+
+/* ── Record: time range tabs (visual; the server filters the bars) ── */
+(function () {
+  var bar = document.querySelector('[data-range]');
+  if (!bar) return;
+  bar.addEventListener('click', function (e) {
+    var btn = e.target.closest('[data-range-opt]');
+    if (!btn) return;
+    var tabs = bar.querySelectorAll('[data-range-opt]');
+    for (var i = 0; i < tabs.length; i++) tabs[i].classList.toggle('range__tab--on', tabs[i] === btn);
   });
 })();

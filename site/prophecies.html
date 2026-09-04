@@ -74,11 +74,11 @@
     <div class="filters" data-filters>
       <button class="filters__tag filters__tag--vote" data-filter="votes">Open votes</button>
       <button class="filters__tag filters__tag--called" data-filter="theses">Prophecies</button>
-      <button class="filters__tag" data-filter="history">History</button>
     </div>
 
     <section class="pgroup" data-group="votes" data-empty-text="{{empty_open_votes}}" data-empty-fallback="No open votes right now.">
       <h2 class="pgroup__title heading">Open votes</h2>
+      <p class="explainer" data-mock="Draft theses waiting on holders. Vote YES or NO. Your voting weight is what you hold.">{{explainer_open_votes}}</p>
       <div class="pgroup__list">
         <!-- repeat: vote — server loop replaces this <template> -->
         <template>
@@ -89,7 +89,7 @@
             <p class="prow__thesis">{{vote.thesis}}</p>
           </div>
           <div class="prow__side">
-            <div class="prow__row"><span class="prow__state prow__state--vote">vote open · <span class="tally tally--{{vote.tally_side}}">{{vote.tally_pct}} {{vote.tally_side_upper}}</span> · <span class="votes" title="votes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><polyline points="8 12.5 11 15.5 16 9.5"/></svg>{{vote.vote_count}}</span></span><div class="vote" data-vote-wrap>
+            <div class="prow__row"><span class="prow__state prow__state--vote">vote open · <span class="tally tally--{{vote.tally_side}}">{{vote.tally_pct}} {{vote.tally_side}}</span> · <span class="votes" title="votes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><polyline points="8 12.5 11 15.5 16 9.5"/></svg>{{vote.vote_count}}</span> · <span class="timer" title="time left"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>{{vote.time_left}} left</span></span><div class="vote" data-vote-wrap>
               <button class="vote__btn" data-vote-open>{{vote.button_label}}</button>
               <div class="vote__pop outline" data-vote-pop hidden>
                 <span class="vote__label heading">Your vote</span>
@@ -97,7 +97,7 @@
                 <button class="vote-btn vote-btn--no {{vote.my_no_class}}" data-vote="no">No</button>
               </div>
             </div></div>
-            <span class="carousel__meta"><span title="time left"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>{{vote.time_left}} left</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>{{vote.take_count}}</span></span>
+            <span class="carousel__meta prow__bottom"><span class="prow__live" title="live yes probability">{{vote.live_pct}} yes</span><span title="ends in"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>{{vote.ends_in}}</span></span>
           </div>
           <div class="prow__drop" data-drop hidden>
             <div class="prow__takes">
@@ -124,7 +124,7 @@
             <p class="prow__thesis">The SEC has approved every exchange that met the custody bar this cycle, and this one meets it. The remaining objections are procedural rather than substantive.</p>
           </div>
           <div class="prow__side">
-            <div class="prow__row"><span class="prow__state prow__state--vote">vote open · <span class="tally tally--yes">62% YES</span> · <span class="votes" title="votes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><polyline points="8 12.5 11 15.5 16 9.5"/></svg>128</span></span><div class="vote" data-vote-wrap>
+            <div class="prow__row"><span class="prow__state prow__state--vote">vote open · <span class="tally tally--yes">62% yes</span> · <span class="votes" title="votes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><polyline points="8 12.5 11 15.5 16 9.5"/></svg>128</span> · <span class="timer" title="time left"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>2d left</span></span><div class="vote" data-vote-wrap>
               <button class="vote__btn" data-vote-open>Vote</button>
               <div class="vote__pop outline" data-vote-pop hidden>
                 <span class="vote__label heading">Your vote</span>
@@ -132,7 +132,7 @@
                 <button class="vote-btn vote-btn--no" data-vote="no">No</button>
               </div>
             </div></div>
-            <span class="carousel__meta"><span title="time left"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>2d left</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>88</span></span>
+            <span class="carousel__meta prow__bottom"><span class="prow__live" title="live yes probability">34% YES</span><span title="ends in"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>9w</span></span>
           </div>
           <div class="prow__drop" data-drop hidden>
             <div class="prow__takes">
@@ -174,7 +174,7 @@
             <p class="prow__thesis">Rate-cut pricing is already in the dollar, so the index holds 100 unless the Fed surprises dovish. A break below needs a catalyst that isn't on the calendar yet.</p>
           </div>
           <div class="prow__side">
-            <div class="prow__row"><span class="prow__state prow__state--vote">vote open · <span class="tally tally--no">55% NO</span> · <span class="votes" title="votes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><polyline points="8 12.5 11 15.5 16 9.5"/></svg>74</span></span><div class="vote" data-vote-wrap>
+            <div class="prow__row"><span class="prow__state prow__state--vote">vote open · <span class="tally tally--no">55% no</span> · <span class="votes" title="votes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><polyline points="8 12.5 11 15.5 16 9.5"/></svg>74</span> · <span class="timer" title="time left"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>14h left</span></span><div class="vote" data-vote-wrap>
               <button class="vote__btn" data-vote-open>Voted <span class="tally tally--yes">YES</span></button>
               <div class="vote__pop outline" data-vote-pop hidden>
                 <span class="vote__label heading">Your vote</span>
@@ -182,7 +182,7 @@
                 <button class="vote-btn vote-btn--no" data-vote="no">No</button>
               </div>
             </div></div>
-            <span class="carousel__meta"><span title="time left"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>14h left</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>114</span></span>
+            <span class="carousel__meta prow__bottom"><span class="prow__live" title="live yes probability">41% YES</span><span title="ends in"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>5mo</span></span>
           </div>
           <div class="prow__drop" data-drop hidden>
             <div class="prow__takes">
@@ -209,6 +209,7 @@
 
     <section class="pgroup" data-group="theses" data-empty-text="{{empty_prophecies}}" data-empty-fallback="No prophecies yet.">
       <h2 class="pgroup__title heading">Prophecies</h2>
+      <p class="explainer" data-mock="Calls that passed the vote, live until the market resolves.">{{explainer_prophecies}}</p>
       <div class="pgroup__list">
         <!-- repeat: thesis — server loop replaces this <template> -->
         <template>
@@ -220,7 +221,7 @@
           </div>
           <div class="prow__side">
             <div class="prow__row"><span class="prow__state">called <span class="tally tally--{{thesis.stance}}">{{thesis.stance_upper}}</span> <span class="conviction">[star icon]{{thesis.conviction}}</span></span>
-            <span class="carousel__meta"><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>{{thesis.take_count}}</span><span>{{thesis.called_ago}}</span></span>
+            <span class="carousel__meta prow__bottom"><span title="market at the call">{{thesis.called_pct}} at call</span><span class="prow__live" title="live yes probability">{{thesis.live_pct}} yes</span><span title="ends in"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>{{thesis.ends_in}}</span></span>
           </div>
           <div class="prow__drop" data-drop hidden>
             <div class="prow__takes">
@@ -248,7 +249,7 @@
           </div>
           <div class="prow__side">
             <span class="prow__state">called <span class="tally tally--yes">YES</span> <span class="conviction" title="conviction"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"/></svg>3</span></span>
-            <span class="carousel__meta"><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>312</span><span>3d ago</span></span>
+            <span class="carousel__meta prow__bottom"><span title="market at the call">84% at call</span><span class="prow__live" title="live yes probability">91% YES</span><span title="ends in"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>3w</span></span>
           </div>
           <div class="prow__drop" data-drop hidden>
             <div class="prow__takes">
@@ -298,7 +299,7 @@
           </div>
           <div class="prow__side">
             <span class="prow__state">called <span class="tally tally--no">NO</span> <span class="conviction" title="conviction"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"/></svg>2</span></span>
-            <span class="carousel__meta"><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>22</span><span>6d ago</span></span>
+            <span class="carousel__meta prow__bottom"><span title="market at the call">22% at call</span><span class="prow__live" title="live yes probability">18% YES</span><span title="ends in"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>7mo</span></span>
           </div>
           <div class="prow__drop" data-drop hidden>
             <div class="prow__takes">
@@ -323,144 +324,6 @@
       <p class="pgroup__empty" data-empty hidden></p>
     </section>
 
-    <section class="pgroup" data-group="history" data-empty-text="{{empty_history}}" data-empty-fallback="Nothing resolved yet.">
-      <h2 class="pgroup__title heading">History</h2>
-      <div class="pgroup__list">
-        <!-- repeat: history — server loop replaces this <template> -->
-        <template>
-        <div class="prow outline" data-row data-slug="{{history.slug}}">
-          <img class="prow__img" src="{{history.image_url}}" alt="" loading="lazy">
-          <div class="prow__main">
-            <p class="prow__q">{{history.question}}</p>
-            <span class="carousel__meta"><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>{{history.volume}}</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>{{history.take_count}}</span><span title="market at the call">{{history.called_pct}} at call</span></span>
-          </div>
-          <div class="prow__side">
-            <span class="prow__state">called <span class="tally tally--{{history.stance}}">{{history.stance_upper}}</span> <span class="conviction">[star icon]{{history.conviction}}</span></span><span class="prow__outcome prow__outcome--{{history.outcome}}">{{history.outcome}}</span></div>
-            <span class="prow__meta">{{history.resolved_ago}}</span>
-          </div>
-          <div class="prow__drop" data-drop hidden>
-            <div class="prow__takes">
-            <!-- repeat: take — server loop replaces this <template> -->
-            <template>
-            <div class="takes__item">
-              <div class="takes__main">
-                <div class="takes__head"><span class="takes__user">{{take.username}}</span><span class="takes__stance takes__stance--{{take.stance}}">{{take.stance}}</span></div>
-                <p class="takes__claim">{{take.claim}}</p>
-              </div>
-              <div class="takes__side"><span class="takes__ago">{{take.ago}}</span><span class="takes__xp">+{{take.xp}} XP</span></div>
-            </div>
-            </template>
-            <!-- /repeat: take -->
-            </div>
-          </div>
-        </div>
-        </template>
-        <!-- /repeat: history -->
-        <div class="prow outline" data-row data-slug="eth-etf">
-          <img class="prow__img" src="https://polymarket-upload.s3.us-east-2.amazonaws.com/ETH+fullsize.jpg" alt="" loading="lazy">
-          <div class="prow__main">
-            <p class="prow__q">Will a spot Ethereum ETF see net inflows in its first month?</p>
-            <span class="carousel__meta"><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>$1.2M</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>156</span><span title="market at the call">61% at call</span></span>
-          </div>
-          <div class="prow__side">
-            <div class="prow__row"><span class="prow__state">called <span class="tally tally--yes">YES</span> <span class="conviction" title="conviction"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"/></svg>4</span></span><span class="prow__outcome prow__outcome--won">won</span></div>
-            <span class="prow__meta">2w ago</span>
-          </div>
-          <div class="prow__drop" data-drop hidden>
-            <div class="prow__takes">
-            <div class="takes__item">
-              <div class="takes__main">
-                <div class="takes__head"><span class="takes__user">ines</span><span class="takes__stance takes__stance--yes">YES</span></div>
-                <p class="takes__claim">Grayscale outflows were front-loaded; net turned positive by week two</p>
-              </div>
-              <div class="takes__side"><span class="takes__ago">3w ago</span><span class="takes__xp">+12 XP</span></div>
-            </div>
-            <div class="takes__item">
-              <div class="takes__main">
-                <div class="takes__head"><span class="takes__user">marrow</span><span class="takes__stance takes__stance--yes">YES</span></div>
-                <p class="takes__claim">Issuers seeded before launch</p>
-              </div>
-              <div class="takes__side"><span class="takes__ago">3w ago</span><span class="takes__xp">+6 XP</span></div>
-            </div>
-            </div>
-          </div>
-        </div>
-        <div class="prow outline" data-row data-slug="fed-hold">
-          <img class="prow__img" src="https://polymarket-upload.s3.us-east-2.amazonaws.com/fed-decision-in-september-762-c4RyWuxRPo1L.jpg" alt="" loading="lazy">
-          <div class="prow__main">
-            <p class="prow__q">Will the Fed hold rates at the last meeting?</p>
-            <span class="carousel__meta"><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>$2.8M</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>97</span><span title="market at the call">74% at call</span></span>
-          </div>
-          <div class="prow__side">
-            <div class="prow__row"><span class="prow__state">called <span class="tally tally--no">NO</span> <span class="conviction" title="conviction"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"/></svg>2</span></span><span class="prow__outcome prow__outcome--lost">lost</span></div>
-            <span class="prow__meta">3w ago</span>
-          </div>
-          <div class="prow__drop" data-drop hidden>
-            <div class="prow__takes">
-            <div class="takes__item">
-              <div class="takes__main">
-                <div class="takes__head"><span class="takes__user">delta_k</span><span class="takes__stance takes__stance--no">NO</span></div>
-                <p class="takes__claim">Labor data was softer than the dot plot assumed</p>
-              </div>
-              <div class="takes__side"><span class="takes__ago">1mo ago</span><span class="takes__xp">+5 XP</span></div>
-            </div>
-            </div>
-          </div>
-        </div>
-        <div class="prow outline" data-row data-slug="gold-2500">
-          <img class="prow__img" src="https://polymarket-upload.s3.us-east-2.amazonaws.com/gold-logo-0d00c80498.png" alt="" loading="lazy">
-          <div class="prow__main">
-            <p class="prow__q">Will gold close above $2,500?</p>
-            <span class="carousel__meta"><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>$890K</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>78</span><span title="market at the call">48% at call</span></span>
-          </div>
-          <div class="prow__side">
-            <div class="prow__row"><span class="prow__state">called <span class="tally tally--yes">YES</span> <span class="conviction" title="conviction"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"/></svg>3</span></span><span class="prow__outcome prow__outcome--won">won</span></div>
-            <span class="prow__meta">1mo ago</span>
-          </div>
-          <div class="prow__drop" data-drop hidden>
-            <div class="prow__takes">
-            <div class="takes__item">
-              <div class="takes__main">
-                <div class="takes__head"><span class="takes__user">kesh</span><span class="takes__stance takes__stance--yes">YES</span></div>
-                <p class="takes__claim">Central-bank buying has not paused a single month this year</p>
-              </div>
-              <div class="takes__side"><span class="takes__ago">1mo ago</span><span class="takes__xp">+9 XP</span></div>
-            </div>
-            </div>
-          </div>
-        </div>
-        <div class="prow outline" data-row data-slug="sol-200">
-          <img class="prow__img" src="https://polymarket-upload.s3.us-east-2.amazonaws.com/SOL-logo.png" alt="" loading="lazy">
-          <div class="prow__main">
-            <p class="prow__q">Will Solana trade above $200?</p>
-            <span class="carousel__meta"><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>$1.9M</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>62</span><span title="market at the call">35% at call</span></span>
-          </div>
-          <div class="prow__side">
-            <div class="prow__row"><span class="prow__state">called <span class="tally tally--yes">YES</span> <span class="conviction" title="conviction"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"/></svg>2</span></span><span class="prow__outcome prow__outcome--lost">lost</span></div>
-            <span class="prow__meta">2mo ago</span>
-          </div>
-          <div class="prow__drop" data-drop hidden>
-            <div class="prow__takes">
-            <div class="takes__item">
-              <div class="takes__main">
-                <div class="takes__head"><span class="takes__user">lunaire</span><span class="takes__stance takes__stance--yes">YES</span></div>
-                <p class="takes__claim">ETF chatter alone should carry it</p>
-              </div>
-              <div class="takes__side"><span class="takes__ago">2mo ago</span><span class="takes__xp">+3 XP</span></div>
-            </div>
-            <div class="takes__item">
-              <div class="takes__main">
-                <div class="takes__head"><span class="takes__user">halden</span><span class="takes__stance takes__stance--no">NO</span></div>
-                <p class="takes__claim">No catalyst on the tape; this is a hope trade</p>
-              </div>
-              <div class="takes__side"><span class="takes__ago">2mo ago</span><span class="takes__xp">+7 XP</span></div>
-            </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <p class="pgroup__empty" data-empty hidden></p>
-    </section>
   </div>
 </main>
 

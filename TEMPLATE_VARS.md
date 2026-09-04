@@ -31,6 +31,7 @@
 | `{{contributor.xp}}` | XP earned for that contribution |
 | `{{market.thesis_stance}}` | `yes` or `no`: which way the thesis (or draft) calls it; shown bold beside the Thesis label |
 | `{{market.thesis}}` | Full thesis text (called) or draft thesis (vote open), set as `data-thesis` on the card; shown in the Thesis block above the takes when the card is selected; empty otherwise |
+| `{{market.vote_time_left}}` | Time left on the vote, relative (purple clock in the badge) |
 | `{{market.vote_count}}` | Votes cast so far on an open vote (shown after a vote icon in the badge) |
 | `{{market.filter_state}}` | `none` (no thesis yet), `vote` (vote open), or `called`; drives the filter tags above the carousel |
 | `{{take.username}}` | Username of the person who posted the take (used in `<!-- repeat: take -->`) |
@@ -47,21 +48,37 @@
 | `{{vote.slug}}`, `{{vote.image_url}}`, `{{vote.question}}` | Open-vote row identity (`<!-- repeat: vote -->`) |
 | `{{vote.stance}}` / `{{vote.stance_upper}}` | Draft stance: `yes`/`no` and `YES`/`NO` |
 | `{{vote.thesis}}` | Draft thesis text |
-| `{{vote.tally_pct}}`, `{{vote.tally_side}}` / `{{vote.tally_side_upper}}` | Live tally in weight, e.g. `62%` + `yes` / `YES` |
+| `{{vote.tally_pct}}`, `{{vote.tally_side}}` | Live tally in weight, e.g. `62%` + `yes` (lowercase) |
 | `{{vote.vote_count}}` | Votes cast so far (vote icon + count in the badge) |
-| `{{vote.take_count}}` | Takes on the market (person icon + count under the badge) |
-| `{{vote.time_left}}` | Relative time left, e.g. `2d`, `14h` |
+| `{{vote.time_left}}` | Time left on the vote, e.g. `2d`, `14h`; shown as a purple clock + "2d left" in the badge |
+| `{{vote.live_pct}}` | Live market YES %, the green number beside the badge column |
+| `{{vote.ends_in}}` | Market ends-in, relative, after a clock icon (the market's own clock; the vote's is in the badge) |
 | `{{vote.button_label}}` | `Vote`, or `Voted <span class="tally tally--yes">YES</span>` / `…tally--no">NO</span>` once the viewer has voted (side colored green/red) |
 | `{{vote.my_yes_class}}` / `{{vote.my_no_class}}` | `vote-btn--chosen` on the popup button the viewer picked, empty otherwise |
 | `{{thesis.slug}}`, `{{thesis.image_url}}`, `{{thesis.question}}` | Live-thesis row identity (`<!-- repeat: thesis -->`) |
 | `{{thesis.stance}}` / `{{thesis.stance_upper}}`, `{{thesis.conviction}}` | Called side and conviction 1–5 |
 | `{{thesis.text}}` | Thesis text |
-| `{{thesis.take_count}}`, `{{thesis.called_ago}}` | Takes and relative time since the call |
-| `{{history.slug}}`, `{{history.image_url}}`, `{{history.question}}` | History row identity (`<!-- repeat: history -->`) |
-| `{{history.stance}}` / `{{history.stance_upper}}`, `{{history.conviction}}` | What was called |
-| `{{history.called_pct}}` | Market YES % at the moment of the call (shown as "61% at call") |
-| `{{history.volume}}`, `{{history.take_count}}` | Final volume and take count |
-| `{{history.outcome}}` | `won` or `lost` (rendered as a green/red tag) |
-| `{{history.resolved_ago}}` | Relative time since resolution, shown bare (e.g. "2w ago") |
-| `{{empty_open_votes}}`, `{{empty_prophecies}}`, `{{empty_history}}` | Empty-state line for each group, set on the section; shown when its list has no rows (fallbacks: "No open votes right now.", "No prophecies yet.", "Nothing resolved yet.") |
+| `{{thesis.live_pct}}` | Live market YES %, the green number beside the badge column |
+| `{{thesis.called_pct}}`, `{{thesis.ends_in}}` | "61% at call" and clock + ends-in on the meta line |
+| `{{explainer_open_votes}}`, `{{explainer_prophecies}}` | One explainer line under each group title on the Prophecies page (approved: "Draft theses waiting on holders. Vote YES or NO. Your voting weight is what you hold." / "Calls that passed the vote, live until the market resolves.") |
+| `{{empty_open_votes}}`, `{{empty_prophecies}}` | Empty-state line for each group, set on the section; shown when its list has no rows (fallbacks: "No open votes right now.", "No prophecies yet.") |
 | `take.*` inside any row's dropdown | Same take variables as the home panel (`<!-- repeat: take -->` inside each row's Contributions dropdown) |
+
+### Record page
+| Variable | Description |
+|---|---|
+| `{{bar.outcome}}`, `{{bar.points_abs}}`, `{{bar.points_signed}}`, `{{bar.question}}` | P&L bars (`<!-- repeat: bar -->`, oldest left): `won`/`lost`, absolute points for height, signed points label, question on hover |
+| `{{record.calls}}`, `{{record.wins}}`, `{{record.losses}}`, `{{record.win_rate}}` | Stats row under the chart |
+| `{{record.edge}}`, `{{record.edge_class}}` | Edge as a signed number (e.g. `+9.4`; "pts" is static) and `win` / `loss` to color it green / red |
+| `{{bar.resolved_ago}}` | Relative time, shown in each bar's hover title |
+| `{{record.edge_range}}` | Selected time range for the Edge chart: `1w`, `1m`, `3m`, `1y`, `all`; the server marks that tab `range__tab--on` and filters the bars |
+| `{{explainer_record}}` | Explainer line under the History title (approved: "Every call he's made, with the odds at the time and how it ended.") |
+| `{{empty_record}}` | Empty-state line when there are no entries (fallback: "No calls on the Record yet.") |
+| `{{entry.slug}}`, `{{entry.image_url}}`, `{{entry.question}}` | Entry row identity (`<!-- repeat: entry -->`, newest first) |
+| `{{entry.stance}}` / `{{entry.stance_upper}}`, `{{entry.conviction}}` | What was called and conviction 1–5 |
+| `{{entry.volume}}`, `{{entry.take_count}}`, `{{entry.called_pct}}` | Row meta: volume, takes, market YES % at the call |
+| `{{entry.outcome}}`, `{{entry.resolved_ago}}` | `won` / `lost` tag and bare relative time |
+| `{{entry.call_text}}`, `{{entry.called_ago}}` | Chain: the call |
+| `{{update.text}}`, `{{update.ago}}` | Chain: each update (`<!-- repeat: update -->`) |
+| `{{entry.resolved_side}}` / `{{entry.resolved_side_upper}}`, `{{entry.resolved_pct}}` | Chain: how the market resolved and its closing % |
+| `{{entry.lesson}}` | Chain: the lesson |
