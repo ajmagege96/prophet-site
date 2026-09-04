@@ -672,7 +672,8 @@
   var CLEAR   = 20;    /* keep this far off any content, pad included */
 
   var IDLE_GAP = 3000, TYPING_GAP = 3000;   /* one steady beat, typing included */
-  var MAX_LIVE = 4;    /* headroom, so the cap never eats a beat */
+  var MAX_LIVE = 1;    /* exactly one run on screen at a time */
+  var MAX_LEN  = 430;  /* (430 + 160) / 200 = 2.95s, so it lands before the next beat */
   var IDLE_LEVEL = 0.72, TYPING_LEVEL = 0.85, SEND_LEVEL = 1;
   var PEAK = 0.62;     /* the roadmap streak peaks at 0.9; this is the same, dimmer */
 
@@ -680,7 +681,7 @@
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
 
   var traces = [], pulses = [], origin = { x: 0, y: 0 }, barBox = null, heroBox = null;
-  var raf = null, lastFrame = 0, lastPulse = 0, typingUntil = 0, lastStart = null;
+  var raf = null, lastFrame = 0, nextBeat = 0, typingUntil = 0, lastStart = null;
 
   function docRect(el) {
     var r = el.getBoundingClientRect();
@@ -828,17 +829,19 @@
 
     for (i = 0; i < starts.length; i++) {
       var s = starts[i], pts = [{ x: s.x, y: s.y }];
-      var x = s.x, y = s.y, dx = s.dx, dy = s.dy, ok = true;
+      var x = s.x, y = s.y, dx = s.dx, dy = s.dy, ok = true, run = 0;
       /* Mostly three legs, sometimes two, occasionally four. Every leg is
          still 48px minimum, so extra legs read as corners, not wiggle. */
       var legs = 2 + (Math.random() < 0.6 ? 1 : 0) + (Math.random() < 0.28 ? 1 : 0);
       for (var leg = 0; leg < legs; leg++) {
         var want = leg === 0 ? s.reach : (s.climb && leg === 1 ? s.climb : rnd(55, 245));
+        want = Math.min(want, MAX_LEN - run);         /* stay inside one beat */
+        if (want < 48) break;
         var got = runLength(x, y, dx, dy, want, leg === 0 ? rects : away);
         /* 44px minimum: a shorter run would land as a stub turn right before
            the pad, which is the fidgety look. Ending here instead is cleaner. */
         if (got < 48) { if (leg === 0) ok = false; break; }
-        x += dx * got; y += dy * got;
+        x += dx * got; y += dy * got; run += got;
         pts.push({ x: x, y: y });
         if (leg < legs - 1) {                        /* right-angle turn only */
           var turn = Math.random() < 0.5 ? 1 : -1;
@@ -1049,23 +1052,26 @@
     /* The bar can shift after first paint (fonts, images, late layout).
        Re-measure each frame and rebuild if it has actually moved. */
     var live = docRect(bar);
-    if (Math.abs(live.t - barBox.t) > 1 || Math.abs(live.l - barBox.l) > 1 ||
-        Math.abs(live.r - barBox.r) > 1 || Math.abs(live.b - barBox.b) > 1) {
+    if (Math.abs(live.t - barBox.t) > 2 || Math.abs(live.l - barBox.l) > 2 ||
+        Math.abs(live.r - barBox.r) > 2 || Math.abs(live.b - barBox.b) > 2) {
       barBox = live; place(); build(); pulses = [];
       return;
     }
-    var gap = now < typingUntil ? TYPING_GAP : IDLE_GAP;
-    /* Advance the beat only when a pulse really fired. Setting lastPulse
-       unconditionally let a blocked beat pass silently, which stretched the
-       interval between flashes to a multiple of the gap. */
-    if (now - lastPulse > gap && firePulse(now < typingUntil ? TYPING_LEVEL : IDLE_LEVEL, false)) lastPulse = now;
+    /* A metronome on a fixed grid. It is never reset by a restart, a
+       rebuild or a resize, which is what made the flashing irregular. */
+    if (!nextBeat) nextBeat = now + IDLE_GAP;
+    if (now >= nextBeat) {
+      firePulse(IDLE_LEVEL, false);
+      nextBeat += IDLE_GAP;
+      if (nextBeat <= now) nextBeat = now + IDLE_GAP;   /* after a hidden tab */
+    }
     paint(now, dt);
   }
 
   function stop() { if (raf) { cancelAnimationFrame(raf); raf = null; } }
   function start() {
     if (raf || !wide.matches) return;
-    lastFrame = 0; lastPulse = performance.now() - IDLE_GAP + 1200;
+    lastFrame = 0;
     raf = requestAnimationFrame(frame);
   }
   function refresh() {
@@ -1081,7 +1087,7 @@
   var input = document.querySelector('[data-prompt-input]');
   if (input) input.addEventListener('input', function () { typingUntil = performance.now() + 2500; });
   var send = document.querySelector('[data-prompt-send]');
-  if (send) send.addEventListener('click', function () { firePulse(SEND_LEVEL, true); lastPulse = performance.now(); });
+  if (send) send.addEventListener('click', function () { firePulse(SEND_LEVEL, true); });
 
   var rt;
   window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(refresh, 200); });
@@ -1113,8 +1119,9 @@
   window.addEventListener('load', later);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(later);
   if (window.ResizeObserver) {
+    /* Only the bar's own wrapper. Observing document.body meant resizing our
+       canvas re-triggered a rebuild, in a loop. */
     var ro = new ResizeObserver(later);
-    ro.observe(document.body);
     if (bar.parentElement) ro.observe(bar.parentElement);
   }
   later();
