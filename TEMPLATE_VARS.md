@@ -71,6 +71,7 @@
 | `{{record.calls}}`, `{{record.wins}}`, `{{record.losses}}`, `{{record.win_rate}}` | Stats row under the chart |
 | `{{record.edge}}`, `{{record.edge_class}}` | Edge as a signed number (e.g. `+9.4`; "pts" is static) and `win` / `loss` to color it green / red |
 | `{{bar.resolved_ago}}` | Relative time, shown in each bar's hover title |
+| `{{record.edge_first_date}}`, `{{record.edge_last_date}}` | Dates at the two ends of the chart's x-axis (oldest left, newest right), e.g. `Jun 12` / `Aug 21` |
 | `{{record.edge_range}}` | Selected time range for the Edge chart: `1w`, `1m`, `3m`, `1y`, `all`; the server marks that tab `range__tab--on` and filters the bars |
 | `{{explainer_record}}` | Explainer line under the History title (approved: "Every call he's made, with the odds at the time and how it ended.") |
 | `{{empty_record}}` | Empty-state line when there are no entries (fallback: "No calls on the Record yet.") |

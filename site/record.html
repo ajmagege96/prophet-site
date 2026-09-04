@@ -78,6 +78,8 @@
       <div class="edge" aria-label="Edge per call">
         <h2 class="pnl__title heading">Edge</h2>
         <!-- Time range: server renders the selected one with class range__tab--on and filters the bars; {{record.edge_range}} = 1w|1m|3m|1y|all -->
+        <span class="edge__axis edge__axis--l" data-mock="Jun 12">{{record.edge_first_date}}</span>
+        <span class="edge__axis edge__axis--r" data-mock="Aug 21">{{record.edge_last_date}}</span>
         <div class="range" data-range>
           <button class="range__tab" data-range-opt="1w">1W</button>
           <button class="range__tab" data-range-opt="1m">1M</button>
@@ -91,17 +93,25 @@
         </template>
         <!-- /repeat: bar -->
         <span class="edge__col"><span class="edge__bar edge__bar--lost" style="--v:34" title="Will Solana trade above $200? · 2mo ago"><span class="edge__val">-34</span></span></span>
+        <span class="edge__col"><span class="edge__bar edge__bar--won" style="--v:22" title="Will the CPI print come in under 3%? · 2mo ago"><span class="edge__val">+22</span></span></span>
+        <span class="edge__col"><span class="edge__bar edge__bar--won" style="--v:41" title="Will BTC hold $60K through the month? · 7w ago"><span class="edge__val">+41</span></span></span>
+        <span class="edge__col"><span class="edge__bar edge__bar--lost" style="--v:18" title="Will the ECB cut before the Fed? · 6w ago"><span class="edge__val">-18</span></span></span>
         <span class="edge__col"><span class="edge__bar edge__bar--won" style="--v:51" title="Will gold close above $2,500? · 1mo ago"><span class="edge__val">+51</span></span></span>
+        <span class="edge__col"><span class="edge__bar edge__bar--won" style="--v:12" title="Will a spot SOL ETF be filed? · 5w ago"><span class="edge__val">+12</span></span></span>
+        <span class="edge__col"><span class="edge__bar edge__bar--lost" style="--v:29" title="Will oil close under $70? · 4w ago"><span class="edge__val">-29</span></span></span>
         <span class="edge__col"><span class="edge__bar edge__bar--lost" style="--v:23" title="Will the Fed hold rates at the last meeting? · 3w ago"><span class="edge__val">-23</span></span></span>
+        <span class="edge__col"><span class="edge__bar edge__bar--won" style="--v:33" title="Will NVDA beat on earnings? · 3w ago"><span class="edge__val">+33</span></span></span>
+        <span class="edge__col"><span class="edge__bar edge__bar--lost" style="--v:9" title="Will the dollar index break 105? · 2w ago"><span class="edge__val">-9</span></span></span>
         <span class="edge__col"><span class="edge__bar edge__bar--won" style="--v:36" title="Will a spot Ethereum ETF see net inflows in its first month? · 2w ago"><span class="edge__val">+36</span></span></span>
+        <span class="edge__col"><span class="edge__bar edge__bar--won" style="--v:27" title="Will unemployment tick up this print? · 1w ago"><span class="edge__val">+27</span></span></span>
       </div>
 
       <div class="stats">
-        <span class="stats__item"><span class="stats__label heading">Calls</span><span class="stats__num" data-mock="4">{{record.calls}}</span></span>
-        <span class="stats__item"><span class="stats__label heading">Wins</span><span class="stats__num stats__num--win" data-mock="2">{{record.wins}}</span></span>
-        <span class="stats__item"><span class="stats__label heading">Losses</span><span class="stats__num stats__num--loss" data-mock="2">{{record.losses}}</span></span>
-        <span class="stats__item"><span class="stats__label heading">Win rate</span><span class="stats__num" data-mock="50%">{{record.win_rate}}</span></span>
-        <span class="stats__item"><span class="stats__label heading">Edge</span><span class="stats__num stats__num--{{record.edge_class}}" data-mock="+9.4" data-mock-class="stats__num--win">{{record.edge}}</span><span class="stats__unit">pts</span></span>
+        <span class="stats__item"><span class="stats__label heading">Calls</span><span class="stats__num" data-mock="12">{{record.calls}}</span></span>
+        <span class="stats__item"><span class="stats__label heading">Wins</span><span class="stats__num stats__num--win" data-mock="7">{{record.wins}}</span></span>
+        <span class="stats__item"><span class="stats__label heading">Losses</span><span class="stats__num stats__num--loss" data-mock="5">{{record.losses}}</span></span>
+        <span class="stats__item"><span class="stats__label heading">Win rate</span><span class="stats__num" data-mock="58%">{{record.win_rate}}</span></span>
+        <span class="stats__item"><span class="stats__label heading">Edge</span><span class="stats__num stats__num--{{record.edge_class}}" data-mock="+9.1" data-mock-class="stats__num--win">{{record.edge}}</span><span class="stats__unit">pts</span></span>
       </div>
       <p class="pnl__explain">Win rate: the share of his calls that resolved his way. Edge: the gap between what the market believed when he called and what actually happened, averaged. For example: He calls YES at 40 and it settles YES: +60 pts. He calls YES at 40 and it settles NO: −40 pts.</p>
     </div>

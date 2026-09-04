@@ -410,10 +410,10 @@ ul, ol { list-style: none; }
 /* vote tallies read "62% Yes"; timers read "2d left" */
 .carousel__state--vote .tally, .prow__state--vote .tally, .thesis__state--vote .tally { text-transform: capitalize; }
 .timer { text-transform: none; }
-.votes { display: inline-flex; align-items: center; gap: 3px; }
-.votes .ico { width: 11px; height: 11px; fill: none; stroke: currentColor; }
-.timer { display: inline-flex; align-items: center; gap: 3px; color: var(--purple-text); }
-.timer .ico { width: 11px; height: 11px; fill: none; stroke: currentColor; }
+/* In the vote badge only the icons are purple; the counts and text stay gray. */
+.votes, .timer { display: inline-flex; align-items: center; gap: 3px; color: var(--offwhite); opacity: 0.55; }
+.votes .ico, .timer .ico { width: 11px; height: 11px; fill: none; stroke: var(--purple-text); }
+.timer { text-transform: none; }
 .tally--yes { color: var(--green); }
 .tally--no  { color: #e53935; }
 .carousel__state:empty { display: none; }
@@ -754,21 +754,24 @@ ul, ol { list-style: none; }
   max-width: 640px;
   height: 150px;
   margin-top: 34px;
-  margin-bottom: 18px;
+  margin-bottom: 26px;
   display: flex;
   justify-content: center;
-  gap: 48px;
+  gap: 14px;
 }
 .edge::before { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: rgba(242, 240, 230, 0.25); }
-.edge__col { position: relative; display: grid; grid-template-rows: 1fr 1fr; width: 22px; }
+.edge__col { position: relative; display: grid; grid-template-rows: 1fr 1fr; width: 18px; }
 /* Time range tabs, top-right of the chart; the selected one is underlined */
+.edge__axis { position: absolute; top: calc(50% + 10px); font-size: 10px; opacity: 0.45; white-space: nowrap; }
+.edge__axis--l { left: 0; }
+.edge__axis--r { right: 0; }
 .range { position: absolute; right: 0; bottom: 100%; margin-bottom: 12px; display: flex; gap: 14px; }
 .range__tab { font-family: var(--font-display); font-size: 10px; letter-spacing: 0.1em; color: var(--offwhite); opacity: 0.45; padding: 2px 0 5px; border-bottom: 1px solid transparent; transition: opacity 0.15s; }
 .range__tab:hover { opacity: 0.85; }
 .range__tab--on { opacity: 1; color: var(--green); border-bottom-color: var(--green); }
 .edge__bar {
   position: relative;
-  width: 22px;
+  width: 18px;
   height: calc(var(--v, 0) * 1.3px);   /* 65px ≈ 50 pts each way */
   max-height: 70px;
   border: 1px solid var(--green);
@@ -1218,6 +1221,14 @@ ul, ol { list-style: none; }
   .range__tab { padding: 0 8px; }
   .prow { padding: 12px; }
   .prow__side { gap: 8px; }
+
+  /* ── Record: the Edge chart needs a tighter footprint here ── */
+  .edge { gap: 8px; padding-bottom: 16px; }
+  .edge__col { width: 12px; }
+  .edge__bar { width: 12px; }
+  .edge__val { font-size: 9px; }
+  /* dates drop below the bars so they never collide */
+  .edge__axis { top: auto; bottom: -2px; }
 
   /* ── $PROPHET ── */
   .tstats { grid-template-columns: repeat(2, 1fr); }
