@@ -1109,58 +1109,62 @@ ul, ol { list-style: none; }
    the last in the file and every rule is scoped to the query. */
 @media (max-width: 767px) {
 
-  /* ── Header: mark + wordmark, nav in the menu ── */
+  /* ── Header ── */
   .site-header { padding: 0 12px; }
   .site-header__hiw { display: none; }
   .site-header__wordmark { height: 11px; }
-
-  /* Address pill stays in the header, shortened. It lives inside the
-     desktop nav, so show the nav but hide its links. */
   .site-header__nav { display: flex; margin-left: auto; }
   .site-header__nav > a { display: none; }
-  .site-header__ca { display: inline-flex; margin-right: 4px; min-height: 44px; padding: 6px 7px; font-size: 10px; }
-  .site-header__menu-btn { width: 44px; height: 44px; margin-right: -6px; }
-  .site-header__mobile-panel a { min-height: 44px; display: flex; align-items: center; }
+  .site-header__ca { display: inline-flex; margin-right: 4px; min-height: 38px; padding: 6px 7px; font-size: 10px; }
+  .site-header__menu-btn { width: 40px; height: 40px; margin-right: -6px; }
+  .site-header__mobile-panel a { min-height: 40px; display: flex; align-items: center; }
+  .menu-links { justify-content: center; }
 
-  /* ── The page scrolls normally: no fixed hero, no inner scrollers ── */
+  /* ── Page scrolls normally; a little more gutter than desktop ── */
   .hero { height: auto; min-height: 0; overflow: visible; }
-  /* Home keeps the desktop behaviour: the panel is one screen tall, the feed
-     scrolls inside it, and the prompt bar sits at its bottom. */
-  .home-panel { height: calc(100svh - 56px); padding: 16px 16px 12px; }
-  .panel { height: auto; overflow: visible; padding: 16px 16px 24px; }
-  .panel--token { overflow: visible; padding-bottom: 40px; }
+  .home-panel { height: calc(100svh - 56px); padding: 16px 20px 14px; }
+  .panel { height: auto; overflow: visible; padding: 16px 20px 28px; }
+  .panel--token { overflow: visible; padding-bottom: 44px; }
   .feed { flex: 1 1 auto; min-height: 0; overflow-y: auto; margin-top: 14px; }
   .pgroup { flex: 0 0 auto; }
   .pgroup__list { max-height: none; overflow: visible; padding-right: 0; }
   .prow__takes { max-height: none; overflow: visible; }
   .panel__scroll { height: auto; overflow: visible; }
 
-  /* ── Filter chips: one row that scrolls sideways ── */
+  /* ── Chips and small controls: shorter than the desktop-era 44px ── */
   .filters {
     flex-wrap: nowrap;
     overflow-x: auto;
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
-    margin: 0 -16px 12px;
-    padding: 0 16px;
+    margin: 0 -20px 12px;
+    padding: 0 20px;
   }
   .filters::-webkit-scrollbar { display: none; }
-  .filters__tag { flex: 0 0 auto; min-height: 44px; padding: 0 14px; display: inline-flex; align-items: center; }
+  .filters__tag { flex: 0 0 auto; min-height: 34px; padding: 0 12px; display: inline-flex; align-items: center; }
+  .vote-btn, .vote__btn { min-height: 34px; padding: 0 12px; display: inline-flex; align-items: center; justify-content: center; gap: 4px; }
+  .range__tab, .seg__opt { min-height: 32px; display: inline-flex; align-items: center; justify-content: center; }
+  .range { gap: 6px; }
+  .range__tab { padding: 0 6px; }
 
-  /* ── Carousel: keep the arrows, narrower card ── */
-  .carousel { gap: 4px; }
-  .carousel__arrow { display: flex; width: 30px; height: 44px; }
+  /* ── Carousel: desktop-sized arrows with room around them ── */
+  .carousel { gap: 12px; }
+  .carousel__arrow { display: flex; width: 36px; height: 36px; }
   .carousel__track { padding: 2px 0; gap: 12px; }
   .carousel__card { flex: 0 0 100%; scroll-snap-align: start; }
 
-  /* ── Takes: scroll, same as desktop ── */
   .takes__item { padding: 10px 0; }
   .takes__ago, .takes__xp { font-size: 10px; }
 
-  /* ── Prompt bar: same block as desktop, just full width ── */
+  /* ── Prompt bar ── */
   .prompt-bar-wrap { margin-top: auto; }
   .prompt-bar__input { font-size: 16px; }   /* 16px stops iOS zooming on focus */
-  .prompt-bar__send { width: 44px; height: 44px; margin: -8px -6px -8px 0; }
+  .prompt-bar__send { width: 40px; height: 40px; margin: -6px -6px -6px 0; }
+
+  /* ── List rows: everything on the right edge stays on the right ── */
+  .prow { padding: 12px; }
+  .prow__side { gap: 8px; align-items: flex-end; }
+  .prow__row, .prow__bottom, .prow__side > .prow__meta { width: 100%; justify-content: flex-end; text-align: right; }
 
   /* ── Tokenomics table: one block per stream ── */
   .doors thead { display: none; }
@@ -1171,50 +1175,60 @@ ul, ol { list-style: none; }
   .doors .doors__name { font-size: 14px; }
   .doors .doors__share { margin: 2px 0 4px; }
 
-  /* ── Below the fold ── */
-  .below { padding: 40px 16px; }
-  .buy { min-height: 44px; display: inline-flex; align-items: center; }
-
-  /* Footer here is the TradeLeague credit only; the links live in the menu */
-  .site-footer__inner { padding: 16px; }
+  /* ── Below the fold and footer ── */
+  .below { padding: 40px 20px; }
+  .buy { min-height: 40px; display: inline-flex; align-items: center; }
+  .site-footer__inner { padding: 16px; justify-content: center; }
   .site-footer__right { display: none; }
-  .site-footer__by { min-height: 44px; }
-
-  /* ── Tap targets on the list panels ── */
-  .vote-btn, .vote__btn, .range__tab, .seg__opt { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; gap: 4px; }
-  .range { gap: 4px; }
-  .range__tab { padding: 0 8px; }
-  .prow { padding: 12px; }
-  .prow__side { gap: 8px; }
 
   /* ── Record ── */
   .panel--record { padding-top: 28px; }
   .pnl { gap: 18px; }
-  .edge { margin-top: 44px; gap: 8px; padding-bottom: 16px; }
-  .edge__col { width: 12px; }
-  .edge__bar { width: 12px; }
+  .edge { margin-top: 44px; gap: 7px; padding: 0 10px 16px; }
+  .edge__col { width: 11px; }
+  .edge__bar { width: 11px; }
   .edge__val { font-size: 9px; }
   .edge__axis { top: auto; bottom: -2px; }   /* dates below the bars, never colliding */
-  /* Calls · Wins · Losses on one row, Win rate · Edge under it */
-  .stats { display: grid; grid-template-columns: repeat(3, auto); justify-content: center; gap: 10px 20px; }
-  .stats__item:nth-child(4) { grid-column: 1 / 2; }
-  .stats__item:nth-child(5) { grid-column: 2 / 4; }
+  .edge__axis--l { left: 10px; }
+  .edge__axis--r { right: 10px; }
+  /* Calls · Wins · Losses centred on one row, Win rate · Edge centred under it */
+  .stats { display: grid; grid-template-columns: repeat(6, auto); justify-content: center; gap: 12px 12px; }
+  .stats__label { white-space: nowrap; }
+  .stats__item { gap: 6px; }
+  .stats__item { grid-column: span 2; justify-self: center; }
+  .stats__item:nth-child(4) { grid-column: 2 / span 2; }
+  .stats__item:nth-child(5) { grid-column: 4 / span 2; }
   .info::after { left: auto; right: 0; width: 240px; }
 
-  /* ── $PROPHET ── */
-  .tstats { grid-template-columns: repeat(2, 1fr); }
-  .token__grid { grid-template-columns: 1fr; }
-  /* price left, Price/MCap + ranges top-right, same as desktop */
-  .tchart__head { flex-wrap: nowrap; align-items: flex-start; }
-  .tchart__now { flex: 1 1 auto; }
-  .tchart__pair { display: none; }   /* the controls need the room */
-  .tchart__controls { flex: 0 0 auto; }
+  /* ── $PROPHET: chart, then live trades, then swap, then wallets ── */
+  .panel--token { display: flex; flex-direction: column; gap: 12px; }
+  .token__grid { display: contents; }
+  .tstats { order: 1; grid-template-columns: repeat(2, 1fr); }
+  .tchart  { order: 2; }
+  .trades  { order: 3; }
+  .swap    { order: 4; }
+  .panel--token .pgroup__title { order: 5; text-align: center; }
+  .wallets { order: 6; }
+  .token__line { order: 7; justify-content: center; margin-top: 10px; }
+
+  .tstat { padding: 7px 12px; gap: 1px; }
+  .tstat__val { font-size: 15px; }
+  /* price, Price/MCap and the ranges all on one row */
+  .tchart { padding: 12px 10px; }
+  .tchart__head { flex-wrap: nowrap; align-items: center; gap: 6px; }
+  .tchart__now { flex: 0 0 auto; gap: 5px; }
+  .tchart__price { font-size: 15px; }
+  .tchart__change { font-size: 10px; }
+  .tchart__pair { display: none; }
+  .tchart__controls { flex: 1 1 auto; min-width: 0; flex-direction: row; justify-content: flex-end; align-items: center; gap: 6px; }
+  .seg__opt { font-size: 8px; padding: 0 5px; letter-spacing: 0.04em; }
+  .tchart__controls .range { gap: 2px; }
+  .tchart__controls .range__tab { padding: 0 3px; font-size: 9px; letter-spacing: 0.04em; }
   .tchart__plot { height: 180px; }
-  .swap, .wallets, .trades { max-width: 340px; margin-left: auto; margin-right: auto; }
-  .swap__field { min-height: 48px; }
-  .swap__flip { width: 44px; height: 44px; }
-  .swap__cta { min-height: 48px; }
+
+  .swap__field { min-height: 46px; }
+  .swap__flip { width: 40px; height: 40px; }
+  .swap__cta { min-height: 44px; }
   .swap__input { font-size: 16px; }
-  .wallet { min-height: 56px; }
-  .token__line { justify-content: center; }
+  .wallet { min-height: 54px; }
 }
