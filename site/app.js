@@ -25,8 +25,8 @@
 })();
 
 /* ── Contract address copy button ─────────────────────── */
-/* Shows first 6 … last 6 of {{contract_address}}; click copies the full
-   address and the pill reads "copied" for a moment. */
+/* Shows a truncated address (shorter on mobile); click copies the full
+   value and the pill reads "copied" for a moment. */
 (function () {
   var btns = document.querySelectorAll('[data-ca-copy]');
   for (var i = 0; i < btns.length; i++) {
@@ -35,14 +35,22 @@
       var text = btn.querySelector('[data-ca-text]');
       /* Sample address for preview while {{contract_address}} is unfilled */
       if (!ca || (/^\{\{/).test(ca)) ca = '7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr';
-      text.textContent = ca.slice(0, 6) + '\u2026' + ca.slice(-6);
+      var locked = false;
+      function short() {
+        var n = window.matchMedia('(max-width: 767px)').matches ? 4 : 6;
+        return ca.slice(0, n) + '\u2026' + ca.slice(-n);
+      }
+      function render() { if (!locked) text.textContent = short(); }
+      render();
+      window.addEventListener('resize', render);
       btn.addEventListener('click', function () {
         var done = function () {
-          var was = text.textContent;
+          locked = true;
           text.textContent = 'copied';
           btn.classList.add('site-header__ca--copied');
           setTimeout(function () {
-            text.textContent = was;
+            locked = false;
+            render();
             btn.classList.remove('site-header__ca--copied');
           }, 1400);
         };
@@ -72,6 +80,7 @@
   var thesisLabel = document.querySelector('[data-thesis-label]');
   var thesisList = document.querySelector('[data-thesis-contributors]');
   var votes = {}; /* slug -> 'yes' | 'no' (mock, in-memory) */
+  var countEl = document.querySelector('[data-carousel-count]');
   var prevBtn = document.querySelector('[data-carousel-prev]');
   var nextBtn = document.querySelector('[data-carousel-next]');
   var activeIndex = -1;
@@ -122,6 +131,10 @@
     for (var i = 0; i < cards.length; i++) {
       if (i === index) cards[i].classList.add('carousel__card--active');
       else cards[i].classList.remove('carousel__card--active');
+    }
+    if (countEl) {
+      var vis = visibleCards();
+      countEl.textContent = (vis.indexOf(cards[index]) + 1) + ' / ' + vis.length;
     }
     startTypewriter(index);
     renderThesis(cards[index]);
@@ -431,7 +444,21 @@
         '</div>' +
         '</div>';
     }
+    if (takes.length > 3) {
+      html += '<button class="takes__more" data-takes-more>More takes</button>';
+    }
     takesContainer.innerHTML = html;
+    takesContainer.classList.remove('takes--expanded');
+  }
+
+  /* Mobile only: the button is hidden by CSS above 767px */
+  if (takesContainer) {
+    takesContainer.addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-takes-more]');
+      if (!btn) return;
+      var open = takesContainer.classList.toggle('takes--expanded');
+      btn.textContent = open ? 'Fewer takes' : 'More takes';
+    });
   }
 
   /* Init first card */

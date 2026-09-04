@@ -1090,3 +1090,143 @@ ul, ol { list-style: none; }
   .phases { grid-template-columns: repeat(3, 1fr); gap: 32px; }
   .timeline__dot { left: 0; top: -33px; }   /* centred on the line at top:12px + 0.5px */
 }
+
+
+/* ══ MOBILE PASS ═══════════════════════════════════════════
+   Everything below 768px. Desktop is untouched: this block is
+   the last in the file and every rule is scoped to the query. */
+@media (max-width: 767px) {
+
+  /* ── Header: mark only, everything else in the menu ── */
+  .site-header { padding: 0 12px; }
+  .site-header__wordmark { display: none; }
+  .site-header__hiw { display: none; }
+  .site-header__logo { gap: 0; }
+
+  /* CA pill stays in the header, shortened; the menu copy is dropped.
+     The pill lives inside the desktop nav, so show the nav but hide its links. */
+  .site-header__nav { display: flex; margin-left: auto; }
+  .site-header__nav > a { display: none; }
+  .site-header__ca { display: inline-flex; margin-right: 6px; min-height: 44px; padding: 6px 8px; font-size: 10px; }
+  .site-header__ca--mobile { display: none; }
+  .site-header__menu-btn { width: 44px; height: 44px; margin-right: -8px; }
+
+  .site-header__mobile-panel a,
+  .site-header__mobile-panel .account { min-height: 44px; display: flex; align-items: center; }
+
+  /* ── The page scrolls normally: no fixed hero, no inner scrollers ── */
+  .hero { height: auto; min-height: 0; overflow: visible; }
+  /* min-height, not a fixed height: content grows past it and the page scrolls.
+     It gives the sticky prompt bar a full screen to pin against. */
+  .home-panel { height: auto; min-height: calc(100svh - 56px); padding: 16px 16px 0; }
+  .panel { height: auto; overflow: visible; padding: 16px 16px 0; }
+  .panel--token { overflow: visible; }
+  .feed { flex: 0 0 auto; min-height: 0; overflow: visible; margin-top: 14px; }
+  .takes { overflow: visible; }
+  .pgroup { flex: 0 0 auto; }
+  .pgroup__list { max-height: none; overflow: visible; padding-right: 0; }
+  .prow__takes { max-height: none; overflow: visible; }
+  .panel__scroll { height: auto; overflow: visible; }
+
+  /* ── Filter chips: one row that scrolls sideways ── */
+  .filters {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    margin: 0 -16px 12px;
+    padding: 0 16px;
+  }
+  .filters::-webkit-scrollbar { display: none; }
+  .filters__tag { flex: 0 0 auto; min-height: 44px; padding: 0 14px; display: inline-flex; align-items: center; }
+
+  /* ── Carousel: one full-width card, swipe only, no peek ── */
+  .carousel__track { padding: 2px 0; gap: 16px; }
+  .carousel__card { flex: 0 0 100%; scroll-snap-align: start; }
+  .carousel__arrow { display: none; }
+  .carousel__count {
+    margin: 8px 0 0;
+    text-align: center;
+    font-family: var(--font-display);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    opacity: 0.45;
+  }
+
+  /* ── Takes: three, then a toggle ── */
+  .takes__item { padding: 10px 0; }
+  .takes__side { gap: 1px; }
+  .takes__ago, .takes__xp { font-size: 10px; }
+  [data-takes-list] .takes__item:nth-of-type(n+4) { display: none; }
+  [data-takes-list].takes--expanded .takes__item:nth-of-type(n+4) { display: flex; }
+  .takes__more {
+    display: block;
+    width: 100%;
+    min-height: 44px;
+    margin-top: 4px;
+    border: 1px solid var(--outline);
+    border-radius: 4px;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--offwhite);
+    opacity: 0.7;
+  }
+
+  /* ── Prompt bar: sticky to the bottom, dot inline on its left ── */
+  .prompt-bar-wrap {
+    position: sticky;
+    bottom: 0;
+    z-index: 20;
+    margin-top: auto;   /* sit at the hero's bottom, then stick while takes scroll */
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: -16px;
+    margin-right: -16px;
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+    background: var(--navy);
+    border-top: 1px solid var(--outline);
+  }
+  .prompt-bar { flex: 1 1 auto; min-width: 0; min-height: 44px; }
+  .prompt-bar__input { font-size: 16px; min-height: 44px; }   /* 16px stops iOS zooming on focus */
+  .prompt-bar__send { width: 44px; height: 44px; margin: -8px -6px -8px 0; }
+  .prompt-bar__row { order: -1; padding: 0; flex: 0 0 auto; }
+  .status-line__name { display: none; }
+  .prompt-bar__tools { display: none; }
+
+  /* ── Tokenomics table: one block per stream ── */
+  .doors thead { display: none; }
+  .doors, .doors tbody, .doors tr, .doors td { display: block; width: 100%; }
+  .doors tr { padding: 12px 0; border-bottom: 1px solid var(--outline); }
+  .doors tr:last-child { border-bottom: none; }
+  .doors td { border: none; padding: 0; }
+  .doors .doors__name { font-size: 14px; }
+  .doors .doors__share { margin: 2px 0 4px; }
+
+  /* ── Below the fold ── */
+  .below { padding: 40px 16px; }
+  .buy { min-height: 44px; display: inline-flex; align-items: center; }
+  .site-footer__inner { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .site-footer__by { min-height: 44px; }
+  .site-footer__group { gap: 4px; }
+  .site-footer__group a { min-width: 44px; min-height: 44px; align-items: center; justify-content: center; }
+
+  /* ── Tap targets on the list panels ── */
+  .vote-btn, .vote__btn, .range__tab, .seg__opt { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; gap: 4px; }
+  .range { gap: 4px; }
+  .range__tab { padding: 0 8px; }
+  .prow { padding: 12px; }
+  .prow__side { gap: 8px; }
+
+  /* ── $PROPHET ── */
+  .tstats { grid-template-columns: repeat(2, 1fr); }
+  .token__grid { grid-template-columns: 1fr; }
+  .tchart__plot { height: 180px; }
+  .swap__field { min-height: 52px; }
+  .swap__flip { width: 44px; height: 44px; }
+  .swap__cta { min-height: 48px; }
+  .swap__input { font-size: 16px; min-height: 44px; }
+  .wallet { min-height: 56px; }
+  .trades { gap: 10px; }
+}

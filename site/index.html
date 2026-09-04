@@ -216,6 +216,8 @@
       </div>
       <button class="carousel__arrow carousel__arrow--next" data-carousel-next aria-label="Next market"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg></button>
     </div>
+    <!-- Position counter: mobile only, filled by app.js -->
+    <p class="carousel__count" data-carousel-count aria-live="polite"></p>
 
     <!-- ── Feed: thesis (if any) on top, takes below ─────── -->
     <div class="feed">
@@ -282,7 +284,7 @@
       <div class="prompt-bar__row">
         <div class="status-line" title="as of {{polymarket_as_of}}">
           <span class="status-line__dot status-line__dot--{{polymarket_status}}"></span>
-          Polymarket
+          <span class="status-line__name">Polymarket</span>
         </div>
         <div class="prompt-bar__tools"><!-- future prompt tools (buttons) go here, right-aligned --></div>
       </div>
