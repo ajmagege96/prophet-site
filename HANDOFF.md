@@ -18,6 +18,7 @@ full list is in the table below and in `TEMPLATE_VARS.md`.
 | `HANDOFF.md` | This file. |
 | `robots.txt` | `Disallow: /` for the test deploy. Delete at launch. |
 | `index.html` (repo root) | Redirect to `site/index.html`, so the bare GitHub Pages URL is not a 404. Delete once `site/` is the document root. |
+| `tools-stamp.py` | Rewrites the `?v=<hash>` on `app.js` and `styles.css` in every page from the file's own content hash. Run it after editing either file. Without it a browser keeps a cached copy after a deploy. Delete it and the query strings once your server sets cache headers. |
 | `site/index.html` | Home. Carousel of 12 markets, thesis block, takes, prompt bar. |
 | `site/prophecies.html` | Prophecies. Open votes and live prophecies, each row expandable to its takes. |
 | `site/record.html` | Record. Edge chart, stats, and the call history with its chain. |
