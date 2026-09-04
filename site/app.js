@@ -676,7 +676,7 @@
      30px wide. A climb has to zigzag inside it without going past the arrow,
      so its sideways steps are allowed to be shorter than a normal leg. */
   var MIN_JOG = 20;
-  var MAX_LEG = 300;   /* no single straight run longer than this: a long route
+  var MAX_LEG = 420;   /* no single straight run longer than this: a long route
                           has to be made of several legs, not one missile */
 
   var wide    = window.matchMedia('(min-width: 1024px)');
@@ -828,6 +828,33 @@
     };
   }
 
+  /* A blocked leg used to end the route outright, so a run that hit the floor
+     or the margin stopped with most of its length unspent — that, not the
+     weighting, is why long routes were rare. Now a blocked axis falls back to
+     the other one and keeps going; the resulting straight run is capped so it
+     never reads as one endless line. */
+  var STRAIGHT_CAP = 560;
+  function wander(w, ax, budget, used, hcap, vcap, maxLegs) {
+    var legs = 1, straight = 0, last = null, got, want;
+    while (used < budget - MIN_LEG && legs < maxLegs) {
+      want = Math.min(budget - used, rnd(70, ax === 'h' ? hcap : vcap));
+      if (ax === last) want = Math.min(want, STRAIGHT_CAP - straight);
+      got = want > MIN_JOG ? w.go(ax, want) : 0;
+      if (!got) {
+        ax = ax === 'h' ? 'v' : 'h';
+        want = Math.min(budget - used, ax === 'h' ? hcap : vcap);
+        if (ax === last) want = Math.min(want, STRAIGHT_CAP - straight);
+        got = want > MIN_JOG ? w.go(ax, want) : 0;
+        if (!got) break;
+      }
+      straight = ax === last ? straight + got : got;
+      last = ax;
+      used += got; legs++;
+      ax = ax === 'h' ? 'v' : 'h';
+    }
+    return used;
+  }
+
   function makeRoute() {
     var side = pickSide();
     var barW = barBox.r - barBox.l, barH = barBox.b - barBox.t;
@@ -841,25 +868,25 @@
       { k: 'tall',  w: 0.18, span: [620, 880] }
     ]);
     var budget = rnd(size.span[0], size.span[1]);
+    /* The side channels are only ~32px wide, so a long budget spent there
+       gets truncated. The band under the bar is the full width, so that is
+       where the long classes mostly go. */
+    if (budget > 420 && Math.random() < 0.35) side = 'down';
     var w, got, used = 0;
 
     if (side === 'down') {
       /* The band under the bar is open all the way across. Use its whole
          width and depth rather than dropping straight down every time. */
       var sx = barBox.l + barW * rnd(0.06, 0.94);
+      /* Head toward whichever side of the band has the room the budget needs. */
       var hd = Math.random() < 0.5 ? -1 : 1;
+      if (budget > 420) hd = (sx - leftX) > (rightX - sx) ? -1 : 1;
       w = walker(sx, barBox.b, hd, 1, rects);
       got = w.go('v', Math.min(rnd(40, 130), budget));
       if (!got) return null;
       used = got;
       w = walker(w.x(), w.y(), hd, 1, offBar);
-      var ax = 'h', n = 1;
-      while (used < budget - MIN_LEG && n < 9) {
-        got = w.go(ax, Math.min(budget - used, rnd(80, 280)));
-        if (!got) break;
-        used += got; n++;
-        ax = ax === 'h' ? 'v' : 'h';
-      }
+      wander(w, 'h', budget, used, 400, 200, 9);
       var d = w.pts(); d.unshift({ x: sx, y: barBox.b });
       return finish(d, side);
     }
@@ -870,7 +897,7 @@
     var goingUp = Math.random() < 0.58;
     var vDir = goingUp ? -1 : 1;
     var startX = side === 'left' ? barBox.l : barBox.r;
-    var startY = barBox.t + barH * rnd(0.28, 0.72);
+    var startY = barBox.t + barH * rnd(0.14, 0.86);
     w = walker(startX, startY, hDir, vDir, rects);
 
     var lane = side === 'left' ? rnd(leftX + 6, colLeft - 8) : rnd(colRight + 8, rightX - 6);
@@ -890,18 +917,16 @@
       /* Alternating legs, always in the two chosen directions, until the
          length is used up. Long runs become staircases across the open
          margin rather than stopping short. */
-      var first = fam === 'runner' ? rnd(0.55, 0.8) : (fam === 'stub' ? rnd(0.45, 0.75) : rnd(0.28, 0.5));
-      got = w.go('h', Math.min(budget * first, toLane));
+      /* Turn point anywhere across the open block, independent of how long
+         the route wants to be. Long routes then wander that block in several
+         legs instead of running straight out to the margin. */
+      var reach = fam === 'runner' ? rnd(toLane * 0.55, toLane)
+                : fam === 'stub'   ? rnd(50, Math.min(150, toLane))
+                                   : rnd(60, toLane * 0.85);
+      got = w.go('h', Math.min(reach, budget * 0.8));
       if (!got) return null;
       used = got;
-      var axis = 'v', legs = 1;
-      while (used < budget - MIN_LEG && legs < 9) {
-        var want = Math.min(budget - used, rnd(70, 240));
-        got = w.go(axis, want);
-        if (!got) break;
-        used += got; legs++;
-        axis = axis === 'h' ? 'v' : 'h';
-      }
+      wander(w, 'v', budget, used, 210, 320, 9);
       return finish(w.pts(), side);
     }
 

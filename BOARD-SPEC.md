@@ -73,10 +73,13 @@ and nothing else; the rest of the board just asks it for a route and draws it.
 | no missiles | longest single leg 300px |
 | sides balanced | left 238, right 242, down 238; worst run 2 |
 
-### Why climbs only happen in the side channels
-The takes feed and the cards together cover x 220-1220 for the full height of
-the hero. Anywhere between those, a trace going up runs into content within a
-few pixels. The only vertical corridors are the margins outside them. With the
-"never past the arrows" rule those margins are the 30px channels at 168-200 and
-1240-1272. Widening a climb means either allowing traces past the arrows, or
-letting them cross the feed.
+### Where routes can actually go
+The cards and the takes feed cover the middle of the hero, and rule 7 forbids
+drawing over them, so the free space is three regions: the band under the bar
+(full width, ~110px deep), the two blocks flanking the bar below the feed
+(~220x220 each), and the two side channels between the arrows and the cards
+(~32px wide, but tall). Routes are spread across all of them. A long route is
+sent to the band most often, because that is the only region wide enough to
+spend the length. Measured over 705 routes: p10 112px, median 272, p90 584,
+max 788; 30% short, 43% mid, 23% long, 4% tall; 0 doubling back, 0 diagonals,
+0 off page, 0 drawn over content.
