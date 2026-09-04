@@ -1,2 +1,20 @@
+# Staging: keep the site out of search results.
 User-agent: *
 Disallow: /
+
+# Link-preview fetchers are allowed so shared links show a card.
+# These do not put the site in search results.
+User-agent: Twitterbot
+Allow: /
+
+User-agent: TelegramBot
+Allow: /
+
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: Discordbot
+Allow: /
+
+User-agent: Slackbot-LinkExpanding
+Allow: /
