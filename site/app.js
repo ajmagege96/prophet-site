@@ -676,7 +676,7 @@
   /* A run lasts (len + STREAK + PAD) / SPEED. At a 3s beat, 434px is the
      longest that is gone before the next flash, so only one is ever on
      screen. Anything longer and two or three overlap. */
-  var MAX_LEN  = 430;
+  var MAX_LEN  = 400;   /* (400 + 166) / 200 = 2.83s, clear of the 3s beat */
   var IDLE_LEVEL = 0.72, TYPING_LEVEL = 0.85, SEND_LEVEL = 1;
   var PEAK = 0.62;     /* the roadmap streak peaks at 0.9; this is the same, dimmer */
 
@@ -946,6 +946,7 @@
        leaves it. Same beat whether or not you are typing. */
     bar.classList.add('prompt-bar--pulse');
     setTimeout(function () { bar.classList.remove('prompt-bar--pulse'); }, 900);
+    return true;                                    /* the beat needs to know it fired */
   }
 
   function strokeSeg(a, b, alpha, wideLine) {
