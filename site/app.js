@@ -673,27 +673,19 @@
   var PADSZ  = 6;
   var PEAK   = 0.50;   /* the roadmap peaks at 0.9; this is dimmer */
 
-  /* Every run takes the same time, whatever its length: a long trace simply
-     carries its light faster. That is what lets runs be long and varied while
-     still being one at a time, since each is always gone before the next
-     flash. Speed is clamped so nothing crawls or darts. */
-  var TRAVEL   = 2.4;  /* seconds of travel, before the pad drains */
-  var MIN_SPD  = 200;  /* the roadmap's own speed */
-  var MAX_SPD  = 340;
-  var MAX_LEN  = Math.floor(MAX_SPD * TRAVEL - STREAK);
-
-  function speedFor(len) {
-    var v = (len + STREAK) / TRAVEL;
-    return v < MIN_SPD ? MIN_SPD : (v > MAX_SPD ? MAX_SPD : v);
-  }
+  var SPEED   = 200;   /* px/s, the roadmap's own speed */
+  var MAX_LEN = 900;   /* runs go far; a long one is still travelling when the
+                          next flash fires, which is fine. The beat is what
+                          must never vary. */
 
   var BAND = 520, CLEAR = 20, MIN_LEG = 48;
 
   var wide    = window.matchMedia('(min-width: 1024px)');
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-  var traces = [], run = null, origin = { x: 0, y: 0 };
-  var barBox = null, ceiling = 0, floorY = 0, beatTimer = null, raf = null, lastPick = -1;
+  var traces = [], runs = [], origin = { x: 0, y: 0 };
+  var barBox = null, ceiling = 0, floorY = 0, leftX = 0, rightX = 0;
+  var beatTimer = null, raf = null, lastPick = -1;
 
   function docRect(el) {
     var r = el.getBoundingClientRect();
@@ -758,7 +750,7 @@
     var step = 4, gone = 0;
     while (gone < want) {
       var nx = x + dx * (gone + step), ny = y + dy * (gone + step);
-      if (ny < ceiling || ny > floorY) break;
+      if (ny < ceiling || ny > floorY || nx < leftX || nx > rightX) break;
       var out = Math.max(barBox.l - nx, 0, nx - barBox.r, barBox.t - ny, ny - barBox.b);
       if (out > BAND) break;
       if (hits(x + dx * gone, y + dy * gone, nx, ny, rects)) break;
@@ -788,13 +780,16 @@
     var w = barBox.r - barBox.l, h = barBox.b - barBox.t, i;
 
     var starts = [];
+    /* room between the bar and the top of the cards, so a climb can be
+       anything from a short rise to the full height */
+    var headroom = Math.max(120, barBox.t - ceiling - CLEAR);
     for (i = 0; i < 13; i++) {                       /* bottom edge, clear of the corners */
       starts.push({ x: barBox.l + w * (0.09 + 0.82 * (i + 0.5) / 13), y: barBox.b, dx: 0, dy: 1, first: rnd(40, 110) });
     }
     for (i = 0; i < 9; i++) {                        /* middle of the side edges only */
       var fy = barBox.t + h * (0.34 + 0.32 * (i + 0.5) / 9);
-      starts.push({ x: barBox.l, y: fy, dx: -1, dy: 0, first: rnd(190, 250), up: i % 2 === 0 });
-      starts.push({ x: barBox.r, y: fy, dx: 1, dy: 0, first: rnd(190, 250), up: i % 2 === 1 });
+      starts.push({ x: barBox.l, y: fy, dx: -1, dy: 0, first: rnd(190, 250), up: i % 2 === 0, climb: headroom * rnd(0.3, 1) });
+      starts.push({ x: barBox.r, y: fy, dx: 1, dy: 0, first: rnd(190, 250), up: i % 2 === 1, climb: headroom * rnd(0.3, 1) });
     }
     for (i = starts.length - 1; i > 0; i--) {        /* shuffle: a different board each load */
       var s = Math.floor(Math.random() * (i + 1)), tmp = starts[i];
@@ -807,7 +802,7 @@
       var legs = 2 + Math.floor(Math.random() * 3);  /* 2 to 4: corners, never a snake */
 
       for (var leg = 0; leg < legs; leg++) {
-        var want = leg === 0 ? st.first : rnd(70, 320);
+        var want = leg === 0 ? st.first : (st.climb && leg === 1 ? st.climb : rnd(90, 300));
         want = Math.min(want, MAX_LEN - total);      /* a run must fit inside one beat */
         if (want < MIN_LEG) break;
         var got = march(x, y, dx, dy, want, leg === 0 ? rects : offBar);
@@ -828,7 +823,7 @@
         segs.push({ a: pts[p], b: pts[p + 1], from: len, len: L });
         len += L;
       }
-      out.push({ pts: pts, segs: segs, len: len, pad: pts[pts.length - 1], speed: speedFor(len) });
+      out.push({ pts: pts, segs: segs, len: len, pad: pts[pts.length - 1] });
     }
     return out;
   }
@@ -840,6 +835,10 @@
     var cards = document.querySelector('.carousel');
     ceiling = cards ? docRect(cards).t : (hb ? hb.t : 0);      /* never above the cards */
     floorY = hb ? hb.b : barBox.b + BAND;
+    /* and never off the page: the hero spans the viewport, so its edges are
+       the left and right limits */
+    leftX = hb ? hb.l : 0;
+    rightX = hb ? hb.r : document.documentElement.clientWidth;
 
     var best = [];                                   /* keep the fullest of a few attempts */
     for (var a = 0; a < 8; a++) {
@@ -849,8 +848,8 @@
     }
     traces = best;
 
-    var box = { l: barBox.l - BAND, t: Math.max(ceiling - 12, barBox.t - BAND),
-                r: barBox.r + BAND, b: Math.min(floorY + 12, barBox.b + BAND) };
+    var box = { l: Math.max(leftX - 12, barBox.l - BAND), t: Math.max(ceiling - 12, barBox.t - BAND),
+                r: Math.min(rightX + 12, barBox.r + BAND), b: Math.min(floorY + 12, barBox.b + BAND) };
     canvas.style.left = box.l + 'px';
     canvas.style.top = box.t + 'px';
     canvas.style.width = (box.r - box.l) + 'px';
@@ -868,7 +867,9 @@
     var i = traces.length === 1 ? 0
           : (lastPick + 1 + Math.floor(Math.random() * (traces.length - 1))) % traces.length;
     lastPick = i;
-    run = { i: i, start: performance.now() };         /* one variable: never two */
+    /* Exactly one push per tick. The beat is a plain interval with no
+       condition in it, so it cannot fire twice or be skipped. */
+    runs.push({ i: i, start: performance.now() });
     bar.classList.add('prompt-bar--pulse');
     setTimeout(function () { bar.classList.remove('prompt-bar--pulse'); }, 900);
   }
@@ -878,59 +879,60 @@
     return (u <= 0 || u >= 1) ? 0 : Math.sin(Math.PI * u);
   }
 
-  function padLevel(r, len, spd) {
+  function padLevel(r, len) {
     var lands = len - PADSZ / 2 + PADSZ * 0.1;        /* leading edge ~10% in */
     var leaves = len + PADSZ * 0.1 + STREAK;          /* trailing edge ~10% past */
     if (r < lands) return 0;
-    if (r <= leaves) return Math.min(1, (r - lands) / (spd * 0.15));
-    var v = 1 - (r - leaves) / (spd * DRAIN / 1000);
+    if (r <= leaves) return Math.min(1, (r - lands) / (SPEED * 0.15));
+    var v = 1 - (r - leaves) / (SPEED * DRAIN / 1000);
     return v > 0 ? v : 0;
   }
 
   function draw(now) {
     raf = requestAnimationFrame(draw);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    if (!run) return;
-    var t = traces[run.i];
-    if (!t) { run = null; return; }
-    var r = (now - run.start) / 1000 * t.speed;
-    if (r > t.len + STREAK + t.speed * DRAIN / 1000 + 10) { run = null; return; }
-
     ctx.save();
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     ctx.shadowColor = 'rgba(' + GREEN + ', 0.5)';
     ctx.shadowBlur = 10;
 
-    for (var s = 0; s < t.segs.length; s++) {
-      var sg = t.segs[s];
-      if (sg.from + sg.len < r - STREAK || sg.from > r) continue;
-      var g = ctx.createLinearGradient(sg.a.x - origin.x, sg.a.y - origin.y,
-                                       sg.b.x - origin.x, sg.b.y - origin.y);
-      var any = false;
-      for (var k = 0; k <= 10; k++) {
-        var lv = profile(r, sg.from + sg.len * (k / 10));
-        if (lv > 0.01) any = true;
-        g.addColorStop(k / 10, 'rgba(' + GREEN + ',' + (PEAK * lv).toFixed(3) + ')');
-      }
-      if (!any) continue;
-      ctx.strokeStyle = g;
-      ctx.lineWidth = 2.5;
-      ctx.beginPath();
-      ctx.moveTo(sg.a.x - origin.x, sg.a.y - origin.y);
-      ctx.lineTo(sg.b.x - origin.x, sg.b.y - origin.y);
-      ctx.stroke();
-    }
+    for (var n = runs.length - 1; n >= 0; n--) {
+      var t = traces[runs[n].i];
+      if (!t) { runs.splice(n, 1); continue; }
+      var r = (now - runs[n].start) / 1000 * SPEED;
+      if (r > t.len + STREAK + SPEED * DRAIN / 1000 + 10) { runs.splice(n, 1); continue; }
 
-    var lit = padLevel(r, t.len, t.speed);
-    if (lit > 0.01) {
-      var e = lit * lit * (3 - 2 * lit);
-      var px = t.pad.x - origin.x - PADSZ / 2, py = t.pad.y - origin.y - PADSZ / 2;
-      ctx.fillStyle = 'rgba(' + GREEN + ',' + (PEAK * e).toFixed(3) + ')';
-      ctx.fillRect(px, py, PADSZ, PADSZ);
-      ctx.strokeStyle = 'rgba(' + GREEN + ',' + (PEAK * 0.9 * e).toFixed(3) + ')';
-      ctx.lineWidth = 1;
-      ctx.strokeRect(px + 0.5, py + 0.5, PADSZ - 1, PADSZ - 1);
+      for (var s = 0; s < t.segs.length; s++) {
+        var sg = t.segs[s];
+        if (sg.from + sg.len < r - STREAK || sg.from > r) continue;
+        var g = ctx.createLinearGradient(sg.a.x - origin.x, sg.a.y - origin.y,
+                                         sg.b.x - origin.x, sg.b.y - origin.y);
+        var any = false;
+        for (var k = 0; k <= 10; k++) {
+          var lv = profile(r, sg.from + sg.len * (k / 10));
+          if (lv > 0.01) any = true;
+          g.addColorStop(k / 10, 'rgba(' + GREEN + ',' + (PEAK * lv).toFixed(3) + ')');
+        }
+        if (!any) continue;
+        ctx.strokeStyle = g;
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(sg.a.x - origin.x, sg.a.y - origin.y);
+        ctx.lineTo(sg.b.x - origin.x, sg.b.y - origin.y);
+        ctx.stroke();
+      }
+
+      var lit = padLevel(r, t.len);
+      if (lit > 0.01) {
+        var e = lit * lit * (3 - 2 * lit);
+        var px = t.pad.x - origin.x - PADSZ / 2, py = t.pad.y - origin.y - PADSZ / 2;
+        ctx.fillStyle = 'rgba(' + GREEN + ',' + (PEAK * e).toFixed(3) + ')';
+        ctx.fillRect(px, py, PADSZ, PADSZ);
+        ctx.strokeStyle = 'rgba(' + GREEN + ',' + (PEAK * 0.9 * e).toFixed(3) + ')';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(px + 0.5, py + 0.5, PADSZ - 1, PADSZ - 1);
+      }
     }
     ctx.restore();
   }
@@ -938,7 +940,7 @@
   function stop() {
     if (beatTimer) { clearInterval(beatTimer); beatTimer = null; }
     if (raf) { cancelAnimationFrame(raf); raf = null; }
-    run = null;
+    runs = [];
   }
 
   function startUp() {
@@ -969,11 +971,11 @@
     maxLen: function () { return MAX_LEN; },
     set: function (o) {
       if (o && o.beat) BEAT = o.beat;
-      if (o && o.travel) TRAVEL = o.travel;
+      if (o && o.speed) SPEED = o.speed;
       if (o && o.peak) PEAK = o.peak;
-      MAX_LEN = Math.floor(MAX_SPD * TRAVEL - STREAK);
+      if (o && o.maxLen) MAX_LEN = o.maxLen;
       later();
-      return { beat: BEAT, travel: TRAVEL, peak: PEAK, maxLen: MAX_LEN };
+      return { beat: BEAT, speed: SPEED, peak: PEAK, maxLen: MAX_LEN };
     }
   };
 
