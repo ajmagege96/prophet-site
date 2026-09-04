@@ -204,6 +204,15 @@ ul, ol { list-style: none; }
   color: var(--green);
   text-decoration: none;
 }
+.menu-links {
+  margin-top: auto;
+  padding-top: 20px;
+  border-top: 1px solid var(--outline);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+}
 .site-header__mobile-panel .account {
   margin-top: auto;
   padding-top: 24px;
@@ -745,7 +754,7 @@ ul, ol { list-style: none; }
 
 /* ── Record ───────────────────────────────────────────── */
 .pnl { width: 100%; max-width: 1000px; margin: 0 auto 10px; display: flex; flex-direction: column; align-items: center; gap: 14px; }
-.pnl__title { position: absolute; left: 0; bottom: 100%; margin-bottom: 14px; font-size: 14px; opacity: 0.9; }
+.pnl__title { position: absolute; left: 0; bottom: 100%; margin-bottom: 14px; font-size: 14px; opacity: 0.9; display: inline-flex; align-items: center; gap: 5px; }
 
 /* Bars grow up (won) or hang down (lost) from a hairline baseline */
 .edge {
@@ -1100,32 +1109,27 @@ ul, ol { list-style: none; }
    the last in the file and every rule is scoped to the query. */
 @media (max-width: 767px) {
 
-  /* ── Header: mark only, everything else in the menu ── */
+  /* ── Header: mark + wordmark, nav in the menu ── */
   .site-header { padding: 0 12px; }
-  .site-header__wordmark { display: none; }
   .site-header__hiw { display: none; }
-  .site-header__logo { gap: 0; }
+  .site-header__wordmark { height: 11px; }
 
-  /* CA pill stays in the header, shortened; the menu copy is dropped.
-     The pill lives inside the desktop nav, so show the nav but hide its links. */
+  /* Address pill stays in the header, shortened. It lives inside the
+     desktop nav, so show the nav but hide its links. */
   .site-header__nav { display: flex; margin-left: auto; }
   .site-header__nav > a { display: none; }
-  .site-header__ca { display: inline-flex; margin-right: 6px; min-height: 44px; padding: 6px 8px; font-size: 10px; }
-  .site-header__ca--mobile { display: none; }
-  .site-header__menu-btn { width: 44px; height: 44px; margin-right: -8px; }
-
-  .site-header__mobile-panel a,
-  .site-header__mobile-panel .account { min-height: 44px; display: flex; align-items: center; }
+  .site-header__ca { display: inline-flex; margin-right: 4px; min-height: 44px; padding: 6px 7px; font-size: 10px; }
+  .site-header__menu-btn { width: 44px; height: 44px; margin-right: -6px; }
+  .site-header__mobile-panel a { min-height: 44px; display: flex; align-items: center; }
 
   /* ── The page scrolls normally: no fixed hero, no inner scrollers ── */
   .hero { height: auto; min-height: 0; overflow: visible; }
-  /* min-height, not a fixed height: content grows past it and the page scrolls.
-     It gives the sticky prompt bar a full screen to pin against. */
-  .home-panel { height: auto; min-height: calc(100svh - 56px); padding: 16px 16px 0; }
-  .panel { height: auto; overflow: visible; padding: 16px 16px 0; }
-  .panel--token { overflow: visible; }
-  .feed { flex: 0 0 auto; min-height: 0; overflow: visible; margin-top: 14px; }
-  .takes { overflow: visible; }
+  /* Home keeps the desktop behaviour: the panel is one screen tall, the feed
+     scrolls inside it, and the prompt bar sits at its bottom. */
+  .home-panel { height: calc(100svh - 56px); padding: 16px 16px 12px; }
+  .panel { height: auto; overflow: visible; padding: 16px 16px 24px; }
+  .panel--token { overflow: visible; padding-bottom: 40px; }
+  .feed { flex: 1 1 auto; min-height: 0; overflow-y: auto; margin-top: 14px; }
   .pgroup { flex: 0 0 auto; }
   .pgroup__list { max-height: none; overflow: visible; padding-right: 0; }
   .prow__takes { max-height: none; overflow: visible; }
@@ -1143,60 +1147,20 @@ ul, ol { list-style: none; }
   .filters::-webkit-scrollbar { display: none; }
   .filters__tag { flex: 0 0 auto; min-height: 44px; padding: 0 14px; display: inline-flex; align-items: center; }
 
-  /* ── Carousel: one full-width card, swipe only, no peek ── */
-  .carousel__track { padding: 2px 0; gap: 16px; }
+  /* ── Carousel: keep the arrows, narrower card ── */
+  .carousel { gap: 4px; }
+  .carousel__arrow { display: flex; width: 30px; height: 44px; }
+  .carousel__track { padding: 2px 0; gap: 12px; }
   .carousel__card { flex: 0 0 100%; scroll-snap-align: start; }
-  .carousel__arrow { display: none; }
-  .carousel__count {
-    margin: 8px 0 0;
-    text-align: center;
-    font-family: var(--font-display);
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    opacity: 0.45;
-  }
 
-  /* ── Takes: three, then a toggle ── */
+  /* ── Takes: scroll, same as desktop ── */
   .takes__item { padding: 10px 0; }
-  .takes__side { gap: 1px; }
   .takes__ago, .takes__xp { font-size: 10px; }
-  [data-takes-list] .takes__item:nth-of-type(n+4) { display: none; }
-  [data-takes-list].takes--expanded .takes__item:nth-of-type(n+4) { display: flex; }
-  .takes__more {
-    display: block;
-    width: 100%;
-    min-height: 44px;
-    margin-top: 4px;
-    border: 1px solid var(--outline);
-    border-radius: 4px;
-    font-size: 11px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--offwhite);
-    opacity: 0.7;
-  }
 
-  /* ── Prompt bar: sticky to the bottom, dot inline on its left ── */
-  .prompt-bar-wrap {
-    position: sticky;
-    bottom: 0;
-    z-index: 20;
-    margin-top: auto;   /* sit at the hero's bottom, then stick while takes scroll */
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-left: -16px;
-    margin-right: -16px;
-    padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
-    background: var(--navy);
-    border-top: 1px solid var(--outline);
-  }
-  .prompt-bar { flex: 1 1 auto; min-width: 0; min-height: 44px; }
-  .prompt-bar__input { font-size: 16px; min-height: 44px; }   /* 16px stops iOS zooming on focus */
+  /* ── Prompt bar: same block as desktop, just full width ── */
+  .prompt-bar-wrap { margin-top: auto; }
+  .prompt-bar__input { font-size: 16px; }   /* 16px stops iOS zooming on focus */
   .prompt-bar__send { width: 44px; height: 44px; margin: -8px -6px -8px 0; }
-  .prompt-bar__row { order: -1; padding: 0; flex: 0 0 auto; }
-  .status-line__name { display: none; }
-  .prompt-bar__tools { display: none; }
 
   /* ── Tokenomics table: one block per stream ── */
   .doors thead { display: none; }
@@ -1210,10 +1174,11 @@ ul, ol { list-style: none; }
   /* ── Below the fold ── */
   .below { padding: 40px 16px; }
   .buy { min-height: 44px; display: inline-flex; align-items: center; }
-  .site-footer__inner { flex-direction: column; align-items: flex-start; gap: 10px; }
+
+  /* Footer here is the TradeLeague credit only; the links live in the menu */
+  .site-footer__inner { padding: 16px; }
+  .site-footer__right { display: none; }
   .site-footer__by { min-height: 44px; }
-  .site-footer__group { gap: 4px; }
-  .site-footer__group a { min-width: 44px; min-height: 44px; align-items: center; justify-content: center; }
 
   /* ── Tap targets on the list panels ── */
   .vote-btn, .vote__btn, .range__tab, .seg__opt { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; gap: 4px; }
@@ -1222,22 +1187,34 @@ ul, ol { list-style: none; }
   .prow { padding: 12px; }
   .prow__side { gap: 8px; }
 
-  /* ── Record: the Edge chart needs a tighter footprint here ── */
-  .edge { gap: 8px; padding-bottom: 16px; }
+  /* ── Record ── */
+  .panel--record { padding-top: 28px; }
+  .pnl { gap: 18px; }
+  .edge { margin-top: 44px; gap: 8px; padding-bottom: 16px; }
   .edge__col { width: 12px; }
   .edge__bar { width: 12px; }
   .edge__val { font-size: 9px; }
-  /* dates drop below the bars so they never collide */
-  .edge__axis { top: auto; bottom: -2px; }
+  .edge__axis { top: auto; bottom: -2px; }   /* dates below the bars, never colliding */
+  /* Calls · Wins · Losses on one row, Win rate · Edge under it */
+  .stats { display: grid; grid-template-columns: repeat(3, auto); justify-content: center; gap: 10px 20px; }
+  .stats__item:nth-child(4) { grid-column: 1 / 2; }
+  .stats__item:nth-child(5) { grid-column: 2 / 4; }
+  .info::after { left: auto; right: 0; width: 240px; }
 
   /* ── $PROPHET ── */
   .tstats { grid-template-columns: repeat(2, 1fr); }
   .token__grid { grid-template-columns: 1fr; }
+  /* price left, Price/MCap + ranges top-right, same as desktop */
+  .tchart__head { flex-wrap: nowrap; align-items: flex-start; }
+  .tchart__now { flex: 1 1 auto; }
+  .tchart__pair { display: none; }   /* the controls need the room */
+  .tchart__controls { flex: 0 0 auto; }
   .tchart__plot { height: 180px; }
-  .swap__field { min-height: 52px; }
+  .swap, .wallets, .trades { max-width: 340px; margin-left: auto; margin-right: auto; }
+  .swap__field { min-height: 48px; }
   .swap__flip { width: 44px; height: 44px; }
   .swap__cta { min-height: 48px; }
-  .swap__input { font-size: 16px; min-height: 44px; }
+  .swap__input { font-size: 16px; }
   .wallet { min-height: 56px; }
-  .trades { gap: 10px; }
+  .token__line { justify-content: center; }
 }

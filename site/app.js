@@ -8,6 +8,15 @@
     var open = panel.classList.toggle('open');
     btn.setAttribute('aria-expanded', open);
   });
+
+  /* Close the panel when the window grows past the breakpoint, so resizing
+     from mobile to desktop never leaves the menu stuck open. */
+  var wide = window.matchMedia('(min-width: 768px)');
+  var onChange = function (e) {
+    if (e.matches) { panel.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); }
+  };
+  if (wide.addEventListener) wide.addEventListener('change', onChange);
+  else wide.addListener(onChange);
 })();
 
 /* ── Preview fill ─────────────────────────────────────── */
@@ -80,7 +89,6 @@
   var thesisLabel = document.querySelector('[data-thesis-label]');
   var thesisList = document.querySelector('[data-thesis-contributors]');
   var votes = {}; /* slug -> 'yes' | 'no' (mock, in-memory) */
-  var countEl = document.querySelector('[data-carousel-count]');
   var prevBtn = document.querySelector('[data-carousel-prev]');
   var nextBtn = document.querySelector('[data-carousel-next]');
   var activeIndex = -1;
@@ -131,10 +139,6 @@
     for (var i = 0; i < cards.length; i++) {
       if (i === index) cards[i].classList.add('carousel__card--active');
       else cards[i].classList.remove('carousel__card--active');
-    }
-    if (countEl) {
-      var vis = visibleCards();
-      countEl.textContent = (vis.indexOf(cards[index]) + 1) + ' / ' + vis.length;
     }
     startTypewriter(index);
     renderThesis(cards[index]);
@@ -444,21 +448,7 @@
         '</div>' +
         '</div>';
     }
-    if (takes.length > 3) {
-      html += '<button class="takes__more" data-takes-more>More takes</button>';
-    }
     takesContainer.innerHTML = html;
-    takesContainer.classList.remove('takes--expanded');
-  }
-
-  /* Mobile only: the button is hidden by CSS above 767px */
-  if (takesContainer) {
-    takesContainer.addEventListener('click', function (e) {
-      var btn = e.target.closest('[data-takes-more]');
-      if (!btn) return;
-      var open = takesContainer.classList.toggle('takes--expanded');
-      btn.textContent = open ? 'Fewer takes' : 'More takes';
-    });
   }
 
   /* Init first card */

@@ -36,7 +36,6 @@
     <a href="prophet.html">$Prophet</a>
     <a href="{{docs_url}}" target="_blank" rel="noopener">Docs</a>
     <button class="site-header__ca" data-ca="{{contract_address}}" data-ca-copy title="Copy contract address" aria-label="Copy contract address">
-      <span class="site-header__ca-label heading">CA</span>
       <span class="site-header__ca-text" data-ca-text></span>
       <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="1.5"/><path d="M5 15V5a1 1 0 0 1 1-1h10"/></svg>
     </button>
@@ -53,18 +52,33 @@
 
   <!-- Mobile panel -->
   <nav class="site-header__mobile-panel" data-menu-panel>
-    <a href="#how-it-works">How it Works</a>
     <a href="index.html">Home</a>
     <a href="prophecies.html">Prophecies</a>
     <a href="record.html">Record</a>
     <a href="prophet.html">$Prophet</a>
     <a href="{{docs_url}}" target="_blank" rel="noopener">Docs</a>
-    <button class="site-header__ca site-header__ca--mobile" data-ca="{{contract_address}}" data-ca-copy title="Copy contract address" aria-label="Copy contract address">
-      <span class="site-header__ca-label heading">CA</span>
-      <span class="site-header__ca-text" data-ca-text></span>
-      <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="1.5"/><path d="M5 15V5a1 1 0 0 1 1-1h10"/></svg>
-    </button>
-    <div class="account" data-mock="[COPY]">{{username}}</div>
+    <div class="menu-links">
+        <div class="site-footer__group">
+          <img src="assets/tradeleague-mark.svg" alt="TradeLeague" class="site-footer__mark site-footer__mark--tl">
+          <a href="{{tl_x_url}}" target="_blank" rel="noopener" aria-label="TradeLeague on X"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+          <a href="{{tl_tg_url}}" target="_blank" rel="noopener" aria-label="TradeLeague on Telegram"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm4.962 7.224c.1-.002.321.023.465.14a.5.5 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg></a>
+          <a href="{{tl_linkedin_url}}" target="_blank" rel="noopener" aria-label="TradeLeague on LinkedIn"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 1 1 0-4.125 2.062 2.062 0 0 1 0 4.125zM7.119 20.452H3.555V9h3.564v11.452z"/></svg></a>
+        </div>
+        <span class="site-footer__sep" aria-hidden="true"></span>
+        <div class="site-footer__group">
+          <img src="assets/prophet-logo-transparent.svg" alt="The Prophet" class="site-footer__mark">
+          <a href="{{x_url}}" target="_blank" rel="noopener" aria-label="The Prophet on X"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+          <a href="{{tg_url}}" target="_blank" rel="noopener" aria-label="The Prophet on Telegram"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm4.962 7.224c.1-.002.321.023.465.14a.5.5 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg></a>
+          <a href="{{linkedin_url}}" target="_blank" rel="noopener" aria-label="The Prophet on LinkedIn"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 1 1 0-4.125 2.062 2.062 0 0 1 0 4.125zM7.119 20.452H3.555V9h3.564v11.452z"/></svg></a>
+        </div>
+        <span class="site-footer__sep" aria-hidden="true"></span>
+        <div class="site-footer__group">
+          <span class="site-footer__ticker heading">$PROPHET</span>
+          <a href="{{jupiter_url}}" target="_blank" rel="noopener" aria-label="$PROPHET on Jupiter" title="Jupiter"><img src="assets/jupiter.png" alt="" class="site-footer__logo"></a>
+          <a href="{{pumpfun_url}}" target="_blank" rel="noopener" aria-label="$PROPHET on pump.fun" title="pump.fun"><img src="assets/pumpfun.png" alt="" class="site-footer__logo"></a>
+          <a href="{{solscan_url}}" target="_blank" rel="noopener" aria-label="$PROPHET on Solscan" title="Solscan"><img src="assets/solscan.png" alt="" class="site-footer__logo"></a>
+        </div>
+    </div>
   </nav>
 </header>
 <!-- /partial:header -->
@@ -187,7 +201,7 @@
         <div class="carousel__card outline" data-card data-state="vote" data-slug="sec-exchange" data-stance="yes" data-thesis="The SEC has approved every exchange that met the custody bar this cycle, and this one meets it. The remaining objections are procedural rather than substantive. Timing is the only real risk, not the outcome." data-contributors="[{&quot;user&quot;: &quot;delta_k&quot;, &quot;claim&quot;: &quot;Custody structure mirrors the two already approved&quot;, &quot;xp&quot;: 11}, {&quot;user&quot;: &quot;ines&quot;, &quot;claim&quot;: &quot;Public comment period closed without a formal objection&quot;, &quot;xp&quot;: 4}]">
           <div class="carousel__top">
             <img class="carousel__img" src="https://polymarket-upload.s3.us-east-2.amazonaws.com/coinbase-stock-d8abe3f599.png" alt="" loading="lazy">
-            <span class="carousel__state carousel__state--vote">vote open · <span class="tally tally--yes">62% yes</span> · <span class="votes" title="votes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><polyline points="8 12.5 11 15.5 16 9.5"/></svg>128</span> · <span class="timer" title="time left"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>2d</span></span>
+            <span class="carousel__state carousel__state--vote">vote open <span class="tally tally--yes">62% yes</span> <span class="votes" title="votes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><polyline points="8 12.5 11 15.5 16 9.5"/></svg>128</span> <span class="timer" title="time left"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>2d</span></span>
           </div>
           <p class="carousel__question">Will the SEC approve a new crypto exchange?</p>
           <span class="carousel__yes heading">34%<small>YES</small></span>
@@ -197,7 +211,7 @@
         <div class="carousel__card outline" data-card data-state="vote" data-slug="dxy-100" data-stance="no" data-thesis="Rate-cut pricing is already in the dollar, so the index holds 100 unless the Fed surprises dovish. Relative growth still favors the US and the alternatives are weak. A break below needs a catalyst that isn&#x27;t on the calendar yet." data-contributors="[{&quot;user&quot;: &quot;tessellate&quot;, &quot;claim&quot;: &quot;Euro-area PMIs keep undershooting&quot;, &quot;xp&quot;: 7}, {&quot;user&quot;: &quot;bram_o&quot;, &quot;claim&quot;: &quot;Futures already price two cuts; little left to remove&quot;, &quot;xp&quot;: 3}]">
           <div class="carousel__top">
             <img class="carousel__img" src="https://polymarket-upload.s3.us-east-2.amazonaws.com/us-canada-diplomatic-agreement-to-lower-tariffs-by-august-31-dHLeCIoNnnOg.jpg" alt="" loading="lazy">
-            <span class="carousel__state carousel__state--vote">vote open · <span class="tally tally--no">55% no</span> · <span class="votes" title="votes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><polyline points="8 12.5 11 15.5 16 9.5"/></svg>74</span> · <span class="timer" title="time left"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>14h</span></span>
+            <span class="carousel__state carousel__state--vote">vote open <span class="tally tally--no">55% no</span> <span class="votes" title="votes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><polyline points="8 12.5 11 15.5 16 9.5"/></svg>74</span> <span class="timer" title="time left"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>14h</span></span>
           </div>
           <p class="carousel__question">Will the US dollar index drop below 100?</p>
           <span class="carousel__yes heading">41%<small>YES</small></span>
@@ -216,8 +230,6 @@
       </div>
       <button class="carousel__arrow carousel__arrow--next" data-carousel-next aria-label="Next market"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg></button>
     </div>
-    <!-- Position counter: mobile only, filled by app.js -->
-    <p class="carousel__count" data-carousel-count aria-live="polite"></p>
 
     <!-- ── Feed: thesis (if any) on top, takes below ─────── -->
     <div class="feed">
