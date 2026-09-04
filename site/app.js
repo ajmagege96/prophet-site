@@ -662,7 +662,7 @@
   var ctx = canvas.getContext('2d');
 
   var GREEN = '16, 240, 95';
-  var BAND    = 300;   /* how far the board reaches from the bar */
+  var BAND    = 900;   /* far enough to climb the margins to the header */
   var REST    = 0;     /* invisible until a pulse runs over it */
   var PAD     = 6;     /* square pad, px */
   var SPEED   = 200;   /* px per second, as the roadmap streak */
@@ -796,38 +796,47 @@
 
     /* exit points on the bar's frame, each leaving at 90 degrees */
     var starts = [], w = barBox.r - barBox.l, h = barBox.b - barBox.t, i;
-    var across = 11;
+    function rnd(a, b) { return a + Math.random() * (b - a); }
+
+    var across = 15;
     for (i = 0; i < across; i++) {
       var fx = barBox.l + w * (i + 0.5) / across;
-      starts.push({ x: fx, y: barBox.b, dx: 0, dy: 1, reach: 36 + (i % 4) * 26 });
+      starts.push({ x: fx, y: barBox.b, dx: 0, dy: 1, reach: rnd(30, 120) });
     }
     /* Side runs head out to the page gutter first, then climb: the gutters
-       beside the content column are empty, so traces can travel up there. */
-    for (i = 0; i < 3; i++) {
-      var fy = barBox.t + h * (i + 0.5) / 3;
-      starts.push({ x: barBox.l, y: fy, dx: -1, dy: 0, reach: 250 + i * 26, up: i % 2 === 0 });
-      starts.push({ x: barBox.r, y: fy, dx: 1, dy: 0, reach: 250 + i * 26, up: i % 2 === 1 });
+       beside the content column are empty, so traces can travel the margins
+       all the way up to the header. */
+    for (i = 0; i < 11; i++) {
+      var fy = barBox.t + h * (i + 0.5) / 11;
+      starts.push({ x: barBox.l, y: fy, dx: -1, dy: 0, reach: rnd(240, 360), up: i % 2 === 0, climb: rnd(120, 720) });
+      starts.push({ x: barBox.r, y: fy, dx: 1, dy: 0, reach: rnd(240, 360), up: i % 2 === 1, climb: rnd(120, 720) });
+    }
+    /* shuffle, so the order traces are laid down (and so which ones survive
+       the spacing check) differs on every build */
+    for (i = starts.length - 1; i > 0; i--) {
+      var sw = Math.floor(Math.random() * (i + 1)), tmp = starts[i];
+      starts[i] = starts[sw]; starts[sw] = tmp;
     }
 
     for (i = 0; i < starts.length; i++) {
       var s = starts[i], pts = [{ x: s.x, y: s.y }];
       var x = s.x, y = s.y, dx = s.dx, dy = s.dy, ok = true;
-      var legs = 2 + (i % 3);                       /* 2 to 4 legs, uneven by design */
+      var legs = 2 + Math.floor(Math.random() * 5);   /* 2 to 6 legs: every route differs */
       for (var leg = 0; leg < legs; leg++) {
-        var want = leg === 0 ? s.reach : (s.up !== undefined && leg === 1 ? 110 + (i % 3) * 45 : 44 + ((i + leg) % 5) * 32);
+        var want = leg === 0 ? s.reach : (s.climb && leg === 1 ? s.climb : rnd(40, 190));
         var got = runLength(x, y, dx, dy, want, rects);
-        if (got < 20) { if (leg === 0) ok = false; break; }
+        if (got < 16) { if (leg === 0) ok = false; break; }
         x += dx * got; y += dy * got;
         pts.push({ x: x, y: y });
         if (leg < legs - 1) {                        /* right-angle turn only */
-          var turn = ((i + leg) % 2) ? 1 : -1;
+          var turn = Math.random() < 0.5 ? 1 : -1;
           if (leg === 0 && s.up !== undefined) turn = s.up ? -1 : 1;   /* send half the side runs upward */
           var ndx = dy * turn, ndy = -dx * turn;
           dx = ndx; dy = ndy;
         }
       }
       if (!ok || pts.length < 2) continue;
-      if (tooClose(pts, traces, 12)) continue;
+      if (tooClose(pts, traces, 7)) continue;
 
       var len = 0, segs = [];
       for (var p = 0; p < pts.length - 1; p++) {
@@ -839,8 +848,17 @@
     }
   }
 
-  function place() {
+  function drawBox() {
     var band = grow(barBox, BAND + 20);
+    if (heroBox) {
+      band = { l: Math.max(band.l, heroBox.l - 4), t: Math.max(band.t, heroBox.t - 4),
+               r: Math.min(band.r, heroBox.r + 4), b: Math.min(band.b, heroBox.b + 4) };
+    }
+    return band;
+  }
+
+  function place() {
+    var band = drawBox();
     canvas.style.left = band.l + 'px';
     canvas.style.top = band.t + 'px';
     canvas.style.width = (band.r - band.l) + 'px';
@@ -852,11 +870,10 @@
     origin = { x: band.l, y: band.t };
   }
 
-  /* fade to nothing at the edge of the band */
-  function fade(x, y) {
-    var d = outset(x, y);
-    return d >= BAND ? 0 : 1 - (d / BAND) * (d / BAND);
-  }
+  /* No distance fade. Fading by distance dimmed the far end of a long run,
+     so it looked like it petered out instead of landing on its pad. Every
+     trace now reads at full strength and ends on a square. */
+  function fade() { return 1; }
   function level(r, d) {
     var u = (r - d) / STREAK;
     return (u <= 0 || u >= 1) ? 0 : Math.sin(Math.PI * u);
@@ -874,7 +891,11 @@
       var free = [];
       for (z = 0; z < traces.length; z++) if (live.indexOf(z) < 0) free.push(z);
       if (!free.length) return;
-      picks.push(free[Math.floor(Math.random() * free.length)]);   /* one at a time */
+      free.sort(function (a, b) { return (traces[a].used || 0) - (traces[b].used || 0); });
+      var pool = free.slice(0, Math.max(1, Math.ceil(free.length / 2)));   /* least recently used half */
+      var pick = pool[Math.floor(Math.random() * pool.length)];
+      traces[pick].used = performance.now();
+      picks.push(pick);                               /* one at a time */
     }
     for (var p = 0; p < picks.length; p++) {
       pulses.push({ i: picks[p], start: performance.now(), level: strength });
