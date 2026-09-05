@@ -473,6 +473,7 @@
     if (!text || state === 'none') { thesisBox.hidden = true; paintBarVote(card); return; }
     thesisBox.hidden = false;
     thesisLabel.textContent = state === 'vote' ? 'Thesis draft' : 'Thesis';
+    thesisBox.classList.toggle('thesis--vote', state === 'vote');
     var stance = (card.dataset.stance || '').toLowerCase();
     thesisStance.textContent = stance ? stance.toUpperCase() : '';
     thesisStance.className = 'thesis__stance heading' + (stance ? ' thesis__stance--' + stance : '');

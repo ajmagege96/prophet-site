@@ -29,7 +29,7 @@
   <meta name="twitter:description" content="An agent that reads prediction markets, publishes a thesis before the outcome, and keeps a public record of every call.">
   <meta name="twitter:image" content="https://ajmagege96.github.io/prophet-site/site/assets/prophet-og-1200x630.png">
 
-  <link rel="stylesheet" href="styles.css?v=3a77f7d9">
+  <link rel="stylesheet" href="styles.css?v=b0cbea73">
 </head>
 <body>
 
@@ -363,12 +363,17 @@
       <!-- Thesis block: shown for called and vote-open markets; filled from the selected card's data-thesis -->
       <div class="thesis outline" data-thesis-box hidden>
         <div class="thesis__head">
-          <span class="thesis__label heading" data-thesis-label>Thesis</span>
-          <span class="thesis__stance heading" data-thesis-stance></span>
-          <span class="thesis__est" data-thesis-est title="estimated probability"></span>
-          <span class="thesis__conv conviction" data-thesis-conv title="conviction"></span>
+          <div class="thesis__top">
+            <span class="thesis__label heading" data-thesis-label>Thesis</span>
+            <span class="thesis__stance heading" data-thesis-stance></span>
+            <span class="thesis__est" data-thesis-est title="estimated probability"></span>
+            <span class="thesis__conv conviction" data-thesis-conv title="conviction"></span>
+          </div>
+          <!-- State line: the badge and, while the vote is open, the Vote button. Right of the head on
+               desktop; on phones an open vote's state line moves under the reasoning. -->
+          <div class="thesis__stateline">
           <span class="thesis__state" data-thesis-state></span>
-          <!-- Vote: top-right beside the badge, only while the vote is open; opens a small popup -->
+          <!-- Vote: beside the badge, only while the vote is open; opens a small popup -->
           <div class="vote" data-vote-wrap hidden>
             <button class="vote__btn" data-vote-open>Vote</button>
             <div class="vote__pop outline" data-vote-pop hidden>
@@ -376,6 +381,7 @@
               <button class="vote-btn vote-btn--yes" data-vote="yes">Yes</button>
               <button class="vote-btn vote-btn--no" data-vote="no">No</button>
             </div>
+          </div>
           </div>
         </div>
         <p class="thesis__text" data-thesis-text></p>
@@ -612,6 +618,6 @@
 </footer>
 <!-- /partial:footer -->
 
-<script src="app.js?v=b6c05122"></script>
+<script src="app.js?v=7911889a"></script>
 </body>
 </html>
