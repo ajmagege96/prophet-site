@@ -512,6 +512,7 @@
       var tags = tagBar.querySelectorAll('[data-filter]');
       for (var i = 0; i < tags.length; i++) tags[i].classList.toggle('filters__tag--on', tags[i].dataset.filter === active);
       for (var g = 0; g < groups.length; g++) groups[g].classList.toggle('is-hidden', !!active && groups[g].dataset.group !== active);
+      panel.classList.toggle('is-filtered', !!active);
     });
   }
 

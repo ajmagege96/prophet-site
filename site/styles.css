@@ -1292,3 +1292,21 @@ ul, ol { list-style: none; }
   .swap__input { font-size: 16px; }
   .wallet { min-height: 54px; }
 }
+
+/* ── Prophecies: two rows each for Open votes and Prophecies, the rest to History ──
+   Open votes and Prophecies are capped at exactly two rows so History gets
+   whatever the hero has left. The caps are two rows plus their 8px gaps at
+   this page's row heights (88px vote rows, 70px thesis rows); adjust them if
+   a row's content grows past one draft line. With one filter tag on there is
+   only one group on screen, so the caps come off and it takes the whole hero. */
+@media (min-width: 768px) {
+  .panel--prophecies .pgroup[data-group="votes"],
+  .panel--prophecies .pgroup[data-group="theses"] { flex: 0 0 auto; }
+  .panel--prophecies .pgroup[data-group="votes"] .pgroup__list { max-height: 192px; }
+  .panel--prophecies .pgroup[data-group="theses"] .pgroup__list { max-height: 156px; }
+  .panel--prophecies .pgroup[data-group="record"] { flex: 1 1 auto; }
+  .panel--prophecies .pgroup[data-group="record"] .pgroup__list { flex: 1 1 auto; }
+
+  .panel--prophecies.is-filtered .pgroup { flex: 1 1 auto; }
+  .panel--prophecies.is-filtered .pgroup__list { max-height: none; }
+}
