@@ -1191,15 +1191,15 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }
   .thesis__head { flex-wrap: wrap; row-gap: 6px; }
   .thesis__label { white-space: nowrap; }
   .thesis__state { margin-left: auto; }
-  /* Onboarding: full width, near full height; video smaller; buttons thumb-height */
-  .onb { padding: 10px; align-items: stretch; }
-  .onb__panel { max-width: none; min-height: calc(100dvh - 20px); padding: 52px 16px 16px; justify-content: flex-start; }
-  .onb__media { aspect-ratio: auto; height: 34dvh; }
-  .onb__title { font-size: 16px; margin-top: 18px; white-space: normal; min-height: 2.6em; }
-  .onb__line { font-size: 15px; height: 4.5em; }   /* three lines reserved on phones */
-  .onb__foot { margin-top: auto; padding-top: 12px; }
+  /* Onboarding on a phone: a modal, not a sheet. Full width, height from its content,
+     centred; the video keeps 16:9; Back / Next are thumb-height and equal width. */
+  .onb { padding: 12px; }
+  .onb__panel { max-width: none; padding: 46px 16px 16px; gap: 10px; }
+  .onb__close { top: 0; right: 0; width: 44px; height: 44px; }
+  .onb__title { font-size: 16px; margin-top: 12px; white-space: normal; min-height: 2.6em; }   /* two lines reserved: slide 1 wraps here */
+  .onb__line { font-size: 14px; height: 3em; }
+  .onb__foot { padding-top: 2px; }
   .onb__back, .onb__next { min-height: 44px; flex: 1 1 0; width: auto; padding: 0 12px; }
-  .onb__close { width: 44px; height: 44px; }
   /* Four chips have to fit a 390px screen without scrolling: 10px type, tighter gap */
   .filters { gap: 6px; }
   .filters__tag { font-size: 10px; }
