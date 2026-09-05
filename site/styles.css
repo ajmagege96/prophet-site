@@ -474,7 +474,10 @@ ul, ol { list-style: none; }
 .onb__panel {
   position: relative;
   width: 100%;
-  max-width: 700px;            /* wide enough that slides 1 and 3 keep their line on one line */
+  max-width: 840px;            /* wide enough that every slide's line is one line */
+  /* On a short screen the 16:9 video would push the box off the top, so the width also
+     follows the viewport height: 240px is everything in the panel that is not the video. */
+  width: min(100%, 840px, calc((100vh - 240px) * 16 / 9));
   background: var(--navy);
   padding: 44px 20px 20px;     /* room above the video for the X in the panel's own corner */
   display: flex;
@@ -490,8 +493,11 @@ ul, ol { list-style: none; }
 .onb__slide[hidden] { display: none; }
 .onb__media { aspect-ratio: 16 / 9; overflow: hidden; background: rgba(242, 240, 230, 0.03); }
 .onb__video { display: block; width: 100%; height: 100%; object-fit: cover; }
-.onb__title { font-size: 15px; line-height: 1.3; margin-top: 16px; min-height: 1.3em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.onb__line { font-size: 14px; line-height: 1.5; opacity: 0.8; margin-top: 8px; height: 3em; overflow: hidden; }   /* exactly two lines reserved so the panel never jumps */
+/* Copy block has a fixed height so the panel never resizes; the slack falls under the
+   text, never between title and line. Desktop: one title line + one text line. */
+.onb__copy { height: 62px; margin-top: 14px; overflow: hidden; }
+.onb__title { font-size: 15px; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.onb__line { font-size: 14px; line-height: 1.5; opacity: 0.8; margin-top: 8px; }
 .onb__foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .onb__back, .onb__next {
   width: 128px; text-align: center;   /* fixed width: "Get Started" is wider than "Next", and the dots must not move */
@@ -508,6 +514,12 @@ ul, ol { list-style: none; }
 .onb__dot { width: 6px; height: 6px; background: rgba(242, 240, 230, 0.25); }   /* square, like the roadmap */
 .onb__dot--on { background: var(--green); }
 html.onb-lock, html.onb-lock body { overflow: hidden; }
+
+/* Short desktop windows: the panel is narrower, so a long line may wrap; give the copy
+   block a second line so nothing is clipped. */
+@media (min-width: 768px) and (max-height: 720px) {
+  .onb__copy { height: 83px; }
+}
 
 /* ── Feed (thesis + takes) ────────────────────────────── */
 .feed {
@@ -1194,12 +1206,13 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }
   /* Onboarding on a phone: a modal, not a sheet. Full width, height from its content,
      centred; the video keeps 16:9; Back / Next are thumb-height and equal width. */
   .onb { padding: 12px; }
-  .onb__panel { max-width: none; padding: 46px 16px 16px; gap: 10px; }
+  .onb__panel { padding: 46px 16px 16px; gap: 10px; }
   .onb__close { top: 0; right: 0; width: 44px; height: 44px; }
-  .onb__title { font-size: 16px; margin-top: 12px; white-space: normal; min-height: 2.6em; }   /* two lines reserved: slide 1 wraps here */
-  .onb__line { font-size: 14px; height: 3em; }
+  .onb__copy { height: 112px; margin-top: 10px; }   /* two title lines + two text lines; slack sits under the text */
+  .onb__title { font-size: 16px; white-space: normal; }
+  .onb__line { font-size: 14px; }
   .onb__foot { padding-top: 2px; }
-  .onb__back, .onb__next { min-height: 44px; flex: 1 1 0; width: auto; padding: 0 12px; }
+  .onb__back, .onb__next { min-height: 44px; flex: 1 1 0; width: auto; max-width: 160px; padding: 0 12px; }   /* capped so they never balloon on a wide phone or a small notebook */
   /* Four chips have to fit a 390px screen without scrolling: 10px type, tighter gap */
   .filters { gap: 6px; }
   .filters__tag { font-size: 10px; }
