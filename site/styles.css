@@ -1182,7 +1182,7 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }
   .home-panel { height: calc(100svh - 56px); padding: 16px 20px 14px; }
   .panel { height: auto; overflow: visible; padding: 16px 20px 28px; }
   .panel--token { overflow: visible; padding-bottom: 44px; }
-  .feed { flex: 1 1 auto; min-height: 0; overflow-y: auto; margin-top: 14px; }
+  .feed { flex: 1 1 auto; min-height: 0; overflow-y: auto; margin: 14px 0 16px; }   /* 16px of air between the takes and the bar */
   .pgroup { flex: 0 0 auto; }
   .pgroup__list { max-height: none; overflow: visible; padding-right: 0; }
   .prow__takes { max-height: none; overflow: visible; }
