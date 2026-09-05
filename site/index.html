@@ -29,7 +29,7 @@
   <meta name="twitter:description" content="An agent that reads prediction markets, publishes a thesis before the outcome, and keeps a public record of every call.">
   <meta name="twitter:image" content="https://ajmagege96.github.io/prophet-site/site/assets/prophet-og-1200x630.png">
 
-  <link rel="stylesheet" href="styles.css?v=d2e1920b">
+  <link rel="stylesheet" href="styles.css?v=4017a352">
 </head>
 <body>
 
@@ -119,7 +119,7 @@
              Called: called <span class="tally tally--yes|no">YES</span> <span class="conviction">[star icon]N</span> (no dot).
              Order: markets with an open vote first, then markets with a live thesis (most recently called first,
              at most twelve), then markets with no thesis. The tags above filter that one list.
-             Bottom row: the meta row on every card. Vote: append the Buy $PROPHET link as the meta row's last child; the YES / NO vote is the switch in the prompt bar, not on the card;
+             Bottom row: the meta row, identical on every card. Vote: also render the Buy $PROPHET link after the meta row; it floats over the card's bottom-right corner. The YES | NO switch in the prompt bar is always shown;
              called: the meta row with "{{market.called_pct}} at call" first; none: the meta row as is.
              History: filter_state "resolved" for the last ten to twelve resolved markets, newest first. They render in
              this same list but only show under the History tab. Badge: called <span class="tally">YES</span> <span class="conviction">[star]N</span>
@@ -133,7 +133,8 @@
           </div>
           <p class="carousel__question">{{market.question}}</p>
           <span class="carousel__yes heading">{{market.yes_pct}}<small>YES</small></span>
-          <span class="carousel__meta"><span title="odds at call">{{market.called_pct}} at call</span><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>{{market.volume}}</span><span title="ends in"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>{{market.ends_in}}</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>{{market.take_count}}</span><a class="carousel__buy" href="{{buy_url}}" target="_blank" rel="noopener">Buy $PROPHET</a></span>
+          <span class="carousel__meta"><span title="odds at call">{{market.called_pct}} at call</span><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>{{market.volume}}</span><span title="ends in"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>{{market.ends_in}}</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>{{market.take_count}}</span></span>
+          <a class="carousel__buy" href="{{buy_url}}" target="_blank" rel="noopener">Buy $PROPHET</a>
         </div>
         </template>
         <!-- /repeat: market -->
@@ -145,7 +146,8 @@
           </div>
           <p class="carousel__question">Will the SEC approve a new crypto exchange?</p>
           <span class="carousel__yes heading">34%<small>YES</small></span>
-          <span class="carousel__meta"><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>$540K</span><span title="ends in"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>9w</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>88</span><a class="carousel__buy" href="{{buy_url}}" target="_blank" rel="noopener">Buy $PROPHET</a></span>
+          <span class="carousel__meta"><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>$540K</span><span title="ends in"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>9w</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>88</span></span>
+          <a class="carousel__buy" href="{{buy_url}}" target="_blank" rel="noopener">Buy $PROPHET</a>
         </div>
 
         <div class="carousel__card outline" data-card data-state="vote" data-slug="dxy-100" data-stance="no" data-estimate="64%" data-conviction="2" data-thesis="Rate-cut pricing is already in the dollar, so the index holds 100 unless the Fed surprises dovish. Relative growth still favors the US and the alternatives are weak. A break below needs a catalyst that isn&#x27;t on the calendar yet." data-contributors="[{&quot;user&quot;: &quot;tessellate&quot;, &quot;claim&quot;: &quot;Euro-area PMIs keep undershooting&quot;, &quot;xp&quot;: 7}, {&quot;user&quot;: &quot;bram_o&quot;, &quot;claim&quot;: &quot;Futures already price two cuts; little left to remove&quot;, &quot;xp&quot;: 3}]">
@@ -155,7 +157,8 @@
           </div>
           <p class="carousel__question">Will the US dollar index drop below 100?</p>
           <span class="carousel__yes heading">41%<small>YES</small></span>
-          <span class="carousel__meta"><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>$980K</span><span title="ends in"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>5mo</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>114</span><a class="carousel__buy" href="{{buy_url}}" target="_blank" rel="noopener">Buy $PROPHET</a></span>
+          <span class="carousel__meta"><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>$980K</span><span title="ends in"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>5mo</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>114</span></span>
+          <a class="carousel__buy" href="{{buy_url}}" target="_blank" rel="noopener">Buy $PROPHET</a>
         </div>
 
         <div class="carousel__card outline" data-card data-state="called" data-slug="mstr-btc" data-stance="yes" data-estimate="92%" data-conviction="3" data-thesis="Saylor&#x27;s playbook hasn&#x27;t changed: every dip is a buying opportunity until the balance sheet says otherwise. The company has raised fresh capital three quarters running and has never let a quarter close without adding. Nothing in the filings suggests this one is different." data-contributors="[{&quot;user&quot;: &quot;marrow&quot;, &quot;claim&quot;: &quot;Filings show new convertible capacity was authorized last week&quot;, &quot;xp&quot;: 14}, {&quot;user&quot;: &quot;lunaire&quot;, &quot;claim&quot;: &quot;Every prior raise was followed by a buy within 10 days&quot;, &quot;xp&quot;: 8}, {&quot;user&quot;: &quot;kesh&quot;, &quot;claim&quot;: &quot;Saylor&#x27;s public cadence hasn&#x27;t slowed&quot;, &quot;xp&quot;: 5}]">
@@ -415,8 +418,8 @@
     <!-- ── Bar ──────────────────────────────────────────── -->
     <div class="prompt-bar-wrap">
       <div class="prompt-bar outline">
-        <!-- Open vote on the selected market: one joint YES | NO switch on the left, the same vote as the thesis block's popup; hidden for every other state -->
-        <div class="seg prompt-bar__vote" data-bar-vote hidden>
+        <!-- Joint YES | NO switch, always shown: the stance for what you type, and for a market with an open vote it is also the vote, in step with the thesis block's popup -->
+        <div class="seg prompt-bar__vote" data-bar-vote>
           <button class="seg__opt seg__opt--yes" data-bar-vote-btn="yes">Yes</button>
           <button class="seg__opt seg__opt--no" data-bar-vote-btn="no">No</button>
         </div>
@@ -571,6 +574,6 @@
 </footer>
 <!-- /partial:footer -->
 
-<script src="app.js?v=dcfdbdcc"></script>
+<script src="app.js?v=d124177a"></script>
 </body>
 </html>

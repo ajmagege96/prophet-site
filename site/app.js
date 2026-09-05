@@ -445,14 +445,12 @@
       }
     }
   }
-  /* YES / NO in the prompt bar: shown only while the selected market's vote is
-     open, and the same vote as the block's popup, so the two never disagree. */
+  /* YES | NO switch in the prompt bar, always shown: the stance for what you
+     type, and for an open vote it is the vote itself, in step with the block's
+     popup so the two never disagree. Remembered per market. */
   var barVote = document.querySelector('[data-bar-vote]');
   function paintBarVote(card) {
     if (!barVote) return;
-    var open = (card.dataset.state || '') === 'vote';
-    barVote.hidden = !open;
-    if (!open) return;
     var chosen = votes[card.dataset.slug];
     var btns = barVote.querySelectorAll('[data-bar-vote-btn]');
     for (var i = 0; i < btns.length; i++) btns[i].classList.toggle('seg__opt--on', btns[i].dataset.barVoteBtn === chosen);
@@ -462,6 +460,7 @@
       var btn = e.target.closest('[data-bar-vote-btn]');
       if (!btn || activeIndex < 0) return;
       votes[cards[activeIndex].dataset.slug] = btn.dataset.barVoteBtn;
+      paintBarVote(cards[activeIndex]);
       renderThesis(cards[activeIndex]);
     });
   }

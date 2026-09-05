@@ -295,8 +295,6 @@ ul, ol { list-style: none; }
 }
 .filters__tag:hover { opacity: 1; }
 .filters__tag--on { opacity: 1; border-color: rgba(242, 240, 230, 0.6); }
-.filters__tag--vote.filters__tag--on { color: var(--purple-text); border-color: var(--purple-text); }
-.filters__tag--called.filters__tag--on { color: var(--green); border-color: var(--green); }
 
 /* ── Carousel ─────────────────────────────────────────── */
 .carousel {
@@ -336,6 +334,7 @@ ul, ol { list-style: none; }
 .carousel__arrow:hover { opacity: 1; color: var(--green); }
 
 .carousel__card {
+  position: relative;           /* anchors the Buy link on open-vote cards */
   flex: 0 0 calc(100% - 32px);
   height: 200px;               /* fixed: cards never change size */
   overflow: hidden;
@@ -446,9 +445,12 @@ ul, ol { list-style: none; }
 .tally--no  { color: #e53935; }
 .carousel__state:empty { display: none; }
 
-/* Buy $PROPHET: last item of an open-vote card's meta row, pushed to the right */
+/* Buy $PROPHET on an open-vote card: floats over the bottom-right corner, centred on
+   the meta row's line, so the card's own layout is identical to every other card */
 .carousel__buy {
-  margin-left: auto;
+  position: absolute;
+  right: 18px;
+  bottom: 14px;
   font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
@@ -627,10 +629,8 @@ ul, ol { list-style: none; }
   color: var(--offwhite);
   opacity: 0.6;
 }
-/* Joint YES | NO switch for the selected market's open vote, far left of the bar;
-   hidden for every other state. Chosen YES reads green, chosen NO red. */
+/* Joint YES | NO switch, far left of the bar, always shown. Chosen YES reads green, chosen NO red. */
 .prompt-bar__vote { flex: 0 0 auto; }
-.prompt-bar__vote[hidden] { display: none; }
 .prompt-bar__vote .seg__opt { font-size: 10px; padding: 5px 10px; font-weight: 700; }
 .prompt-bar__vote .seg__opt--no.seg__opt--on { color: #e53935; }
 
@@ -1110,6 +1110,7 @@ ul, ol { list-style: none; }
     height: 220px;
     padding: 20px;
   }
+  .carousel__buy { right: 20px; bottom: 16px; }
 
   .feed {
     flex: 1 1 auto;         /* fills the space between cards and bar; feed scrolls */
@@ -1209,8 +1210,7 @@ ul, ol { list-style: none; }
   .vote-btn, .vote__btn { min-height: 0; padding: 4px 12px; display: inline-flex; align-items: center; justify-content: center; gap: 4px; }
   /* An open-vote card's meta row also carries Buy $PROPHET; at 390px that only fits
      on one line with a smaller Buy and a tighter gap. */
-  .carousel__buy { padding: 1px 4px; line-height: 1.3; font-size: 9px; letter-spacing: 0.04em; }
-  .carousel__meta:has(.carousel__buy) { gap: 4px 5px; }
+  .carousel__buy { padding: 1px 5px; line-height: 1.3; font-size: 9px; letter-spacing: 0.04em; bottom: 14px; }
   .range__tab, .seg__opt { min-height: 32px; display: inline-flex; align-items: center; justify-content: center; }
   .range { gap: 6px; }
   .range__tab { padding: 0 6px; }
