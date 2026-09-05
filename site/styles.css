@@ -1208,7 +1208,7 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }
   .thesis--vote .thesis__head { display: contents; }
   .thesis--vote .thesis__top { order: 1; }
   .thesis--vote .thesis__text { order: 2; }
-  .thesis--vote .thesis__stateline { order: 3; margin-left: 0; justify-content: space-between; }
+  .thesis--vote .thesis__stateline { order: 3; margin-left: 0; justify-content: flex-start; }   /* Vote sits beside the badge */
   .thesis--vote .thesis__outcome { order: 4; }
   .thesis--vote .thesis__list { order: 5; }
   /* Onboarding on a phone: a modal, not a sheet. Full width, height from its content,
