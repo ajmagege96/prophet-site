@@ -304,7 +304,7 @@ markets with no thesis. The four tags above the carousel filter that list. Histo
 cards sit in the same list but the JS shows them only under the History tab.
 
 The bottom row of a card depends on its state — see the comment on the card
-`<template>` in `site/index.html`. The YES / NO buttons in the prompt bar (shown only for an open vote) and the
+`<template>` in `site/index.html`. The YES | NO switch at the left of the prompt bar (shown only for an open vote) and the
 thesis block's popup share one vote; the JS keeps them in step.
 
 The Edge-chart JS is still in `app.js`, inert without the Record page.

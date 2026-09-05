@@ -446,10 +446,7 @@ ul, ol { list-style: none; }
 .tally--no  { color: #e53935; }
 .carousel__state:empty { display: none; }
 
-/* Bottom row by state. Vote cards carry Buy $PROPHET in place of the meta row;
-   called cards keep the meta row with the odds at call. The YES / NO vote is in
-   the prompt bar, not on the card. */
-.carousel__actions { display: flex; align-items: center; justify-content: flex-end; }
+/* Buy $PROPHET: last item of an open-vote card's meta row, pushed to the right */
 .carousel__buy {
   margin-left: auto;
   font-size: 10px;
@@ -630,10 +627,12 @@ ul, ol { list-style: none; }
   color: var(--offwhite);
   opacity: 0.6;
 }
-/* YES / NO for the selected market's open vote; hidden for every other state */
-.prompt-bar__vote { display: flex; align-items: center; gap: 6px; margin-right: 6px; flex: 0 0 auto; }
+/* Joint YES | NO switch for the selected market's open vote, far left of the bar;
+   hidden for every other state. Chosen YES reads green, chosen NO red. */
+.prompt-bar__vote { flex: 0 0 auto; }
 .prompt-bar__vote[hidden] { display: none; }
-.prompt-bar__vote .vote-btn { padding: 3px 10px; }
+.prompt-bar__vote .seg__opt { font-size: 10px; padding: 5px 10px; font-weight: 700; }
+.prompt-bar__vote .seg__opt--no.seg__opt--on { color: #e53935; }
 
 .prompt-bar__send {
   flex: 0 0 auto;
@@ -1208,7 +1207,10 @@ ul, ol { list-style: none; }
   .filters__tag { flex: 0 0 auto; min-height: 34px; padding: 0 8px; display: inline-flex; align-items: center; }   /* 8px so four chips fit 390 */
   /* same height as desktop: padding only, no min-height */
   .vote-btn, .vote__btn { min-height: 0; padding: 4px 12px; display: inline-flex; align-items: center; justify-content: center; gap: 4px; }
-  .carousel__buy { padding: 1px 8px; line-height: 1.3; }   /* keeps vote cards inside the fixed 200px */
+  /* An open-vote card's meta row also carries Buy $PROPHET; at 390px that only fits
+     on one line with a smaller Buy and a tighter gap. */
+  .carousel__buy { padding: 1px 4px; line-height: 1.3; font-size: 9px; letter-spacing: 0.04em; }
+  .carousel__meta:has(.carousel__buy) { gap: 4px 5px; }
   .range__tab, .seg__opt { min-height: 32px; display: inline-flex; align-items: center; justify-content: center; }
   .range { gap: 6px; }
   .range__tab { padding: 0 6px; }

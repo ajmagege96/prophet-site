@@ -281,6 +281,14 @@
   if (nextBtn) nextBtn.addEventListener('click', function () { page(1); });
 
   document.addEventListener('keydown', function (e) {
+    /* Tab cycles the four tags: No thesis → Open votes → Prophecies → History → …; Shift+Tab goes back */
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      var order = ['none', 'vote', 'called', 'resolved'];
+      var at = order.indexOf(activeFilter);
+      applyFilter(order[(at + (e.shiftKey ? -1 : 1) + order.length) % order.length]);
+      return;
+    }
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
     if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); stepSelection(1); }
     else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); stepSelection(-1); }
@@ -447,7 +455,7 @@
     if (!open) return;
     var chosen = votes[card.dataset.slug];
     var btns = barVote.querySelectorAll('[data-bar-vote-btn]');
-    for (var i = 0; i < btns.length; i++) btns[i].classList.toggle('vote-btn--chosen', btns[i].dataset.barVoteBtn === chosen);
+    for (var i = 0; i < btns.length; i++) btns[i].classList.toggle('seg__opt--on', btns[i].dataset.barVoteBtn === chosen);
   }
   if (barVote) {
     barVote.addEventListener('click', function (e) {
