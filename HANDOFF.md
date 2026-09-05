@@ -21,7 +21,6 @@ full list is in the table below and in `TEMPLATE_VARS.md`.
 | `tools-stamp.py` | Rewrites the `?v=<hash>` on `app.js` and `styles.css` in every page from the file's own content hash. Run it after editing either file. Without it a browser keeps a cached copy after a deploy. Delete it and the query strings once your server sets cache headers. |
 | `site/index.html` | Home. Carousel of 12 markets, thesis block, takes, prompt bar. |
 | `site/prophecies.html` | Prophecies. Open votes and live prophecies, each row expandable to its takes. |
-| `site/record.html` | Record. Edge chart, stats, and the call history with its chain. |
 | `site/prophet.html` | $PROPHET. Stat strip, price chart, swap, live trades, wallets. |
 | `site/partials/header.html` | **Canonical** header. |
 | `site/partials/below-fold.html` | **Canonical** How it Works, Tokenomics, Roadmap. |
@@ -82,9 +81,9 @@ still carrying the exact markup your loop should emit. Replace the whole
 | `contributor` | Home | Contributor rows in the thesis block |
 | `vote` | Prophecies | Open-vote rows |
 | `thesis` | Prophecies | Live prophecy rows |
-| `entry` | Record | History rows |
-| `update` | Record | Update steps inside a history row's chain |
-| `bar` | Record | Bars in the Edge chart |
+| `entry` | Prophecies | History rows |
+| `update` | Prophecies | Update steps inside a history row's chain |
+
 | `trade` | $PROPHET | Pills in the live-trades strip |
 
 The hardcoded rows sitting next to each `<template>` are mock data. Delete them
@@ -106,7 +105,6 @@ Everything is progressive: with JS off, every page still renders and reads.
 | Carousel | Card selection, deck rotation, arrow keys, mobile swipe, filter tags, and the typewriter placeholder. Reads the selected card's `data-thesis`, `data-contributors`, `data-state` and `data-stance` to render the thesis block. | Those four `data-` attributes on each card. Takes are currently a JS object literal (`TAKES`) keyed by slug — **replace this with server-rendered rows or a JSON endpoint.** |
 | Roadmap timeline light | The travelling streak on the Roadmap. | Nothing. Pure decoration. |
 | List panels | Filter tags, row dropdowns, and vote popups on Prophecies. | Nothing for display. The vote buttons are **UI only** — wire them to your vote endpoint. |
-| Record range tabs | Highlights the selected 1W/1M/3M/1Y/ALL tab. | **Visual only.** You filter the bars server-side and mark the selected tab `range__tab--on`. |
 | $PROPHET price chart | Draws the area chart, x-axis and price tag from JSON. Redraws on resize. | `{{token.chart_series}}` (JSON array of prices, oldest first) and `{{token.chart_ticks}}` (JSON array of axis labels). |
 | Circuit board | Decorative canvas around the prompt bar only, desktop (1024px+), home page only. Right-angle traces from the bar's frame to small pads; light runs out to a pad, which fills then drains. **Nothing to wire.** It measures the bar and the surrounding content every frame and rebuilds if the layout shifts, so traces never cross text or a card. `window.prophetBoard.pulse()`, `.all()`, `.rest(0.05)` for tuning. 30fps cap, pauses on hidden tabs, static under `prefers-reduced-motion`. | Nothing. Purely decorative; safe to delete with its `<canvas data-board>` element. |
 | Price / MCap toggle | Highlights the selected mode. | **Visual only.** Serve the matching series. |
@@ -122,9 +120,9 @@ These render as fixed markup today and need wiring when the backend is ready.
 | Swap panel | $PROPHET | Fields, flip button and Buy button are inert. | Quote, approve and submit. |
 | Vote buttons | Home, Prophecies | Toggle the chosen state in the browser only; nothing is sent, nothing persists. | Post the vote, gate on holdings, return the new tally. |
 | Prompt bar | Home | Text field and send button. The typewriter runs; the send button does nothing. | Submit the take. |
-| Range and Price/MCap tabs | Record, $PROPHET | Highlight only. | Filter server-side. |
+| Range and Price/MCap tabs | $PROPHET | Highlight only. | Filter server-side. |
 | Live trades | $PROPHET | Ten mock pills. | Stream or poll. |
-| Empty states | Home, Prophecies, Record | Template variables with approved fallback copy in the markup. | Fill the variables, or leave the fallbacks. |
+| Empty states | Home, Prophecies | Template variables with approved fallback copy in the markup. | Fill the variables, or leave the fallbacks. |
 | Walkthrough | Home | Three cards, first visit only, remembered in `localStorage` under `prophet_walkthrough_done`. Copy is still `[COPY]`. | Write the copy. No other change needed. |
 | Signed-out account label | Header | Shows `[COPY]`. | Write the label, or fill `{{username}}` when signed in. |
 | How it Works, Tokenomics, Roadmap | Below the fold | **Final copy, intentionally static.** Only `{{buy_url}}` is a variable. | Nothing. Do not template the rest. |
@@ -153,7 +151,7 @@ These render as fixed markup today and need wiring when the backend is ready.
   short ranges and dates on long ones.
 - **Never show a wallet address.** Wallets are links labelled "Public wallet".
   The token contract in the header is the one address on the site.
-- **Losses sit next to wins.** The Record shows both, always.
+- **Losses sit next to wins.** The History group shows both, always.
 - **Four colours only:** navy `#151B26`, deep purple `#5F3A8B` (logo and hero
   glow), readable purple `#B08CF5` (vote states), green `#10F05F`, off-white
   `#F2F0E6`. Red `#e53935` is used for NO, losses and burns.
@@ -170,10 +168,6 @@ These render as fixed markup today and need wiring when the backend is ready.
 
 | Variable | Page | Holds | Mock now |
 |---|---|---|---|
-| `{{bar.outcome}}` | Record | `won` or `lost` | — (inside a `<template>`; the sample rows beside it are the mock) |
-| `{{bar.points_abs}}` | Record | Absolute points, drives bar height | — (inside a `<template>`; the sample rows beside it are the mock) |
-| `{{bar.points_signed}}` | Record | Signed points label | — (inside a `<template>`; the sample rows beside it are the mock) |
-| `{{bar.question}}` | Record | Question, on hover | — (inside a `<template>`; the sample rows beside it are the mock) |
 | `{{buy_url}}` | $PROPHET; Home; Prophecies; Record; below-fold | Buy $PROPHET link (Tokenomics section) | — (not rendered until filled) |
 | `{{contract_address}}` | $PROPHET; Home; Prophecies; Record; header | Token contract address; the pill shows first 6 … last 6 and copies the full value | — (not rendered until filled) |
 | `{{contributor.claim}}` | Home | Their contribution, one line | — (inside a `<template>`; the sample rows beside it are the mock) |
@@ -296,3 +290,19 @@ These render as fixed markup today and need wiring when the backend is ready.
 | `{{wallet_war_chest_url}}` | $PROPHET | Explorer link | — (not rendered until filled) |
 | `{{wallet_war_chest_value}}` | $PROPHET | Live balance | `$48,200` |
 | `{{x_url}}` | $PROPHET; Home; Prophecies; Record; footer | The Prophet on X | — (not rendered until filled) |
+
+## MVP scope
+
+The Record page is **not in the MVP**. Its History group now lives on the
+Prophecies page as a third group, `data-group="record"`, with its own filter
+tag. Nothing else about those rows changed — same markup, same variables,
+same drop-open chain.
+
+The Record page itself (the Edge chart, the stats row, the range tabs and the
+info tip) is preserved unchanged on the `v2` branch and the `v2-record-page`
+tag, and is due back in a couple of weeks. When it returns it takes History
+with it and Prophecies goes back to two groups.
+
+The Edge-chart JS is still in `app.js`. It is inert with no Record page on the
+document — it looks for elements that are not there and exits — and is kept so
+v2 needs no reconstruction.

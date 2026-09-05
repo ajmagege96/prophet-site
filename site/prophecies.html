@@ -46,7 +46,6 @@
   <!-- Desktop nav -->
   <nav class="site-header__nav">
     <a href="prophecies.html" class="active">Prophecies</a>
-    <a href="record.html">Record</a>
     <a href="prophet.html">$Prophet</a>
     <a href="{{docs_url}}" target="_blank" rel="noopener">Docs</a>
     <button class="site-header__ca" data-ca="{{contract_address}}" data-ca-copy title="Copy contract address" aria-label="Copy contract address">
@@ -68,7 +67,6 @@
   <nav class="site-header__mobile-panel" data-menu-panel>
     <a href="index.html">Home</a>
     <a href="prophecies.html" class="active">Prophecies</a>
-    <a href="record.html">Record</a>
     <a href="prophet.html">$Prophet</a>
     <a href="{{docs_url}}" target="_blank" rel="noopener">Docs</a>
     <div class="menu-links">
@@ -103,6 +101,7 @@
     <div class="filters" data-filters>
       <button class="filters__tag filters__tag--vote" data-filter="votes">Open votes</button>
       <button class="filters__tag filters__tag--called" data-filter="theses">Prophecies</button>
+      <button class="filters__tag" data-filter="record">History</button>
     </div>
 
     <section class="pgroup" data-group="votes" data-empty-text="{{empty_open_votes}}" data-empty-fallback="No open votes right now.">
@@ -349,6 +348,181 @@
             </div>
           </div>
         </div>
+      </div>
+      <p class="pgroup__empty" data-empty hidden></p>
+    </section>
+
+    <section class="pgroup" data-group="record" data-empty-text="{{empty_record}}" data-empty-fallback="No calls on the Record yet.">
+      <h2 class="pgroup__title heading">History</h2>
+      <p class="explainer" data-mock="Every call he's made, with the odds at the time and how it ended.">{{explainer_record}}</p>
+      <div class="pgroup__list">
+      <!-- repeat: entry — server loop replaces this <template>; the chain's update steps repeat with the nested update block -->
+      <template>
+      <div class="prow outline" data-row data-slug="{{entry.slug}}">
+        <img class="prow__img" src="{{entry.image_url}}" alt="" loading="lazy">
+        <div class="prow__main">
+          <p class="prow__q">{{entry.question}} <span class="tally tally--{{entry.stance}}">{{entry.stance_upper}}</span></p>
+          <span class="carousel__meta"><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>{{entry.volume}}</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>{{entry.take_count}}</span><span title="market at the call">{{entry.called_pct}} at call</span></span>
+        </div>
+        <div class="prow__side">
+          <div class="prow__row"><span class="prow__state">called <span class="tally tally--{{entry.stance}}">{{entry.stance_upper}}</span> <span class="conviction">[star icon]{{entry.conviction}}</span></span><span class="prow__outcome prow__outcome--{{entry.outcome}}">{{entry.outcome}}</span></div>
+          <span class="prow__meta">{{entry.resolved_ago}}</span>
+        </div>
+        <div class="prow__drop" data-drop hidden>
+          <div class="chain">
+            <div class="chain__step chain__step--call"><span class="chain__label heading">Call</span><p class="chain__body">{{entry.call_text}}</p><span class="chain__meta">{{entry.called_pct}} at call · {{entry.called_ago}}</span></div>
+            <!-- repeat: update -->
+            <template>
+            <div class="chain__step chain__step--update"><span class="chain__label heading">Update</span><p class="chain__body">{{update.text}}</p><span class="chain__meta">{{update.ago}}</span></div>
+            </template>
+            <!-- /repeat: update -->
+            <div class="chain__step chain__step--resolution"><span class="chain__label heading">Resolution</span><p class="chain__body">Resolved <span class="tally tally--{{entry.resolved_side}}">{{entry.resolved_side_upper}}</span> · market closed at {{entry.resolved_pct}}</p><span class="chain__meta">{{entry.resolved_ago}}</span></div>
+            <div class="chain__step chain__step--lesson"><span class="chain__label heading">Lesson</span><p class="chain__body">{{entry.lesson}}</p><span class="chain__meta"></span></div>
+          </div>
+        </div>
+      </div>
+      </template>
+      <!-- /repeat: entry -->
+      <div class="prow outline" data-row data-slug="eth-etf">
+        <img class="prow__img" src="https://polymarket-upload.s3.us-east-2.amazonaws.com/ETH+fullsize.jpg" alt="" loading="lazy">
+        <div class="prow__main">
+          <p class="prow__q">Will a spot Ethereum ETF see net inflows in its first month? <span class="tally tally--yes">YES</span></p>
+          <span class="carousel__meta"><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>$1.2M</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>156</span><span title="market at the call">61% at call</span></span>
+        </div>
+        <div class="prow__side">
+          <div class="prow__row"><span class="prow__state">called <span class="tally tally--yes">YES</span> <span class="conviction" title="conviction"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"/></svg>4</span></span><span class="prow__outcome prow__outcome--won">won</span></div>
+          <span class="prow__meta">2w ago</span>
+        </div>
+        <div class="prow__drop" data-drop hidden>
+          <div class="chain">
+            <div class="chain__step chain__step--call">
+              <span class="chain__label heading">Call</span>
+              <p class="chain__body">Grayscale outflows are front-loaded and the new issuers seeded before launch. Net flows turn positive by week two and stay there.</p>
+              <span class="chain__meta">61% at call · 5w ago</span>
+            </div>
+            <div class="chain__step chain__step--update">
+              <span class="chain__label heading">Update</span>
+              <p class="chain__body">Week-one outflows were heavier than modeled, but issuer inflows already exceed them on a rolling basis. Holding.</p>
+              <span class="chain__meta">4w ago</span>
+            </div>
+            <div class="chain__step chain__step--resolution">
+              <span class="chain__label heading">Resolution</span>
+              <p class="chain__body">Resolved <span class="tally tally--yes">YES</span> · market closed at 97%</p>
+              <span class="chain__meta">2w ago</span>
+            </div>
+            <div class="chain__step chain__step--lesson">
+              <span class="chain__label heading">Lesson</span>
+              <p class="chain__body">Front-loaded selling reads as failure in the first week and is usually the setup. Weight the flow trend over the flow level.</p>
+              <span class="chain__meta"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="prow outline" data-row data-slug="fed-hold">
+        <img class="prow__img" src="https://polymarket-upload.s3.us-east-2.amazonaws.com/fed-decision-in-september-762-c4RyWuxRPo1L.jpg" alt="" loading="lazy">
+        <div class="prow__main">
+          <p class="prow__q">Will the Fed hold rates at the last meeting? <span class="tally tally--no">NO</span></p>
+          <span class="carousel__meta"><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>$2.8M</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>97</span><span title="market at the call">74% at call</span></span>
+        </div>
+        <div class="prow__side">
+          <div class="prow__row"><span class="prow__state">called <span class="tally tally--no">NO</span> <span class="conviction" title="conviction"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"/></svg>2</span></span><span class="prow__outcome prow__outcome--lost">lost</span></div>
+          <span class="prow__meta">3w ago</span>
+        </div>
+        <div class="prow__drop" data-drop hidden>
+          <div class="chain">
+            <div class="chain__step chain__step--call">
+              <span class="chain__label heading">Call</span>
+              <p class="chain__body">Labor data has softened faster than the dot plot assumed. A cut is more likely than the market is pricing.</p>
+              <span class="chain__meta">74% at call · 6w ago</span>
+            </div>
+            <div class="chain__step chain__step--update">
+              <span class="chain__label heading">Update</span>
+              <p class="chain__body">Payrolls revised down again. Conviction unchanged.</p>
+              <span class="chain__meta">5w ago</span>
+            </div>
+            <div class="chain__step chain__step--update">
+              <span class="chain__label heading">Update</span>
+              <p class="chain__body">Two governors signaled patience in the same week. Conviction lowered from 3 to 2.</p>
+              <span class="chain__meta">4w ago</span>
+            </div>
+            <div class="chain__step chain__step--resolution">
+              <span class="chain__label heading">Resolution</span>
+              <p class="chain__body">Resolved <span class="tally tally--yes">YES</span> · market closed at 97%</p>
+              <span class="chain__meta">3w ago</span>
+            </div>
+            <div class="chain__step chain__step--lesson">
+              <span class="chain__label heading">Lesson</span>
+              <p class="chain__body">Softer data is necessary but not sufficient. Count the votes on the committee before counting the data.</p>
+              <span class="chain__meta"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="prow outline" data-row data-slug="gold-2500">
+        <img class="prow__img" src="https://polymarket-upload.s3.us-east-2.amazonaws.com/gold-logo-0d00c80498.png" alt="" loading="lazy">
+        <div class="prow__main">
+          <p class="prow__q">Will gold close above $2,500? <span class="tally tally--yes">YES</span></p>
+          <span class="carousel__meta"><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>$890K</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>78</span><span title="market at the call">48% at call</span></span>
+        </div>
+        <div class="prow__side">
+          <div class="prow__row"><span class="prow__state">called <span class="tally tally--yes">YES</span> <span class="conviction" title="conviction"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"/></svg>3</span></span><span class="prow__outcome prow__outcome--won">won</span></div>
+          <span class="prow__meta">1mo ago</span>
+        </div>
+        <div class="prow__drop" data-drop hidden>
+          <div class="chain">
+            <div class="chain__step chain__step--call">
+              <span class="chain__label heading">Call</span>
+              <p class="chain__body">Central-bank buying has not paused a single month this year and real yields are rolling over. The level is a matter of time, not direction.</p>
+              <span class="chain__meta">48% at call · 2mo ago</span>
+            </div>
+            <div class="chain__step chain__step--resolution">
+              <span class="chain__label heading">Resolution</span>
+              <p class="chain__body">Resolved <span class="tally tally--yes">YES</span> · market closed at 99%</p>
+              <span class="chain__meta">1mo ago</span>
+            </div>
+            <div class="chain__step chain__step--lesson">
+              <span class="chain__label heading">Lesson</span>
+              <p class="chain__body">When the buyer is price-insensitive, the level argument wins. Structural bids beat technical resistance.</p>
+              <span class="chain__meta"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="prow outline" data-row data-slug="sol-200">
+        <img class="prow__img" src="https://polymarket-upload.s3.us-east-2.amazonaws.com/SOL-logo.png" alt="" loading="lazy">
+        <div class="prow__main">
+          <p class="prow__q">Will Solana trade above $200? <span class="tally tally--yes">YES</span></p>
+          <span class="carousel__meta"><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>$1.9M</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>62</span><span title="market at the call">35% at call</span></span>
+        </div>
+        <div class="prow__side">
+          <div class="prow__row"><span class="prow__state">called <span class="tally tally--yes">YES</span> <span class="conviction" title="conviction"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"/></svg>2</span></span><span class="prow__outcome prow__outcome--lost">lost</span></div>
+          <span class="prow__meta">2mo ago</span>
+        </div>
+        <div class="prow__drop" data-drop hidden>
+          <div class="chain">
+            <div class="chain__step chain__step--call">
+              <span class="chain__label heading">Call</span>
+              <p class="chain__body">ETF filings alone should carry it through the level with room to spare.</p>
+              <span class="chain__meta">35% at call · 3mo ago</span>
+            </div>
+            <div class="chain__step chain__step--update">
+              <span class="chain__label heading">Update</span>
+              <p class="chain__body">No filing progress this month. Conviction lowered.</p>
+              <span class="chain__meta">10w ago</span>
+            </div>
+            <div class="chain__step chain__step--resolution">
+              <span class="chain__label heading">Resolution</span>
+              <p class="chain__body">Resolved <span class="tally tally--no">NO</span> · market closed at 1%</p>
+              <span class="chain__meta">2mo ago</span>
+            </div>
+            <div class="chain__step chain__step--lesson">
+              <span class="chain__label heading">Lesson</span>
+              <p class="chain__body">A catalyst that hasn't happened is a hope, not a thesis. Do not call on chatter.</p>
+              <span class="chain__meta"></span>
+            </div>
+          </div>
+        </div>
+      </div>
       </div>
       <p class="pgroup__empty" data-empty hidden></p>
     </section>

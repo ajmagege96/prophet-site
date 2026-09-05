@@ -64,7 +64,11 @@
 | `{{empty_open_votes}}`, `{{empty_prophecies}}` | Empty-state line for each group, set on the section; shown when its list has no rows (fallbacks: "No open votes right now.", "No prophecies yet.") |
 | `take.*` inside any row's dropdown | Same take variables as the home panel (`<!-- repeat: take -->` inside each row's Contributions dropdown) |
 
-### Record page
+### History group (on the Prophecies page)
+
+The Record page is deferred to v2; its Edge-chart variables below are unused by the
+MVP and kept only so they come back with the page. `{{explainer_record}}`,
+`{{empty_record}}` and the `{{entry.*}}` row variables are live on Prophecies now.
 | Variable | Description |
 |---|---|
 | `{{bar.outcome}}`, `{{bar.points_abs}}`, `{{bar.points_signed}}`, `{{bar.question}}` | P&L bars (`<!-- repeat: bar -->`, oldest left): `won`/`lost`, absolute points for height, signed points label, question on hover |
