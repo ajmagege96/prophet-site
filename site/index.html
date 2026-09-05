@@ -29,7 +29,7 @@
   <meta name="twitter:description" content="An agent that reads prediction markets, publishes a thesis before the outcome, and keeps a public record of every call.">
   <meta name="twitter:image" content="https://ajmagege96.github.io/prophet-site/site/assets/prophet-og-1200x630.png">
 
-  <link rel="stylesheet" href="styles.css?v=4017a352">
+  <link rel="stylesheet" href="styles.css?v=56d4d4c4">
 </head>
 <body>
 
@@ -44,7 +44,7 @@
       <img src="assets/prophet-logo-transparent.svg" alt="" class="site-header__mark" width="48" height="48">
       <img src="assets/wordmark_offwhite.svg" alt="The Prophet" class="site-header__wordmark">
     </a>
-    <a href="#how-it-works" class="site-header__hiw heading">How it Works</a>
+    <a href="#how-it-works" class="site-header__hiw heading" data-onboarding-open>How it Works</a>
   </div>
 
   <!-- Desktop nav -->
@@ -68,6 +68,7 @@
 
   <!-- Mobile panel -->
   <nav class="site-header__mobile-panel" data-menu-panel>
+    <a href="#how-it-works" data-onboarding-open>How it Works</a>
     <a href="prophet.html">$Prophet</a>
     <a href="{{docs_url}}" target="_blank" rel="noopener">Docs</a>
     <div class="menu-links">
@@ -437,27 +438,58 @@
       </div>
     </div>
 
-    <!-- ── Walkthrough ──────────────────────────────────── -->
-    <div class="walkthrough" data-walkthrough hidden>
-      <button class="walkthrough__close" data-walkthrough-close aria-label="Close">&times;</button>
-      <div class="walkthrough__card outline" data-walkthrough-step>
-        <h3 class="walkthrough__title heading">[COPY]</h3>
-        <p class="walkthrough__text">[COPY]</p>
-        <button class="walkthrough__btn" data-walkthrough-next>Next</button>
-      </div>
-      <div class="walkthrough__card outline" data-walkthrough-step hidden>
-        <h3 class="walkthrough__title heading">[COPY]</h3>
-        <p class="walkthrough__text">[COPY]</p>
-        <button class="walkthrough__btn" data-walkthrough-next>Next</button>
-      </div>
-      <div class="walkthrough__card outline" data-walkthrough-step hidden>
-        <h3 class="walkthrough__title heading">[COPY]</h3>
-        <p class="walkthrough__text">[COPY]</p>
-        <button class="walkthrough__btn" data-walkthrough-done>Done</button>
-      </div>
-    </div>
   </div>
 </main>
+
+<!-- partial:onboarding -->
+<!-- Onboarding modal. Opens on a first visit (remembered on the device in localStorage) and from the
+     How it Works link every time. Three slides; Next / Back / Get Started, dots, swipe on touch.
+     Closes on the X, Escape, or the backdrop. Static copy; no template variables. -->
+<div class="onb" data-onboarding hidden role="dialog" aria-modal="true" aria-label="How it Works">
+  <div class="onb__backdrop" data-onboarding-close></div>
+  <div class="onb__panel outline" data-onboarding-panel>
+    <button class="onb__close" data-onboarding-close aria-label="Close">&times;</button>
+    <div class="onb__slides">
+      <section class="onb__slide" data-onboarding-slide>
+        <div class="onb__media outline">
+          <!-- PLACEHOLDER FRAME. To swap in the real recording, drop the file in assets/ and add
+               <source src="assets/onboarding-1.mp4" type="video/mp4"> inside this <video>. The poster stays as the first frame. -->
+          <video class="onb__video" muted autoplay loop playsinline poster="assets/onboarding-1-placeholder.png"></video>
+        </div>
+        <h3 class="onb__title heading">The first prediction agent the crowd controls</h3>
+        <p class="onb__line">He reads the markets, picks his side, and shows his reasoning every time.</p>
+      </section>
+      <section class="onb__slide" data-onboarding-slide hidden>
+        <div class="onb__media outline">
+          <!-- PLACEHOLDER FRAME. To swap in the real recording, drop the file in assets/ and add
+               <source src="assets/onboarding-2.mp4" type="video/mp4"> inside this <video>. The poster stays as the first frame. -->
+          <video class="onb__video" muted autoplay loop playsinline poster="assets/onboarding-2-placeholder.png"></video>
+        </div>
+        <h3 class="onb__title heading">Shaped by the community</h3>
+        <p class="onb__line">Every thesis is built from the crowd's takes. Contributors are credited by name and paid every week.</p>
+      </section>
+      <section class="onb__slide" data-onboarding-slide hidden>
+        <div class="onb__media outline">
+          <!-- PLACEHOLDER FRAME. To swap in the real recording, drop the file in assets/ and add
+               <source src="assets/onboarding-3.mp4" type="video/mp4"> inside this <video>. The poster stays as the first frame. -->
+          <video class="onb__video" muted autoplay loop playsinline poster="assets/onboarding-3-placeholder.png"></video>
+        </div>
+        <h3 class="onb__title heading">Your opinion, his position</h3>
+        <p class="onb__line">Give a take on any market. Hold $PROPHET and nothing fires without your vote.</p>
+      </section>
+    </div>
+    <div class="onb__foot">
+      <button class="onb__back" data-onboarding-back>Back</button>
+      <div class="onb__dots" aria-hidden="true">
+        <span class="onb__dot onb__dot--on" data-onboarding-dot="0"></span>
+        <span class="onb__dot" data-onboarding-dot="1"></span>
+        <span class="onb__dot" data-onboarding-dot="2"></span>
+      </div>
+      <button class="onb__next" data-onboarding-next>Next</button>
+    </div>
+  </div>
+</div>
+<!-- /partial:onboarding -->
 
 <!-- partial:below-fold -->
 <!-- Sits under every panel. Static copy; the only variable is {{buy_url}}. -->
@@ -574,6 +606,6 @@
 </footer>
 <!-- /partial:footer -->
 
-<script src="app.js?v=d124177a"></script>
+<script src="app.js?v=b6c05122"></script>
 </body>
 </html>

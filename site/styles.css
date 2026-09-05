@@ -467,6 +467,47 @@ ul, ol { list-style: none; }
 .carousel__buy:hover { opacity: 1; border-color: currentColor; text-decoration: none; }
 
 
+/* ── Onboarding modal ─────────────────────────────────── */
+.onb { position: fixed; inset: 0; z-index: 1000;   /* above the header and the mobile menu */ display: flex; align-items: center; justify-content: center; padding: 16px; }
+.onb[hidden] { display: none; }
+.onb__backdrop { position: absolute; inset: 0; background: rgba(21, 27, 38, 0.84); }
+.onb__panel {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  background: var(--navy);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.onb__close {
+  position: absolute; top: 6px; right: 6px; z-index: 1;
+  width: 34px; height: 34px;
+  font-size: 22px; line-height: 1; opacity: 0.6;
+}
+.onb__close:hover { opacity: 1; }
+.onb__slide[hidden] { display: none; }
+.onb__media { aspect-ratio: 16 / 9; overflow: hidden; background: rgba(242, 240, 230, 0.03); }
+.onb__video { display: block; width: 100%; height: 100%; object-fit: cover; }
+.onb__title { font-size: 15px; margin-top: 16px; }
+.onb__line { font-size: 14px; line-height: 1.5; opacity: 0.8; margin-top: 8px; min-height: 3em; }   /* two lines reserved so the panel never jumps */
+.onb__foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.onb__back, .onb__next {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 9px 16px; border: 1px solid var(--outline); border-radius: 4px;
+  transition: opacity 0.15s, border-color 0.15s;
+}
+.onb__back { opacity: 0.7; }
+.onb__back:hover { opacity: 1; }
+.onb__back.is-off { visibility: hidden; }        /* slide 1: keeps the dots centred */
+.onb__next { color: var(--green); border-color: var(--green); }
+.onb__next:hover { opacity: 0.85; }
+.onb__dots { display: flex; gap: 8px; }
+.onb__dot { width: 6px; height: 6px; background: rgba(242, 240, 230, 0.25); }   /* square, like the roadmap */
+.onb__dot--on { background: var(--green); }
+html.onb-lock, html.onb-lock body { overflow: hidden; }
+
 /* ── Feed (thesis + takes) ────────────────────────────── */
 .feed {
   flex: 1 1 auto;
@@ -687,56 +728,6 @@ ul, ol { list-style: none; }
 }
 
 /* ── Walkthrough ──────────────────────────────────────── */
-.walkthrough {
-  position: absolute;
-  inset: 0;
-  z-index: 10;
-  background: rgba(21, 27, 38, 0.92);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.walkthrough[hidden] { display: none; }
-
-.walkthrough__close {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  font-size: 22px;
-  color: var(--offwhite);
-  opacity: 0.5;
-  line-height: 1;
-}
-.walkthrough__close:hover { opacity: 1; }
-
-.walkthrough__card {
-  max-width: 320px;
-  width: calc(100% - 48px);
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.walkthrough__card[hidden] { display: none; }
-
-.walkthrough__title { font-size: 14px; }
-.walkthrough__text {
-  font-size: 13px;
-  opacity: 0.6;
-  line-height: 1.5;
-}
-.walkthrough__btn {
-  align-self: flex-end;
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--green);
-  padding: 6px 16px;
-  border: 1px solid var(--outline);
-  border-radius: 4px;
-  transition: opacity 0.15s;
-}
-.walkthrough__btn:hover { opacity: 0.8; }
 
 /* ── List panels (Prophecies, Record) ─────────────────── */
 /* Filter tags on top; each group's list scrolls on its own. */
@@ -1199,6 +1190,15 @@ ul, ol { list-style: none; }
   .thesis__head { flex-wrap: wrap; row-gap: 6px; }
   .thesis__label { white-space: nowrap; }
   .thesis__state { margin-left: auto; }
+  /* Onboarding: full width, near full height; video smaller; buttons thumb-height */
+  .onb { padding: 10px; align-items: stretch; }
+  .onb__panel { max-width: none; min-height: calc(100dvh - 20px); padding: 16px; justify-content: flex-start; }
+  .onb__media { aspect-ratio: auto; height: 34dvh; }
+  .onb__title { font-size: 16px; margin-top: 18px; }
+  .onb__line { font-size: 15px; }
+  .onb__foot { margin-top: auto; padding-top: 12px; }
+  .onb__back, .onb__next { min-height: 44px; flex: 1 1 0; padding: 0 12px; }
+  .onb__close { width: 44px; height: 44px; }
   /* Four chips have to fit a 390px screen without scrolling: 10px type, tighter gap */
   .filters { gap: 6px; }
   .filters__tag { font-size: 10px; }

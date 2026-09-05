@@ -19,6 +19,79 @@
   else wide.addListener(onChange);
 })();
 
+/* ── Onboarding modal (first-visit walkthrough) ───────── */
+/* Opens once per device (localStorage) and from any [data-onboarding-open]
+   link every time. Three slides: Next / Back / Get Started, dots, swipe,
+   arrow keys. Closes on the X, Escape, or the backdrop. Body scroll locked. */
+(function () {
+  var root = document.querySelector('[data-onboarding]');
+  if (!root) return;
+  var KEY = 'prophet.onboarded';
+  var slides = root.querySelectorAll('[data-onboarding-slide]');
+  var dots = root.querySelectorAll('[data-onboarding-dot]');
+  var next = root.querySelector('[data-onboarding-next]');
+  var back = root.querySelector('[data-onboarding-back]');
+  var panel = root.querySelector('[data-onboarding-panel]');
+  var closeBtn = root.querySelector('.onb__close');
+  var at = 0, lastFocus = null, sx = null;
+
+  function show(i) {
+    at = Math.max(0, Math.min(i, slides.length - 1));
+    for (var k = 0; k < slides.length; k++) {
+      slides[k].hidden = k !== at;
+      var v = slides[k].querySelector('video');
+      if (v) { if (k === at) { var p = v.play(); if (p && p.catch) p.catch(function () {}); } else { v.pause(); } }
+      if (dots[k]) dots[k].classList.toggle('onb__dot--on', k === at);
+    }
+    back.classList.toggle('is-off', at === 0);
+    next.textContent = at === slides.length - 1 ? 'Get Started' : 'Next';
+  }
+  function open() {
+    lastFocus = document.activeElement;
+    root.hidden = false;
+    document.documentElement.classList.add('onb-lock');
+    var menu = document.querySelector('[data-menu-panel]'), mb = document.querySelector('[data-menu-toggle]');
+    if (menu) menu.classList.remove('open');
+    if (mb) mb.setAttribute('aria-expanded', 'false');
+    show(0);
+    if (closeBtn) closeBtn.focus();
+  }
+  function close() {
+    root.hidden = true;
+    document.documentElement.classList.remove('onb-lock');
+    for (var k = 0; k < slides.length; k++) { var v = slides[k].querySelector('video'); if (v) v.pause(); }
+    try { localStorage.setItem(KEY, '1'); } catch (e) {}
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+  root.addEventListener('click', function (e) {
+    if (e.target.closest('[data-onboarding-close]')) { close(); return; }
+    if (e.target.closest('[data-onboarding-next]')) { if (at === slides.length - 1) close(); else show(at + 1); return; }
+    if (e.target.closest('[data-onboarding-back]')) { show(at - 1); return; }
+    var d = e.target.closest('[data-onboarding-dot]');
+    if (d) show(parseInt(d.dataset.onboardingDot, 10));
+  });
+  document.addEventListener('keydown', function (e) {
+    if (root.hidden) return;
+    if (e.key === 'Escape') { e.preventDefault(); close(); }
+    else if (e.key === 'ArrowRight') { e.preventDefault(); show(at + 1); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); show(at - 1); }
+  }, true);
+  panel.addEventListener('touchstart', function (e) { sx = e.touches[0].clientX; }, { passive: true });
+  panel.addEventListener('touchend', function (e) {
+    if (sx === null) return;
+    var dx = e.changedTouches[0].clientX - sx; sx = null;
+    if (Math.abs(dx) > 40) show(at + (dx < 0 ? 1 : -1));
+  });
+  var openers = document.querySelectorAll('[data-onboarding-open]');
+  for (var i = 0; i < openers.length; i++) {
+    openers[i].addEventListener('click', function (e) { e.preventDefault(); open(); });
+  }
+  var seen = false;
+  try { seen = localStorage.getItem(KEY) === '1'; } catch (e) {}
+  if (!seen) open();
+  window.prophetOnboarding = { open: open, close: close, show: show };
+})();
+
 /* ── Preview fill ─────────────────────────────────────── */
 /* Any element with data-mock whose text is still an unfilled {{variable}}
    shows the mock value so the page previews from disk. */
@@ -281,6 +354,8 @@
   if (nextBtn) nextBtn.addEventListener('click', function () { page(1); });
 
   document.addEventListener('keydown', function (e) {
+    var onb = document.querySelector('[data-onboarding]');
+    if (onb && !onb.hidden) return;   /* the onboarding modal owns the keys while open */
     /* Tab cycles the four tags: No thesis → Open votes → Prophecies → History → …; Shift+Tab goes back */
     if (e.key === 'Tab') {
       e.preventDefault();
@@ -779,7 +854,7 @@
     var out = [], seen = [], i, k;
     function add(el) {
       if (!el || el === bar || bar.contains(el) || el.contains(bar) || seen.indexOf(el) >= 0) return;
-      if (el.closest && el.closest('[data-walkthrough]')) return;
+      if (el.closest && el.closest('[data-onboarding]')) return;
       seen.push(el);
       var r = visibleRect(el);
       /* The cards sit right against the side channels, so their clearance is

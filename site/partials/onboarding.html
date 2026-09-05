@@ -1,0 +1,49 @@
+<!-- partial:onboarding -->
+<!-- Onboarding modal. Opens on a first visit (remembered on the device in localStorage) and from the
+     How it Works link every time. Three slides; Next / Back / Get Started, dots, swipe on touch.
+     Closes on the X, Escape, or the backdrop. Static copy; no template variables. -->
+<div class="onb" data-onboarding hidden role="dialog" aria-modal="true" aria-label="How it Works">
+  <div class="onb__backdrop" data-onboarding-close></div>
+  <div class="onb__panel outline" data-onboarding-panel>
+    <button class="onb__close" data-onboarding-close aria-label="Close">&times;</button>
+    <div class="onb__slides">
+      <section class="onb__slide" data-onboarding-slide>
+        <div class="onb__media outline">
+          <!-- PLACEHOLDER FRAME. To swap in the real recording, drop the file in assets/ and add
+               <source src="assets/onboarding-1.mp4" type="video/mp4"> inside this <video>. The poster stays as the first frame. -->
+          <video class="onb__video" muted autoplay loop playsinline poster="assets/onboarding-1-placeholder.png"></video>
+        </div>
+        <h3 class="onb__title heading">The first prediction agent the crowd controls</h3>
+        <p class="onb__line">He reads the markets, picks his side, and shows his reasoning every time.</p>
+      </section>
+      <section class="onb__slide" data-onboarding-slide hidden>
+        <div class="onb__media outline">
+          <!-- PLACEHOLDER FRAME. To swap in the real recording, drop the file in assets/ and add
+               <source src="assets/onboarding-2.mp4" type="video/mp4"> inside this <video>. The poster stays as the first frame. -->
+          <video class="onb__video" muted autoplay loop playsinline poster="assets/onboarding-2-placeholder.png"></video>
+        </div>
+        <h3 class="onb__title heading">Shaped by the community</h3>
+        <p class="onb__line">Every thesis is built from the crowd's takes. Contributors are credited by name and paid every week.</p>
+      </section>
+      <section class="onb__slide" data-onboarding-slide hidden>
+        <div class="onb__media outline">
+          <!-- PLACEHOLDER FRAME. To swap in the real recording, drop the file in assets/ and add
+               <source src="assets/onboarding-3.mp4" type="video/mp4"> inside this <video>. The poster stays as the first frame. -->
+          <video class="onb__video" muted autoplay loop playsinline poster="assets/onboarding-3-placeholder.png"></video>
+        </div>
+        <h3 class="onb__title heading">Your opinion, his position</h3>
+        <p class="onb__line">Give a take on any market. Hold $PROPHET and nothing fires without your vote.</p>
+      </section>
+    </div>
+    <div class="onb__foot">
+      <button class="onb__back" data-onboarding-back>Back</button>
+      <div class="onb__dots" aria-hidden="true">
+        <span class="onb__dot onb__dot--on" data-onboarding-dot="0"></span>
+        <span class="onb__dot" data-onboarding-dot="1"></span>
+        <span class="onb__dot" data-onboarding-dot="2"></span>
+      </div>
+      <button class="onb__next" data-onboarding-next>Next</button>
+    </div>
+  </div>
+</div>
+<!-- /partial:onboarding -->

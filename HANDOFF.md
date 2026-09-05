@@ -22,6 +22,7 @@ full list is in the table below and in `TEMPLATE_VARS.md`.
 | `site/index.html` | Home. Carousel of 12 markets, thesis block, takes, prompt bar. |
 | `archive/prophecies.html` (archived, not built) | Prophecies. Open votes and live prophecies, each row expandable to its takes. |
 | `site/prophet.html` | $PROPHET. Stat strip, price chart, swap, live trades, wallets. |
+| `site/partials/onboarding.html` | Onboarding modal, included on both pages between `<!-- partial:onboarding -->` markers. Static copy. To swap in a real recording, drop `onboarding-N.mp4` in `assets/` and add its `<source>` inside the slide's `<video>`; the placeholder PNG stays as the poster. |
 | `site/partials/header.html` | **Canonical** header. |
 | `site/partials/below-fold.html` | **Canonical** How it Works, Tokenomics, Roadmap. |
 | `site/partials/footer.html` | **Canonical** footer. |
