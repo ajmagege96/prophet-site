@@ -446,10 +446,10 @@ ul, ol { list-style: none; }
 .tally--no  { color: #e53935; }
 .carousel__state:empty { display: none; }
 
-/* Bottom row by state. Vote cards carry the YES / NO buttons and Buy $PROPHET in
-   place of the meta row; called cards keep the meta row with the odds at call. */
-.carousel__actions { display: flex; align-items: center; gap: 6px; }
-.carousel__actions .vote-btn { padding: 3px 10px; }
+/* Bottom row by state. Vote cards carry Buy $PROPHET in place of the meta row;
+   called cards keep the meta row with the odds at call. The YES / NO vote is in
+   the prompt bar, not on the card. */
+.carousel__actions { display: flex; align-items: center; justify-content: flex-end; }
 .carousel__buy {
   margin-left: auto;
   font-size: 10px;
@@ -465,7 +465,7 @@ ul, ol { list-style: none; }
   opacity: 0.85;
   transition: opacity 0.15s, border-color 0.15s;
 }
-.carousel__buy:hover { opacity: 1; border-color: currentColor; }
+.carousel__buy:hover { opacity: 1; border-color: currentColor; text-decoration: none; }
 
 
 /* ── Feed (thesis + takes) ────────────────────────────── */
@@ -630,6 +630,11 @@ ul, ol { list-style: none; }
   color: var(--offwhite);
   opacity: 0.6;
 }
+/* YES / NO for the selected market's open vote; hidden for every other state */
+.prompt-bar__vote { display: flex; align-items: center; gap: 6px; margin-right: 6px; flex: 0 0 auto; }
+.prompt-bar__vote[hidden] { display: none; }
+.prompt-bar__vote .vote-btn { padding: 3px 10px; }
+
 .prompt-bar__send {
   flex: 0 0 auto;
   display: flex;
@@ -1197,7 +1202,7 @@ ul, ol { list-style: none; }
   .filters__tag { flex: 0 0 auto; min-height: 34px; padding: 0 8px; display: inline-flex; align-items: center; }   /* 8px so four chips fit 390 */
   /* same height as desktop: padding only, no min-height */
   .vote-btn, .vote__btn { min-height: 0; padding: 4px 12px; display: inline-flex; align-items: center; justify-content: center; gap: 4px; }
-  .carousel__actions .vote-btn, .carousel__buy { padding: 1px 8px; line-height: 1.3; }   /* keeps vote cards inside the fixed 200px */
+  .carousel__buy { padding: 1px 8px; line-height: 1.3; }   /* keeps vote cards inside the fixed 200px */
   .range__tab, .seg__opt { min-height: 32px; display: inline-flex; align-items: center; justify-content: center; }
   .range { gap: 6px; }
   .range__tab { padding: 0 6px; }

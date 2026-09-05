@@ -387,7 +387,7 @@
     if (!thesisBox) return;
     var text = card.dataset.thesis || '';
     var state = card.dataset.state || 'none';
-    if (!text || state === 'none') { thesisBox.hidden = true; return; }
+    if (!text || state === 'none') { thesisBox.hidden = true; paintBarVote(card); return; }
     thesisBox.hidden = false;
     thesisLabel.textContent = state === 'vote' ? 'Thesis draft' : 'Thesis';
     var stance = (card.dataset.stance || '').toLowerCase();
@@ -424,7 +424,7 @@
     }
     thesisList.innerHTML = html;
 
-    paintCardVote(card);
+    paintBarVote(card);
 
     voteWrap.hidden = state !== 'vote';
     votePop.hidden = true;
@@ -437,21 +437,26 @@
       }
     }
   }
-  /* The card's own YES / NO buttons: same vote as the block's popup, so the
-     two never disagree. */
-  function paintCardVote(card) {
+  /* YES / NO in the prompt bar: shown only while the selected market's vote is
+     open, and the same vote as the block's popup, so the two never disagree. */
+  var barVote = document.querySelector('[data-bar-vote]');
+  function paintBarVote(card) {
+    if (!barVote) return;
+    var open = (card.dataset.state || '') === 'vote';
+    barVote.hidden = !open;
+    if (!open) return;
     var chosen = votes[card.dataset.slug];
-    var btns = card.querySelectorAll('[data-card-vote]');
-    for (var i = 0; i < btns.length; i++) btns[i].classList.toggle('vote-btn--chosen', btns[i].dataset.cardVote === chosen);
+    var btns = barVote.querySelectorAll('[data-bar-vote-btn]');
+    for (var i = 0; i < btns.length; i++) btns[i].classList.toggle('vote-btn--chosen', btns[i].dataset.barVoteBtn === chosen);
   }
-  track.addEventListener('click', function (e) {
-    var btn = e.target.closest('[data-card-vote]');
-    if (!btn) return;
-    var card = btn.closest('[data-card]');
-    votes[card.dataset.slug] = btn.dataset.cardVote;
-    paintCardVote(card);
-    if (activeIndex >= 0 && cards[activeIndex] === card) renderThesis(card);
-  });
+  if (barVote) {
+    barVote.addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-bar-vote-btn]');
+      if (!btn || activeIndex < 0) return;
+      votes[cards[activeIndex].dataset.slug] = btn.dataset.barVoteBtn;
+      renderThesis(cards[activeIndex]);
+    });
+  }
   if (voteWrap) {
     voteOpen.addEventListener('click', function () { votePop.hidden = !votePop.hidden; });
     votePop.addEventListener('click', function (e) {
