@@ -1193,6 +1193,12 @@ ul, ol { list-style: none; }
     margin: 0 -20px 12px;
     padding: 0 20px;
   }
+  /* The block head carries label · position · estimate · conviction plus the badge
+     and Vote; on a phone that is one line too many, so the badge and Vote wrap to a
+     second line, right-aligned, instead of running off the edge. */
+  .thesis__head { flex-wrap: wrap; row-gap: 6px; }
+  .thesis__label { white-space: nowrap; }
+  .thesis__state { margin-left: auto; }
   /* Four chips have to fit a 390px screen without scrolling: 10px type, tighter gap */
   .filters { gap: 6px; }
   .filters__tag { font-size: 10px; }
