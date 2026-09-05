@@ -88,7 +88,9 @@
   var voteOpen = document.querySelector('[data-vote-open]');
   var thesisLabel = document.querySelector('[data-thesis-label]');
   var thesisList = document.querySelector('[data-thesis-contributors]');
-  var thesisSources = document.querySelector('[data-thesis-sources]');
+  var thesisEst = document.querySelector('[data-thesis-est]');
+  var thesisConv = document.querySelector('[data-thesis-conv]');
+  var thesisOutcome = document.querySelector('[data-thesis-outcome]');
   var votes = {}; /* slug -> 'yes' | 'no' (mock, in-memory) */
   var prevBtn = document.querySelector('[data-carousel-prev]');
   var nextBtn = document.querySelector('[data-carousel-next]');
@@ -120,6 +122,21 @@
       { user: 'halden', xp: 4, stance: 'NO',  claim: 'The comment period closing quietly isn\'t the same as staff sign-off', ago: '40m ago' },
       { user: 'ines',   xp: 2, stance: 'YES', claim: 'Two commissioners have already said the custody model is fine', ago: '2h ago' },
       { user: 'oddlot', xp: 1, stance: 'YES', claim: 'Timing risk is real but the question doesn\'t ask about timing', ago: '6h ago' }
+    ],
+    'eth-etf': [
+      { user: 'marrow',   xp: 6, stance: 'YES', claim: 'Day-one volume was the second biggest ETF debut ever', ago: '2w ago' },
+      { user: 'halden',   xp: 2, stance: 'NO',  claim: 'Grayscale outflows will swamp the new money', ago: '2w ago' }
+    ],
+    'fed-hold': [
+      { user: 'oddlot',   xp: 3, stance: 'YES', claim: 'Core PCE is still a full point above target', ago: '3w ago' },
+      { user: 'delta_k',  xp: 5, stance: 'NO',  claim: 'Powell said the labor market is "in balance" twice', ago: '3w ago' }
+    ],
+    'gold-2500': [
+      { user: 'kesh',     xp: 4, stance: 'YES', claim: 'Central bank demand is price-insensitive', ago: '1mo ago' }
+    ],
+    'nvda-earnings': [
+      { user: 'tessellate', xp: 7, stance: 'YES', claim: 'Blackwell ramp is ahead of the guide', ago: '2mo ago' },
+      { user: 'bram_o',   xp: 2, stance: 'NO',  claim: 'Expectations are so high a beat may not move it', ago: '2mo ago' }
     ],
     'mstr-btc': [
       { user: 'quietfox', xp: 5, stance: 'YES', claim: 'Latest 8-K shows the ATM program still has room', ago: '3h ago' },
@@ -282,7 +299,7 @@
       }
     }
     for (var k = 0; k < cards.length; k++) {
-      cards[k].classList.toggle('is-hidden', !!state && cards[k].dataset.state !== state);
+      cards[k].classList.toggle('is-hidden', state ? cards[k].dataset.state !== state : cards[k].dataset.state === 'resolved');
     }
     track.scrollTo({ left: 0 });
     var v = visibleCards();
@@ -364,7 +381,8 @@
     });
   }
 
-  /* ── Thesis block (called / vote-open markets) ────────── */
+  /* ── Thesis block (called / vote-open / resolved markets) ── */
+  var STAR_SVG = '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"/></svg>';
   function renderThesis(card) {
     if (!thesisBox) return;
     var text = card.dataset.thesis || '';
@@ -376,6 +394,20 @@
     thesisStance.textContent = stance ? stance.toUpperCase() : '';
     thesisStance.className = 'thesis__stance heading' + (stance ? ' thesis__stance--' + stance : '');
     thesisText.textContent = text;
+    /* position · estimated probability · conviction */
+    var est = card.dataset.estimate || '', conv = card.dataset.conviction || '';
+    if (thesisEst) thesisEst.textContent = est ? est + ' est.' : '';
+    if (thesisConv) thesisConv.innerHTML = conv ? STAR_SVG + conv : '';
+    /* resolved: how it played out */
+    if (thesisOutcome) {
+      var rs = (card.dataset.resolvedSide || '').toLowerCase();
+      thesisOutcome.hidden = state !== 'resolved' || !rs;
+      if (!thesisOutcome.hidden) {
+        thesisOutcome.innerHTML = 'Resolved <span class="tally tally--' + rs + '">' + rs.toUpperCase() + '</span>' +
+          ' · market closed at ' + (card.dataset.resolvedPct || '') +
+          (card.dataset.resolvedAgo ? ' · ' + card.dataset.resolvedAgo : '');
+      }
+    }
     var badge = card.querySelector('.carousel__state');
     thesisState.innerHTML = badge ? badge.innerHTML : '';
     thesisState.className = 'thesis__state' + (state === 'vote' ? ' thesis__state--vote' : '');
@@ -392,19 +424,6 @@
     }
     thesisList.innerHTML = html;
 
-    var sources = [];
-    try { sources = JSON.parse(card.dataset.sources || '[]'); } catch (e2) {}
-    if (thesisSources) {
-      var sh = '';
-      for (var s = 0; s < sources.length; s++) {
-        sh += '<li class="thesis__row">' +
-          '<a class="thesis__source" href="' + sources[s].url + '" target="_blank" rel="noopener">' + sources[s].title + '</a>' +
-          '<span class="thesis__domain">' + (sources[s].domain || '') + '</span>' +
-          '</li>';
-      }
-      thesisSources.innerHTML = sh;
-      thesisSources.hidden = !sh;
-    }
     paintCardVote(card);
 
     voteWrap.hidden = state !== 'vote';
@@ -483,7 +502,7 @@
   }
 
   /* Init first card */
-  if (cards.length > 0) setActiveCard(0);
+  if (cards.length > 0) applyFilter(null);   /* hides the History deck, selects the first card */
 })();
 
 /* ── Roadmap timeline light ───────────────────────────── */

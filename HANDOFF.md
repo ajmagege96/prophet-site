@@ -299,7 +299,9 @@ rebuild. Everything they showed is on the home carousel.
 
 Carousel order is the server's job: open-vote markets first, then markets
 with a live thesis (most recently called first, capped at twelve), then
-markets with no thesis. The three tags above the carousel filter that list.
+markets with no thesis. The four tags above the carousel filter that list. History (`filter_state`
+`resolved`) is the last ten to twelve resolved markets, newest first; those
+cards sit in the same list but the JS shows them only under the History tab.
 
 The bottom row of a card depends on its state — see the comment on the card
 `<template>` in `site/index.html`. A vote card's YES / NO buttons and the

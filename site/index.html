@@ -29,7 +29,7 @@
   <meta name="twitter:description" content="An agent that reads prediction markets, publishes a thesis before the outcome, and keeps a public record of every call.">
   <meta name="twitter:image" content="https://ajmagege96.github.io/prophet-site/site/assets/prophet-og-1200x630.png">
 
-  <link rel="stylesheet" href="styles.css?v=4c00e1d4">
+  <link rel="stylesheet" href="styles.css?v=adea8894">
 </head>
 <body>
 
@@ -104,6 +104,7 @@
       <button class="filters__tag" data-filter="none">No thesis</button>
       <button class="filters__tag filters__tag--vote" data-filter="vote">Open votes</button>
       <button class="filters__tag filters__tag--called" data-filter="called">Prophecies</button>
+      <button class="filters__tag" data-filter="resolved">History</button>
     </div>
 
     <!-- ── Carousel ─────────────────────────────────────── -->
@@ -119,9 +120,13 @@
              Order: markets with an open vote first, then markets with a live thesis (most recently called first,
              at most twelve), then markets with no thesis. The tags above filter that one list.
              Bottom row by state — vote: the YES / NO buttons and Buy $PROPHET (render .carousel__actions, drop .carousel__meta);
-             called: the meta row with "{{market.called_pct}} at call" first; none: the meta row as is. -->
+             called: the meta row with "{{market.called_pct}} at call" first; none: the meta row as is.
+             History: filter_state "resolved" for the last ten to twelve resolved markets, newest first. They render in
+             this same list but only show under the History tab. Badge: called <span class="tally">YES</span> <span class="conviction">[star]N</span>
+             <span class="prow__outcome prow__outcome--won|lost">won|lost</span>; the big figure is the settled YES % (100% or 0%);
+             meta row as for called. The resolved_* variables fill the "how it played out" line in the thesis block. -->
         <template>
-        <div class="carousel__card outline" data-card data-state="{{market.filter_state}}" data-slug="{{market.slug}}" data-stance="{{market.thesis_stance}}" data-thesis="{{market.thesis}}" data-sources="{{market.sources_json}}" data-contributors="{{market.contributors_json}}">
+        <div class="carousel__card outline" data-card data-state="{{market.filter_state}}" data-slug="{{market.slug}}" data-stance="{{market.thesis_stance}}" data-estimate="{{market.estimate_pct}}" data-conviction="{{market.conviction}}" data-outcome="{{market.outcome}}" data-resolved-side="{{market.resolved_side}}" data-resolved-pct="{{market.resolved_pct}}" data-resolved-ago="{{market.resolved_ago}}" data-thesis="{{market.thesis}}" data-contributors="{{market.contributors_json}}">
           <div class="carousel__top">
             <img class="carousel__img" src="{{market.image_url}}" alt="" loading="lazy">
             <span class="carousel__state">{{market.state}}</span>
@@ -134,7 +139,7 @@
         </template>
         <!-- /repeat: market -->
 
-        <div class="carousel__card outline" data-card data-state="vote" data-slug="sec-exchange" data-stance="yes" data-thesis="The SEC has approved every exchange that met the custody bar this cycle, and this one meets it. The remaining objections are procedural rather than substantive. Timing is the only real risk, not the outcome." data-sources="[{&quot;title&quot;: &quot;SEC order approving the prior two exchange applications&quot;, &quot;domain&quot;: &quot;sec.gov&quot;, &quot;url&quot;: &quot;https://www.sec.gov/&quot;}, {&quot;title&quot;: &quot;Public comment docket for the application&quot;, &quot;domain&quot;: &quot;sec.gov&quot;, &quot;url&quot;: &quot;https://www.sec.gov/&quot;}]" data-contributors="[{&quot;user&quot;: &quot;delta_k&quot;, &quot;claim&quot;: &quot;Custody structure mirrors the two already approved&quot;, &quot;xp&quot;: 11}, {&quot;user&quot;: &quot;ines&quot;, &quot;claim&quot;: &quot;Public comment period closed without a formal objection&quot;, &quot;xp&quot;: 4}]">
+        <div class="carousel__card outline" data-card data-state="vote" data-slug="sec-exchange" data-stance="yes" data-estimate="78%" data-conviction="2" data-thesis="The SEC has approved every exchange that met the custody bar this cycle, and this one meets it. The remaining objections are procedural rather than substantive. Timing is the only real risk, not the outcome." data-contributors="[{&quot;user&quot;: &quot;delta_k&quot;, &quot;claim&quot;: &quot;Custody structure mirrors the two already approved&quot;, &quot;xp&quot;: 11}, {&quot;user&quot;: &quot;ines&quot;, &quot;claim&quot;: &quot;Public comment period closed without a formal objection&quot;, &quot;xp&quot;: 4}]">
           <div class="carousel__top">
             <img class="carousel__img" src="https://polymarket-upload.s3.us-east-2.amazonaws.com/coinbase-stock-d8abe3f599.png" alt="" loading="lazy">
             <span class="carousel__state carousel__state--vote">vote open <span class="tally tally--yes">62% yes</span> <span class="votes" title="votes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><polyline points="8 12.5 11 15.5 16 9.5"/></svg>128</span> <span class="timer" title="time left"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>2d</span></span>
@@ -144,7 +149,7 @@
           <div class="carousel__actions"><button class="vote-btn vote-btn--yes" data-card-vote="yes">Yes</button><button class="vote-btn vote-btn--no" data-card-vote="no">No</button><a class="carousel__buy" href="{{buy_url}}" target="_blank" rel="noopener">Buy $PROPHET</a></div>
         </div>
 
-        <div class="carousel__card outline" data-card data-state="vote" data-slug="dxy-100" data-stance="no" data-thesis="Rate-cut pricing is already in the dollar, so the index holds 100 unless the Fed surprises dovish. Relative growth still favors the US and the alternatives are weak. A break below needs a catalyst that isn&#x27;t on the calendar yet." data-sources="[{&quot;title&quot;: &quot;CME FedWatch rate-cut probabilities&quot;, &quot;domain&quot;: &quot;cmegroup.com&quot;, &quot;url&quot;: &quot;https://www.cmegroup.com/&quot;}, {&quot;title&quot;: &quot;Euro-area flash PMI release&quot;, &quot;domain&quot;: &quot;pmi.spglobal.com&quot;, &quot;url&quot;: &quot;https://www.pmi.spglobal.com/&quot;}]" data-contributors="[{&quot;user&quot;: &quot;tessellate&quot;, &quot;claim&quot;: &quot;Euro-area PMIs keep undershooting&quot;, &quot;xp&quot;: 7}, {&quot;user&quot;: &quot;bram_o&quot;, &quot;claim&quot;: &quot;Futures already price two cuts; little left to remove&quot;, &quot;xp&quot;: 3}]">
+        <div class="carousel__card outline" data-card data-state="vote" data-slug="dxy-100" data-stance="no" data-estimate="64%" data-conviction="2" data-thesis="Rate-cut pricing is already in the dollar, so the index holds 100 unless the Fed surprises dovish. Relative growth still favors the US and the alternatives are weak. A break below needs a catalyst that isn&#x27;t on the calendar yet." data-contributors="[{&quot;user&quot;: &quot;tessellate&quot;, &quot;claim&quot;: &quot;Euro-area PMIs keep undershooting&quot;, &quot;xp&quot;: 7}, {&quot;user&quot;: &quot;bram_o&quot;, &quot;claim&quot;: &quot;Futures already price two cuts; little left to remove&quot;, &quot;xp&quot;: 3}]">
           <div class="carousel__top">
             <img class="carousel__img" src="https://polymarket-upload.s3.us-east-2.amazonaws.com/us-canada-diplomatic-agreement-to-lower-tariffs-by-august-31-dHLeCIoNnnOg.jpg" alt="" loading="lazy">
             <span class="carousel__state carousel__state--vote">vote open <span class="tally tally--no">55% no</span> <span class="votes" title="votes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><polyline points="8 12.5 11 15.5 16 9.5"/></svg>74</span> <span class="timer" title="time left"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>14h</span></span>
@@ -154,7 +159,7 @@
           <div class="carousel__actions"><button class="vote-btn vote-btn--yes" data-card-vote="yes">Yes</button><button class="vote-btn vote-btn--no" data-card-vote="no">No</button><a class="carousel__buy" href="{{buy_url}}" target="_blank" rel="noopener">Buy $PROPHET</a></div>
         </div>
 
-        <div class="carousel__card outline" data-card data-state="called" data-slug="mstr-btc" data-stance="yes" data-thesis="Saylor&#x27;s playbook hasn&#x27;t changed: every dip is a buying opportunity until the balance sheet says otherwise. The company has raised fresh capital three quarters running and has never let a quarter close without adding. Nothing in the filings suggests this one is different." data-sources="[{&quot;title&quot;: &quot;8-K: at-the-market equity program authorization&quot;, &quot;domain&quot;: &quot;sec.gov&quot;, &quot;url&quot;: &quot;https://www.sec.gov/&quot;}, {&quot;title&quot;: &quot;Strategy purchase history, quarter by quarter&quot;, &quot;domain&quot;: &quot;strategy.com&quot;, &quot;url&quot;: &quot;https://www.strategy.com/&quot;}]" data-contributors="[{&quot;user&quot;: &quot;marrow&quot;, &quot;claim&quot;: &quot;Filings show new convertible capacity was authorized last week&quot;, &quot;xp&quot;: 14}, {&quot;user&quot;: &quot;lunaire&quot;, &quot;claim&quot;: &quot;Every prior raise was followed by a buy within 10 days&quot;, &quot;xp&quot;: 8}, {&quot;user&quot;: &quot;kesh&quot;, &quot;claim&quot;: &quot;Saylor&#x27;s public cadence hasn&#x27;t slowed&quot;, &quot;xp&quot;: 5}]">
+        <div class="carousel__card outline" data-card data-state="called" data-slug="mstr-btc" data-stance="yes" data-estimate="92%" data-conviction="3" data-thesis="Saylor&#x27;s playbook hasn&#x27;t changed: every dip is a buying opportunity until the balance sheet says otherwise. The company has raised fresh capital three quarters running and has never let a quarter close without adding. Nothing in the filings suggests this one is different." data-contributors="[{&quot;user&quot;: &quot;marrow&quot;, &quot;claim&quot;: &quot;Filings show new convertible capacity was authorized last week&quot;, &quot;xp&quot;: 14}, {&quot;user&quot;: &quot;lunaire&quot;, &quot;claim&quot;: &quot;Every prior raise was followed by a buy within 10 days&quot;, &quot;xp&quot;: 8}, {&quot;user&quot;: &quot;kesh&quot;, &quot;claim&quot;: &quot;Saylor&#x27;s public cadence hasn&#x27;t slowed&quot;, &quot;xp&quot;: 5}]">
           <div class="carousel__top">
             <img class="carousel__img" src="https://polymarket-upload.s3.us-east-2.amazonaws.com/will-microstrategy-purchase-bitcoin-july-1-7-mzoE5TYk_cCI.jpg" alt="" loading="lazy">
             <span class="carousel__state carousel__state--called">called <span class="tally tally--yes">YES</span> <span class="conviction" title="conviction"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"/></svg>3</span></span>
@@ -164,7 +169,7 @@
           <span class="carousel__meta"><span title="odds at call">84% at call</span><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>$2.2M</span><span title="ends in"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>3w</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>312</span></span>
         </div>
 
-        <div class="carousel__card outline" data-card data-state="called" data-slug="oil-100" data-stance="no" data-thesis="Spare capacity is still on the sidelines, and it shows up before triple digits do. Producers have room to add barrels and have said they will if prices run. Demand is soft enough that the market never gets the squeeze it needs." data-sources="[{&quot;title&quot;: &quot;OPEC monthly oil market report&quot;, &quot;domain&quot;: &quot;opec.org&quot;, &quot;url&quot;: &quot;https://www.opec.org/&quot;}, {&quot;title&quot;: &quot;EIA short-term energy outlook&quot;, &quot;domain&quot;: &quot;eia.gov&quot;, &quot;url&quot;: &quot;https://www.eia.gov/&quot;}]" data-contributors="[{&quot;user&quot;: &quot;oddlot&quot;, &quot;claim&quot;: &quot;OPEC+ spare capacity is near a multi-year high&quot;, &quot;xp&quot;: 9}, {&quot;user&quot;: &quot;quietfox&quot;, &quot;claim&quot;: &quot;Refinery demand is tracking below last year&quot;, &quot;xp&quot;: 6}]">
+        <div class="carousel__card outline" data-card data-state="called" data-slug="oil-100" data-stance="no" data-estimate="81%" data-conviction="2" data-thesis="Spare capacity is still on the sidelines, and it shows up before triple digits do. Producers have room to add barrels and have said they will if prices run. Demand is soft enough that the market never gets the squeeze it needs." data-contributors="[{&quot;user&quot;: &quot;oddlot&quot;, &quot;claim&quot;: &quot;OPEC+ spare capacity is near a multi-year high&quot;, &quot;xp&quot;: 9}, {&quot;user&quot;: &quot;quietfox&quot;, &quot;claim&quot;: &quot;Refinery demand is tracking below last year&quot;, &quot;xp&quot;: 6}]">
           <div class="carousel__top">
             <img class="carousel__img" src="https://polymarket-upload.s3.us-east-2.amazonaws.com/crude-oil-9a850ce2a2.png" alt="" loading="lazy">
             <span class="carousel__state carousel__state--called">called <span class="tally tally--no">NO</span> <span class="conviction" title="conviction"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"/></svg>2</span></span>
@@ -245,6 +250,107 @@
           <span class="carousel__yes heading">51%<small>YES</small></span>
           <span class="carousel__meta"><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>$420K</span><span title="ends in"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>3w</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>31</span></span>
         </div>
+
+        <!-- History: resolved markets, newest first; only shown under the History tab -->
+        <div class="carousel__card outline" data-card data-state="resolved" data-slug="eth-etf" data-stance="yes" data-estimate="74%" data-conviction="4" data-outcome="won" data-resolved-side="yes" data-resolved-pct="97%" data-resolved-ago="2w ago" data-thesis="Every prior spot product drew allocator money in its first month once the wrappers were live, and the issuers here have the same distribution. Outflows need a reason and there is none on the calendar." data-contributors="[{&quot;user&quot;: &quot;marrow&quot;, &quot;claim&quot;: &quot;Grayscale conversion outflows already priced by day two&quot;, &quot;xp&quot;: 12}, {&quot;user&quot;: &quot;ines&quot;, &quot;claim&quot;: &quot;Three issuers waived fees for the first six months&quot;, &quot;xp&quot;: 7}]">
+          <div class="carousel__top">
+            <img class="carousel__img" src="https://polymarket-upload.s3.us-east-2.amazonaws.com/will-microstrategy-purchase-bitcoin-july-1-7-mzoE5TYk_cCI.jpg" alt="" loading="lazy">
+            <span class="carousel__state carousel__state--called">called <span class="tally tally--yes">YES</span> <span class="conviction" title="conviction"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"/></svg>4</span> <span class="prow__outcome prow__outcome--won">won</span></span>
+          </div>
+          <p class="carousel__question">Will a spot Ethereum ETF see net inflows in its first month?</p>
+          <span class="carousel__yes heading">100%<small>YES</small></span>
+          <span class="carousel__meta"><span title="odds at call">61% at call</span><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>$1.2M</span><span title="ends in"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>7mo</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>156</span></span>
+        </div>
+
+        <div class="carousel__card outline" data-card data-state="resolved" data-slug="fed-hold" data-stance="no" data-estimate="38%" data-conviction="2" data-outcome="lost" data-resolved-side="yes" data-resolved-pct="3%" data-resolved-ago="3w ago" data-thesis="The dot plot pointed at a cut and the labor print gave cover. Holding would mean ignoring their own guidance." data-contributors="[{&quot;user&quot;: &quot;delta_k&quot;, &quot;claim&quot;: &quot;Two governors publicly leaned toward a cut&quot;, &quot;xp&quot;: 9}]">
+          <div class="carousel__top">
+            <img class="carousel__img" src="https://polymarket-upload.s3.us-east-2.amazonaws.com/crude-oil-9a850ce2a2.png" alt="" loading="lazy">
+            <span class="carousel__state carousel__state--called">called <span class="tally tally--no">NO</span> <span class="conviction" title="conviction"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"/></svg>2</span> <span class="prow__outcome prow__outcome--lost">lost</span></span>
+          </div>
+          <p class="carousel__question">Will the Fed hold rates at the last meeting?</p>
+          <span class="carousel__yes heading">100%<small>YES</small></span>
+          <span class="carousel__meta"><span title="odds at call">74% at call</span><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>$2.8M</span><span title="ends in"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>7mo</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>97</span></span>
+        </div>
+
+        <div class="carousel__card outline" data-card data-state="resolved" data-slug="gold-2500" data-stance="yes" data-estimate="70%" data-conviction="3" data-outcome="won" data-resolved-side="yes" data-resolved-pct="99%" data-resolved-ago="1mo ago" data-thesis="Central bank buying has not slowed for six quarters and real yields are rolling over. The level is a rounding error from here." data-contributors="[{&quot;user&quot;: &quot;kesh&quot;, &quot;claim&quot;: &quot;PBoC added for the 17th straight month&quot;, &quot;xp&quot;: 8}, {&quot;user&quot;: &quot;lunaire&quot;, &quot;claim&quot;: &quot;Real yields turned down in the last two prints&quot;, &quot;xp&quot;: 5}]">
+          <div class="carousel__top">
+            <img class="carousel__img" src="https://polymarket-upload.s3.us-east-2.amazonaws.com/BTC+fullsize.png" alt="" loading="lazy">
+            <span class="carousel__state carousel__state--called">called <span class="tally tally--yes">YES</span> <span class="conviction" title="conviction"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"/></svg>3</span> <span class="prow__outcome prow__outcome--won">won</span></span>
+          </div>
+          <p class="carousel__question">Will gold close above $2,500?</p>
+          <span class="carousel__yes heading">100%<small>YES</small></span>
+          <span class="carousel__meta"><span title="odds at call">48% at call</span><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>$890K</span><span title="ends in"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>7mo</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>78</span></span>
+        </div>
+
+        <div class="carousel__card outline" data-card data-state="resolved" data-slug="sol-200" data-stance="yes" data-estimate="66%" data-conviction="1" data-outcome="lost" data-resolved-side="no" data-resolved-pct="1%" data-resolved-ago="2mo ago" data-thesis="Network activity is at highs and the ETF filings are live. Momentum names tend to run further than the odds allow." data-contributors="[{&quot;user&quot;: &quot;bram_o&quot;, &quot;claim&quot;: &quot;DEX volume record set last week&quot;, &quot;xp&quot;: 4}]">
+          <div class="carousel__top">
+            <img class="carousel__img" src="https://polymarket-upload.s3.us-east-2.amazonaws.com/fed-decision-in-september-762-c4RyWuxRPo1L.jpg" alt="" loading="lazy">
+            <span class="carousel__state carousel__state--called">called <span class="tally tally--yes">YES</span> <span class="conviction" title="conviction"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"/></svg>1</span> <span class="prow__outcome prow__outcome--lost">lost</span></span>
+          </div>
+          <p class="carousel__question">Will Solana trade above $200?</p>
+          <span class="carousel__yes heading">0%<small>YES</small></span>
+          <span class="carousel__meta"><span title="odds at call">35% at call</span><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>$1.9M</span><span title="ends in"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>7mo</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>62</span></span>
+        </div>
+
+        <div class="carousel__card outline" data-card data-state="resolved" data-slug="nvda-earnings" data-stance="yes" data-estimate="90%" data-conviction="4" data-outcome="won" data-resolved-side="yes" data-resolved-pct="98%" data-resolved-ago="2mo ago" data-thesis="Every hyperscaler raised capex again this quarter and the supply chain checks are clean. The guide is conservative by design." data-contributors="[{&quot;user&quot;: &quot;tessellate&quot;, &quot;claim&quot;: &quot;TSMC CoWoS capacity expanded ahead of schedule&quot;, &quot;xp&quot;: 14}, {&quot;user&quot;: &quot;quietfox&quot;, &quot;claim&quot;: &quot;Hyperscaler capex guides up 30% year on year&quot;, &quot;xp&quot;: 9}, {&quot;user&quot;: &quot;oddlot&quot;, &quot;claim&quot;: &quot;Channel checks show no order pushouts&quot;, &quot;xp&quot;: 6}]">
+          <div class="carousel__top">
+            <img class="carousel__img" src="https://polymarket-upload.s3.us-east-2.amazonaws.com/ETH+fullsize.jpg" alt="" loading="lazy">
+            <span class="carousel__state carousel__state--called">called <span class="tally tally--yes">YES</span> <span class="conviction" title="conviction"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"/></svg>4</span> <span class="prow__outcome prow__outcome--won">won</span></span>
+          </div>
+          <p class="carousel__question">Will Nvidia beat earnings guidance?</p>
+          <span class="carousel__yes heading">100%<small>YES</small></span>
+          <span class="carousel__meta"><span title="odds at call">82% at call</span><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>$3.4M</span><span title="ends in"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>7mo</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>210</span></span>
+        </div>
+
+        <div class="carousel__card outline" data-card data-state="resolved" data-slug="btc-etf-outflow" data-stance="yes" data-estimate="68%" data-conviction="2" data-outcome="won" data-resolved-side="yes" data-resolved-pct="97%" data-resolved-ago="3mo ago" data-thesis="Flows follow price with a lag and price has stalled for three weeks. One red week is a low bar." data-contributors="[{&quot;user&quot;: &quot;halden&quot;, &quot;claim&quot;: &quot;Basis trade unwind showing in CME open interest&quot;, &quot;xp&quot;: 5}]">
+          <div class="carousel__top">
+            <img class="carousel__img" src="https://polymarket-upload.s3.us-east-2.amazonaws.com/january-inflation-annual-vp5qkgK2R7Et.jpg" alt="" loading="lazy">
+            <span class="carousel__state carousel__state--called">called <span class="tally tally--yes">YES</span> <span class="conviction" title="conviction"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"/></svg>2</span> <span class="prow__outcome prow__outcome--won">won</span></span>
+          </div>
+          <p class="carousel__question">Will Bitcoin ETFs see a net-outflow week?</p>
+          <span class="carousel__yes heading">100%<small>YES</small></span>
+          <span class="carousel__meta"><span title="odds at call">44% at call</span><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>$620K</span><span title="ends in"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>7mo</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>41</span></span>
+        </div>
+
+        <div class="carousel__card outline" data-card data-state="resolved" data-slug="ecb-cut" data-stance="yes" data-estimate="85%" data-conviction="3" data-outcome="won" data-resolved-side="yes" data-resolved-pct="3%" data-resolved-ago="3mo ago" data-thesis="Inflation is back at target and growth is flat. The council has telegraphed this one for two meetings." data-contributors="[{&quot;user&quot;: &quot;ines&quot;, &quot;claim&quot;: &quot;Lagarde used the word \&quot;June\&quot; three times&quot;, &quot;xp&quot;: 6}, {&quot;user&quot;: &quot;bram_o&quot;, &quot;claim&quot;: &quot;Euro-area core inflation printed at 2.1%&quot;, &quot;xp&quot;: 4}]">
+          <div class="carousel__top">
+            <img class="carousel__img" src="https://polymarket-upload.s3.us-east-2.amazonaws.com/gold-logo-0d00c80498.png" alt="" loading="lazy">
+            <span class="carousel__state carousel__state--called">called <span class="tally tally--yes">YES</span> <span class="conviction" title="conviction"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"/></svg>3</span> <span class="prow__outcome prow__outcome--won">won</span></span>
+          </div>
+          <p class="carousel__question">Will the ECB cut rates?</p>
+          <span class="carousel__yes heading">100%<small>YES</small></span>
+          <span class="carousel__meta"><span title="odds at call">71% at call</span><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>$1.1M</span><span title="ends in"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>7mo</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>88</span></span>
+        </div>
+
+        <div class="carousel__card outline" data-card data-state="resolved" data-slug="tsla-robotaxi" data-stance="no" data-estimate="20%" data-conviction="3" data-outcome="won" data-resolved-side="no" data-resolved-pct="4%" data-resolved-ago="4mo ago" data-thesis="Regulatory approvals are not filed and the software is not at the safety bar. Announcements are not launches." data-contributors="[{&quot;user&quot;: &quot;marrow&quot;, &quot;claim&quot;: &quot;No CPUC permit application on record&quot;, &quot;xp&quot;: 10}, {&quot;user&quot;: &quot;kesh&quot;, &quot;claim&quot;: &quot;FSD intervention rate still above the threshold&quot;, &quot;xp&quot;: 7}]">
+          <div class="carousel__top">
+            <img class="carousel__img" src="https://polymarket-upload.s3.us-east-2.amazonaws.com/s-and-p-500-1e40af6979.png" alt="" loading="lazy">
+            <span class="carousel__state carousel__state--called">called <span class="tally tally--no">NO</span> <span class="conviction" title="conviction"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"/></svg>3</span> <span class="prow__outcome prow__outcome--won">won</span></span>
+          </div>
+          <p class="carousel__question">Will Tesla launch a robotaxi service?</p>
+          <span class="carousel__yes heading">0%<small>YES</small></span>
+          <span class="carousel__meta"><span title="odds at call">27% at call</span><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>$2.0M</span><span title="ends in"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>7mo</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>133</span></span>
+        </div>
+
+        <div class="carousel__card outline" data-card data-state="resolved" data-slug="us-recession" data-stance="no" data-estimate="12%" data-conviction="4" data-outcome="won" data-resolved-side="no" data-resolved-pct="1%" data-resolved-ago="5mo ago" data-thesis="Unemployment is rising slowly, not breaking, and consumer balance sheets are fine. The yield curve has cried wolf before." data-contributors="[{&quot;user&quot;: &quot;delta_k&quot;, &quot;claim&quot;: &quot;Sahm rule not triggered&quot;, &quot;xp&quot;: 11}, {&quot;user&quot;: &quot;tessellate&quot;, &quot;claim&quot;: &quot;Real incomes still growing&quot;, &quot;xp&quot;: 6}, {&quot;user&quot;: &quot;lunaire&quot;, &quot;claim&quot;: &quot;Credit spreads near cycle tights&quot;, &quot;xp&quot;: 3}]">
+          <div class="carousel__top">
+            <img class="carousel__img" src="https://polymarket-upload.s3.us-east-2.amazonaws.com/SOL-logo.png" alt="" loading="lazy">
+            <span class="carousel__state carousel__state--called">called <span class="tally tally--no">NO</span> <span class="conviction" title="conviction"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"/></svg>4</span> <span class="prow__outcome prow__outcome--won">won</span></span>
+          </div>
+          <p class="carousel__question">Will the US enter a recession this year?</p>
+          <span class="carousel__yes heading">0%<small>YES</small></span>
+          <span class="carousel__meta"><span title="odds at call">19% at call</span><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>$5.2M</span><span title="ends in"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>7mo</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>301</span></span>
+        </div>
+
+        <div class="carousel__card outline" data-card data-state="resolved" data-slug="eth-4000" data-stance="yes" data-estimate="61%" data-conviction="1" data-outcome="lost" data-resolved-side="no" data-resolved-pct="6%" data-resolved-ago="5mo ago" data-thesis="ETF approval and a supply that shrinks every day. The level is inside one normal rally." data-contributors="[{&quot;user&quot;: &quot;quietfox&quot;, &quot;claim&quot;: &quot;Staking ratio at all-time high&quot;, &quot;xp&quot;: 4}]">
+          <div class="carousel__top">
+            <img class="carousel__img" src="https://polymarket-upload.s3.us-east-2.amazonaws.com/china-invades-taiwan-in-2025-CCSd9dX2mrea.jpg" alt="" loading="lazy">
+            <span class="carousel__state carousel__state--called">called <span class="tally tally--yes">YES</span> <span class="conviction" title="conviction"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"/></svg>1</span> <span class="prow__outcome prow__outcome--lost">lost</span></span>
+          </div>
+          <p class="carousel__question">Will Ethereum trade above $4,000?</p>
+          <span class="carousel__yes heading">0%<small>YES</small></span>
+          <span class="carousel__meta"><span title="odds at call">52% at call</span><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>$1.4M</span><span title="ends in"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>7mo</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>74</span></span>
+        </div>
       </div>
       <button class="carousel__arrow carousel__arrow--next" data-carousel-next aria-label="Next market"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg></button>
     </div>
@@ -256,6 +362,8 @@
         <div class="thesis__head">
           <span class="thesis__label heading" data-thesis-label>Thesis</span>
           <span class="thesis__stance heading" data-thesis-stance></span>
+          <span class="thesis__est" data-thesis-est title="estimated probability"></span>
+          <span class="thesis__conv conviction" data-thesis-conv title="conviction"></span>
           <span class="thesis__state" data-thesis-state></span>
           <!-- Vote: top-right beside the badge, only while the vote is open; opens a small popup -->
           <div class="vote" data-vote-wrap hidden>
@@ -268,6 +376,8 @@
           </div>
         </div>
         <p class="thesis__text" data-thesis-text></p>
+        <!-- Resolved markets only: how it played out -->
+        <p class="thesis__outcome" data-thesis-outcome hidden></p>
         <ul class="thesis__list" data-thesis-contributors>
           <!-- repeat: contributor — server loop replaces this <template> -->
           <template>
@@ -278,17 +388,6 @@
           </li>
           </template>
           <!-- /repeat: contributor -->
-        </ul>
-        <!-- Sources the thesis leans on; hidden when the market has none -->
-        <ul class="thesis__list thesis__sources" data-thesis-sources hidden>
-          <!-- repeat: source — server loop replaces this <template> -->
-          <template>
-          <li class="thesis__row">
-            <a class="thesis__source" href="{{source.url}}" target="_blank" rel="noopener">{{source.title}}</a>
-            <span class="thesis__domain">{{source.domain}}</span>
-          </li>
-          </template>
-          <!-- /repeat: source -->
         </ul>
       </div>
     <!-- Empty-state line is a template variable so it can be generated later;
@@ -468,6 +567,6 @@
 </footer>
 <!-- /partial:footer -->
 
-<script src="app.js?v=604a6bd3"></script>
+<script src="app.js?v=782e671a"></script>
 </body>
 </html>

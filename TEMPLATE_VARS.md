@@ -25,8 +25,13 @@
 | `{{market.ends_in}}` | Relative time until the market ends (e.g. "12d", "3mo"), shown after a clock icon |
 | `{{market.take_count}}` | Number of takes on this market |
 | `{{market.state}}` | State badge, top-right of the card, rendered only for vote/called: `vote open · <span class="tally tally--yes">62% YES</span>` or `called <span class="tally tally--no">NO</span> <span class="conviction">[star icon]N</span>` (no dot); tally colors green/red by side; empty for open markets with no thesis |
+| `{{market.estimate_pct}}` | The Prophet's estimated probability for his position, e.g. `78%`; shown in the thesis block head as "78% est." |
+| `{{market.conviction}}` | Star conviction, 1–5; shown in the thesis block head and the called badge |
+| `{{market.outcome}}` | `won` / `lost` — resolved markets only, drives the tag in the badge |
+| `{{market.resolved_side}}` | `yes` / `no` — the side the market settled on |
+| `{{market.resolved_pct}}` | Closing YES % at settlement, e.g. `97%` |
+| `{{market.resolved_ago}}` | Relative time since resolution, e.g. `2w ago` |
 | `{{market.called_pct}}` | Odds when the thesis was called, e.g. `84%`; rendered on called cards only |
-| `{{market.sources_json}}` | JSON array of `{title, domain, url}` for the thesis block's sources; `[]` when none |
 | `{{market.contributors_json}}` | JSON array of `{user, claim, xp}` set as `data-contributors` on the card; listed under the thesis as Contributors |
 | `{{contributor.username}}` | Contributor's username (used in `<!-- repeat: contributor -->` inside the Thesis block) |
 | `{{contributor.claim}}` | The contribution that fed the thesis, one line |
@@ -65,14 +70,6 @@
 | `{{explainer_open_votes}}`, `{{explainer_prophecies}}` | One explainer line under each group title on the Prophecies page (approved: "Draft theses waiting on holders. Vote YES or NO. Your voting weight is what you hold." / "Calls that passed the vote, live until the market resolves.") |
 | `{{empty_open_votes}}`, `{{empty_prophecies}}` | Empty-state line for each group, set on the section; shown when its list has no rows (fallbacks: "No open votes right now.", "No prophecies yet.") |
 | `take.*` inside any row's dropdown | Same take variables as the home panel (`<!-- repeat: take -->` inside each row's Contributions dropdown) |
-
-### Sources (inside the thesis block)
-
-| Variable | Meaning |
-|---|---|
-| `{{source.title}}` | Link text for one source |
-| `{{source.domain}}` | Gray domain shown at the right of the row, e.g. `sec.gov` |
-| `{{source.url}}` | Link target |
 
 ### History group (archived with the Prophecies page)
 
