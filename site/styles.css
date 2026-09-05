@@ -446,6 +446,27 @@ ul, ol { list-style: none; }
 .tally--no  { color: #e53935; }
 .carousel__state:empty { display: none; }
 
+/* Bottom row by state. Vote cards carry the YES / NO buttons and Buy $PROPHET in
+   place of the meta row; called cards keep the meta row with the odds at call. */
+.carousel__actions { display: flex; align-items: center; gap: 6px; }
+.carousel__actions .vote-btn { padding: 3px 10px; }
+.carousel__buy {
+  margin-left: auto;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 3px 8px;
+  border: 1px solid var(--outline);
+  border-radius: 4px;
+  color: var(--green);
+  text-decoration: none;
+  white-space: nowrap;
+  opacity: 0.85;
+  transition: opacity 0.15s, border-color 0.15s;
+}
+.carousel__buy:hover { opacity: 1; border-color: currentColor; }
+
 
 /* ── Feed (thesis + takes) ────────────────────────────── */
 .feed {
@@ -504,6 +525,11 @@ ul, ol { list-style: none; }
 .thesis__user { flex: 0 0 auto; font-weight: 500; opacity: 0.85; }
 .thesis__claim { flex: 1 1 auto; min-width: 0; opacity: 0.6; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .thesis__xp { flex: 0 0 auto; font-size: 11px; color: var(--green); opacity: 0.8; }
+/* Sources: same rows as the contributors, title as a link, domain gray on the right */
+.thesis__sources[hidden] { display: none; }
+.thesis__source { flex: 1 1 auto; min-width: 0; color: var(--green); text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; opacity: 0.85; }
+.thesis__source:hover { opacity: 1; }
+.thesis__domain { flex: 0 0 auto; font-size: 11px; opacity: 0.5; }
 .vote-btn {
   font-size: 10px;
   font-weight: 700;
@@ -1164,6 +1190,7 @@ ul, ol { list-style: none; }
   .filters__tag { flex: 0 0 auto; min-height: 34px; padding: 0 12px; display: inline-flex; align-items: center; }
   /* same height as desktop: padding only, no min-height */
   .vote-btn, .vote__btn { min-height: 0; padding: 4px 12px; display: inline-flex; align-items: center; justify-content: center; gap: 4px; }
+  .carousel__actions .vote-btn, .carousel__buy { padding: 1px 8px; line-height: 1.3; }   /* keeps vote cards inside the fixed 200px */
   .range__tab, .seg__opt { min-height: 32px; display: inline-flex; align-items: center; justify-content: center; }
   .range { gap: 6px; }
   .range__tab { padding: 0 6px; }

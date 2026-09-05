@@ -88,6 +88,7 @@
   var voteOpen = document.querySelector('[data-vote-open]');
   var thesisLabel = document.querySelector('[data-thesis-label]');
   var thesisList = document.querySelector('[data-thesis-contributors]');
+  var thesisSources = document.querySelector('[data-thesis-sources]');
   var votes = {}; /* slug -> 'yes' | 'no' (mock, in-memory) */
   var prevBtn = document.querySelector('[data-carousel-prev]');
   var nextBtn = document.querySelector('[data-carousel-next]');
@@ -391,6 +392,21 @@
     }
     thesisList.innerHTML = html;
 
+    var sources = [];
+    try { sources = JSON.parse(card.dataset.sources || '[]'); } catch (e2) {}
+    if (thesisSources) {
+      var sh = '';
+      for (var s = 0; s < sources.length; s++) {
+        sh += '<li class="thesis__row">' +
+          '<a class="thesis__source" href="' + sources[s].url + '" target="_blank" rel="noopener">' + sources[s].title + '</a>' +
+          '<span class="thesis__domain">' + (sources[s].domain || '') + '</span>' +
+          '</li>';
+      }
+      thesisSources.innerHTML = sh;
+      thesisSources.hidden = !sh;
+    }
+    paintCardVote(card);
+
     voteWrap.hidden = state !== 'vote';
     votePop.hidden = true;
     if (state === 'vote') {
@@ -402,6 +418,21 @@
       }
     }
   }
+  /* The card's own YES / NO buttons: same vote as the block's popup, so the
+     two never disagree. */
+  function paintCardVote(card) {
+    var chosen = votes[card.dataset.slug];
+    var btns = card.querySelectorAll('[data-card-vote]');
+    for (var i = 0; i < btns.length; i++) btns[i].classList.toggle('vote-btn--chosen', btns[i].dataset.cardVote === chosen);
+  }
+  track.addEventListener('click', function (e) {
+    var btn = e.target.closest('[data-card-vote]');
+    if (!btn) return;
+    var card = btn.closest('[data-card]');
+    votes[card.dataset.slug] = btn.dataset.cardVote;
+    paintCardVote(card);
+    if (activeIndex >= 0 && cards[activeIndex] === card) renderThesis(card);
+  });
   if (voteWrap) {
     voteOpen.addEventListener('click', function () { votePop.hidden = !votePop.hidden; });
     votePop.addEventListener('click', function (e) {

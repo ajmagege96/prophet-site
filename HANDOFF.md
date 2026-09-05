@@ -20,7 +20,7 @@ full list is in the table below and in `TEMPLATE_VARS.md`.
 | `index.html` (repo root) | Redirect to `site/index.html`, so the bare GitHub Pages URL is not a 404. Delete once `site/` is the document root. |
 | `tools-stamp.py` | Rewrites the `?v=<hash>` on `app.js` and `styles.css` in every page from the file's own content hash. Run it after editing either file. Without it a browser keeps a cached copy after a deploy. Delete it and the query strings once your server sets cache headers. |
 | `site/index.html` | Home. Carousel of 12 markets, thesis block, takes, prompt bar. |
-| `site/prophecies.html` | Prophecies. Open votes and live prophecies, each row expandable to its takes. |
+| `archive/prophecies.html` (archived, not built) | Prophecies. Open votes and live prophecies, each row expandable to its takes. |
 | `site/prophet.html` | $PROPHET. Stat strip, price chart, swap, live trades, wallets. |
 | `site/partials/header.html` | **Canonical** header. |
 | `site/partials/below-fold.html` | **Canonical** How it Works, Tokenomics, Roadmap. |
@@ -293,16 +293,16 @@ These render as fixed markup today and need wiring when the backend is ready.
 
 ## MVP scope
 
-The Record page is **not in the MVP**. Its History group now lives on the
-Prophecies page as a third group, `data-group="record"`, with its own filter
-tag. Nothing else about those rows changed — same markup, same variables,
-same drop-open chain.
+Two pages ship: home and $PROPHET. Prophecies and Record are **archived in
+`archive/`**, out of the nav and the build, so they can come back without a
+rebuild. Everything they showed is on the home carousel.
 
-The Record page itself (the Edge chart, the stats row, the range tabs and the
-info tip) is preserved unchanged on the `v2` branch and the `v2-record-page`
-tag, and is due back in a couple of weeks. When it returns it takes History
-with it and Prophecies goes back to two groups.
+Carousel order is the server's job: open-vote markets first, then markets
+with a live thesis (most recently called first, capped at twelve), then
+markets with no thesis. The three tags above the carousel filter that list.
 
-The Edge-chart JS is still in `app.js`. It is inert with no Record page on the
-document — it looks for elements that are not there and exits — and is kept so
-v2 needs no reconstruction.
+The bottom row of a card depends on its state — see the comment on the card
+`<template>` in `site/index.html`. A vote card's YES / NO buttons and the
+thesis block's popup share one vote; the JS keeps them in step.
+
+The Edge-chart JS is still in `app.js`, inert without the Record page.
