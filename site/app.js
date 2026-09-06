@@ -596,6 +596,14 @@
   function fmt(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
   function q(root, sel) { return root.querySelector(sel); }
 
+  /* Market head shared by both modals: image, question, stats, probability */
+  function fillMarketHead(root, card) {
+    q(root, '[data-mh-img]').src = q(card, '.carousel__img').src;
+    q(root, '[data-mh-q]').textContent = q(card, '.carousel__question').textContent;
+    q(root, '[data-mh-meta]').innerHTML = q(card, '.carousel__meta').innerHTML;
+    q(root, '[data-mh-pct]').innerHTML = q(card, '.carousel__yes').innerHTML;
+  }
+
   /* ── Vote modal ── */
   var vm = document.querySelector('[data-vote-modal]');
   var vmCard = null, vmSide = 'yes';
@@ -618,8 +626,7 @@
     }
     vmCard = card; vmSide = 'yes';
     var stance = (card.dataset.stance || '').toLowerCase();
-    q(vm, '[data-vm-q]').textContent = q(card, '.carousel__question').textContent;
-    q(vm, '[data-vm-img]').src = q(card, '.carousel__img').src;
+    fillMarketHead(vm, card);
     var st = q(vm, '[data-vm-stance]'); st.textContent = stance.toUpperCase(); st.className = 'thesis__stance heading thesis__stance--' + stance;
     q(vm, '[data-vm-est]').textContent = (card.dataset.estimate || '') + ' est.';
     q(vm, '[data-vm-conv]').innerHTML = card.dataset.conviction ? STAR_SVG + card.dataset.conviction : '';
@@ -687,10 +694,11 @@
     if (!text) return;
     var card = cards[activeIndex], slug = card.dataset.slug;
     promptInput.value = '';
+    fillMarketHead(tm, card);
     q(tm, '[data-tm-loading]').hidden = false; q(tm, '[data-tm-done]').hidden = true;
     openModal(tm);
-    clearTimeout(tmTimer);
-    tmTimer = setTimeout(function () {
+    /* The confirmed card is filled now (the result is known here) so the box already has its final
+       height while the spinner shows; it is revealed, and the feed updated, on confirmation. */
       /* what the server returns for the take; the mock fallbacks are used only while the variables are unfilled */
       var summary = val(tm, 'summary', 'Custody objections were withdrawn in the latest docket filing, so the timing risk on approval is smaller than the market is pricing');
       var stance = val(tm, 'stance', stances[slug] || 'unsure').toLowerCase();
@@ -703,6 +711,8 @@
       q(tm, '[data-tm-user]').textContent = user;
       q(tm, '[data-tm-xpcard]').textContent = '+' + xp + ' XP';
       q(tm, '[data-tm-xp]').textContent = 'You earned +' + xp + ' XP for this contribution.';
+    clearTimeout(tmTimer);
+    tmTimer = setTimeout(function () {
       /* the summarised take lands at the top of the feed behind the modal; raw text never does */
       if (!TAKES[slug]) TAKES[slug] = [];
       TAKES[slug].unshift({ user: user, xp: parseInt(xp, 10) || 1, stance: stance === 'unsure' ? 'unsure' : stance.toUpperCase(), claim: summary, ago: ago });

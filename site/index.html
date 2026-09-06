@@ -29,7 +29,7 @@
   <meta name="twitter:description" content="An agent that reads prediction markets, publishes a thesis before the outcome, and keeps a public record of every call.">
   <meta name="twitter:image" content="https://ajmagege96.github.io/prophet-site/site/assets/prophet-og-1200x630.png">
 
-  <link rel="stylesheet" href="styles.css?v=615b8b37">
+  <link rel="stylesheet" href="styles.css?v=f3f467c8">
 </head>
 <body>
 
@@ -454,9 +454,14 @@
 
     <!-- the ballot -->
     <div class="vm" data-vm-ballot>
+      <!-- the market: image, question, its stats, its probability -->
       <div class="vm__head">
-        <img class="carousel__img vm__img" data-vm-img src="" alt="">
-        <p class="vm__q" data-vm-q></p>
+        <img class="carousel__img vm__img" data-mh-img src="" alt="">
+        <div class="vm__headmain">
+          <p class="vm__q" data-mh-q></p>
+          <span class="carousel__meta vm__meta" data-mh-meta></span>
+        </div>
+        <span class="carousel__yes vm__pct heading" data-mh-pct></span>
       </div>
       <!-- the draft thesis, in the same block as the page uses -->
       <div class="thesis vm__thesis">
@@ -518,8 +523,18 @@
 <div class="mdl" data-modal data-take-modal hidden role="dialog" aria-modal="true" aria-label="Take sent"
      data-summary="{{take_result.summary}}" data-stance="{{take_result.stance}}" data-evidence="{{take_result.evidence}}" data-ago="{{take_result.ago}}" data-xp="{{take_result.xp}}">
   <div class="mdl__backdrop" data-modal-close></div>
-  <div class="mdl__panel outline">
+  <div class="mdl__panel mdl__panel--take outline">
     <button class="mdl__close" data-modal-close aria-label="Close">&times;</button>
+    <!-- the market the take is on -->
+      <div class="vm__head">
+        <img class="carousel__img vm__img" data-mh-img src="" alt="">
+        <div class="vm__headmain">
+          <p class="vm__q" data-mh-q></p>
+          <span class="carousel__meta vm__meta" data-mh-meta></span>
+        </div>
+        <span class="carousel__yes vm__pct heading" data-mh-pct></span>
+      </div>
+    <div class="tm__stack">
     <div class="tm tm--loading" data-tm-loading>
       <div class="spinner" aria-hidden="true"></div>
       <p class="tm__label">Synthesizing your take</p>
@@ -547,6 +562,7 @@
         <button class="is-primary" data-tm-again>Give another take</button>
         <button data-modal-close>Close</button>
       </div>
+    </div>
     </div>
   </div>
 </div>
@@ -723,6 +739,6 @@
 </footer>
 <!-- /partial:footer -->
 
-<script src="app.js?v=846e71a9"></script>
+<script src="app.js?v=f51bf751"></script>
 </body>
 </html>
