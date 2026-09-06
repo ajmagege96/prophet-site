@@ -29,7 +29,7 @@
   <meta name="twitter:description" content="An agent that reads prediction markets, publishes a thesis before the outcome, and keeps a public record of every call.">
   <meta name="twitter:image" content="https://ajmagege96.github.io/prophet-site/site/assets/prophet-og-1200x630.png">
 
-  <link rel="stylesheet" href="styles.css?v=5d167667">
+  <link rel="stylesheet" href="styles.css?v=fe09c846">
 </head>
 <body>
 
@@ -420,8 +420,13 @@
     <!-- ── Bar ──────────────────────────────────────────── -->
     <div class="prompt-bar-wrap">
       <div class="prompt-bar outline">
+        <!-- Joint YES | NO switch: the stance attached to what you type, remembered per market. It is not the vote;
+             voting happens in the Vote modal. -->
+        <div class="seg prompt-bar__vote" data-bar-stance>
+          <button class="seg__opt seg__opt--yes" data-bar-stance-btn="yes">Yes</button>
+          <button class="seg__opt seg__opt--no" data-bar-stance-btn="no">No</button>
+        </div>
         <input type="text" class="prompt-bar__input" data-prompt-input autocomplete="off">
-        <!-- Send opens the Take sent modal; the stance is inferred server-side, so there is no toggle on the bar -->
         <button class="prompt-bar__send" data-prompt-send aria-label="Send">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
         </button>
@@ -444,49 +449,65 @@
 <div class="mdl" data-modal data-vote-modal hidden role="dialog" aria-modal="true" aria-label="Vote"
      data-signed-in="{{viewer.signed_in}}" data-balance="{{viewer.balance}}" data-share="{{viewer.vote_share}}" data-username="{{viewer.username}}">
   <div class="mdl__backdrop" data-modal-close></div>
-  <div class="mdl__panel outline" data-vm-panel>
+  <div class="mdl__panel mdl__panel--wide outline" data-vm-panel>
     <button class="mdl__close" data-modal-close aria-label="Close">&times;</button>
 
     <!-- the ballot -->
     <div class="vm" data-vm-ballot>
-      <p class="vm__q" data-vm-q></p>
-      <div class="vm__thesis outline">
-        <div class="vm__row">
-          <span class="thesis__label heading">Thesis draft</span>
-          <span class="thesis__stance heading" data-vm-stance></span>
-          <span class="thesis__est" data-vm-est title="estimated probability"></span>
-          <span class="dots" data-vm-conv title="conviction"></span>
+      <div class="vm__head">
+        <img class="carousel__img vm__img" data-vm-img src="" alt="">
+        <p class="vm__q" data-vm-q></p>
+      </div>
+      <!-- the draft thesis, in the same block as the page uses -->
+      <div class="thesis vm__thesis">
+        <div class="thesis__head">
+          <div class="thesis__top">
+            <span class="thesis__label heading">Thesis draft</span>
+            <span class="thesis__stance heading" data-vm-stance></span>
+            <span class="thesis__est" data-vm-est title="estimated probability"></span>
+            <span class="thesis__conv conviction" data-vm-conv title="conviction"></span>
+          </div>
         </div>
-        <p class="vm__text" data-vm-text></p>
-        <button class="vm__more" data-vm-more>More</button>
+        <p class="thesis__text" data-vm-text></p>
+        <button class="vm__more" data-vm-more>More</button>   <!-- phones only: the reasoning is clamped there -->
         <ul class="thesis__list" data-vm-contrib></ul>
       </div>
       <div class="vm__tally">
-        <div class="vm__tallyrow"><span class="tally tally--yes" data-vm-yes></span><span class="vm__left" data-vm-left></span><span class="tally tally--no" data-vm-no></span></div>
+        <div class="vm__tallyrow">
+          <span class="vm__side"><span class="tally tally--yes">YES</span> <span data-vm-yes></span></span>
+          <span class="vm__left" data-vm-left></span>
+          <span class="vm__side"><span data-vm-no></span> <span class="tally tally--no">NO</span></span>
+        </div>
         <div class="bar"><span class="bar__yes" data-vm-bar></span></div>
       </div>
       <dl class="vm__you">
-        <div><dt>Your $PROPHET</dt><dd data-vm-balance></dd></div>
-        <div><dt>Your voting weight</dt><dd data-vm-weight></dd></div>
+        <div><dt>Balance</dt><dd data-vm-balance></dd></div>
+        <div><dt>Voting weight</dt><dd data-vm-weight></dd></div>
       </dl>
-      <div class="seg vm__seg" data-vm-side>
-        <button class="seg__opt seg__opt--yes seg__opt--on" data-vm-side-btn="yes">Yes</button>
-        <button class="seg__opt seg__opt--no" data-vm-side-btn="no">No</button>
+      <div class="vm__act">
+        <div class="seg vm__seg" data-vm-side>
+          <button class="seg__opt seg__opt--yes seg__opt--on" data-vm-side-btn="yes">Yes</button>
+          <button class="seg__opt seg__opt--no" data-vm-side-btn="no">No</button>
+        </div>
+        <!-- states the consequence; no second confirmation, votes can't be changed -->
+        <button class="mdl__cta" data-vm-cast></button>
       </div>
-      <!-- states the consequence; no second confirmation, votes can't be changed -->
-      <button class="mdl__cta" data-vm-cast></button>
     </div>
 
-    <!-- voted: transforms in place -->
+    <!-- voted: transforms in place. Green check for YES, red X for NO. -->
     <div class="vm vm--done" data-vm-done hidden>
-      <div class="vm__check"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="5 12.5 10 17.5 19 7"/></svg></div>
+      <div class="vm__check" data-vm-mark><svg class="vm__ico vm__ico--check" viewBox="0 0 24 24" aria-hidden="true"><polyline points="5 12.5 10 17.5 19 7"/></svg><svg class="vm__ico vm__ico--x is-hidden" viewBox="0 0 24 24" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></div>
       <p class="vm__voted heading" data-vm-voted></p>
       <p class="vm__weightline" data-vm-doneweight></p>
       <div class="vm__tally">
-        <div class="vm__tallyrow"><span class="tally tally--yes" data-vm-yes2></span><span class="vm__left" data-vm-left2></span><span class="tally tally--no" data-vm-no2></span></div>
+        <div class="vm__tallyrow">
+          <span class="vm__side"><span class="tally tally--yes">YES</span> <span data-vm-yes2></span></span>
+          <span class="vm__left" data-vm-left2></span>
+          <span class="vm__side"><span data-vm-no2></span> <span class="tally tally--no">NO</span></span>
+        </div>
         <div class="bar"><span class="bar__yes" data-vm-bar2></span></div>
       </div>
-      <button class="mdl__cta" data-vm-next></button>
+      <div class="vm__act"><button class="mdl__cta" data-vm-next></button></div>
     </div>
   </div>
 </div>
@@ -499,7 +520,7 @@
   <div class="mdl__backdrop" data-modal-close></div>
   <div class="mdl__panel outline">
     <button class="mdl__close" data-modal-close aria-label="Close">&times;</button>
-    <div class="tm" data-tm-loading>
+    <div class="tm tm--loading" data-tm-loading>
       <div class="spinner" aria-hidden="true"></div>
       <p class="tm__label">Synthesizing your take</p>
     </div>
@@ -511,6 +532,7 @@
         <span class="tm__meta" data-tm-ago></span>
         <p class="takes__claim tm__claim" data-tm-claim></p>
         <span class="tm__meta" data-tm-user></span>
+        <span class="takes__xp tm__cardxp" data-tm-xpcard></span>
       </div>
       <p class="tm__xp" data-tm-xp></p>
       <div class="mdl__actions">
@@ -693,6 +715,6 @@
 </footer>
 <!-- /partial:footer -->
 
-<script src="app.js?v=9541602c"></script>
+<script src="app.js?v=846e71a9"></script>
 </body>
 </html>

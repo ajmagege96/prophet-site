@@ -163,7 +163,8 @@
   var thesisEst = document.querySelector('[data-thesis-est]');
   var thesisConv = document.querySelector('[data-thesis-conv]');
   var thesisOutcome = document.querySelector('[data-thesis-outcome]');
-  var votes = {}; /* slug -> 'yes' | 'no' (mock, in-memory) */
+  var votes = {};   /* slug -> 'yes' | 'no': the vote cast in the Vote modal (mock, in-memory) */
+  var stances = {}; /* slug -> 'yes' | 'no': the bar switch, the stance for what you type; never the vote */
   var prevBtn = document.querySelector('[data-carousel-prev]');
   var nextBtn = document.querySelector('[data-carousel-next]');
   var activeIndex = -1;
@@ -468,6 +469,7 @@
     if (!thesisBox) return;
     var text = card.dataset.thesis || '';
     var state = card.dataset.state || 'none';
+    paintBarStance(card);
     if (!text || state === 'none') { thesisBox.hidden = true; return; }
     thesisBox.hidden = false;
     thesisLabel.textContent = state === 'vote' ? 'Thesis draft' : 'Thesis';
@@ -555,6 +557,24 @@
 
   /* Init first card */
 
+  /* ── Bar stance switch ── */
+  var barStance = document.querySelector('[data-bar-stance]');
+  function paintBarStance(card) {
+    if (!barStance) return;
+    var chosen = stances[card.dataset.slug];
+    var btns = barStance.querySelectorAll('[data-bar-stance-btn]');
+    for (var i = 0; i < btns.length; i++) btns[i].classList.toggle('seg__opt--on', btns[i].dataset.barStanceBtn === chosen);
+  }
+  if (barStance) {
+    barStance.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-bar-stance-btn]');
+      if (!b || activeIndex < 0) return;
+      var slug = cards[activeIndex].dataset.slug;
+      stances[slug] = stances[slug] === b.dataset.barStanceBtn ? undefined : b.dataset.barStanceBtn;   /* tap again to clear */
+      paintBarStance(cards[activeIndex]);
+    });
+  }
+
   /* ── Modals: Vote, Take sent ──────────────────────────── */
   /* Shared: close on X, Escape or the backdrop; body scroll locked while open. */
   function anyModalOpen() { return !!document.querySelector('[data-modal]:not([hidden]), [data-onboarding]:not([hidden])'); }
@@ -585,8 +605,8 @@
     return { y: y, n: n, pct: (y + n) ? Math.round(100 * y / (y + n)) : 50 };
   }
   function paintTally(sfx, t, left) {
-    q(vm, '[data-vm-yes' + sfx + ']').textContent = fmt(t.y) + ' YES';
-    q(vm, '[data-vm-no' + sfx + ']').textContent = fmt(t.n) + ' NO';
+    q(vm, '[data-vm-yes' + sfx + ']').textContent = fmt(t.y) + ' $PROPHET';
+    q(vm, '[data-vm-no' + sfx + ']').textContent = fmt(t.n) + ' $PROPHET';
     q(vm, '[data-vm-left' + sfx + ']').textContent = left + ' left';
     q(vm, '[data-vm-bar' + sfx + ']').style.width = t.pct + '%';
   }
@@ -599,11 +619,10 @@
     vmCard = card; vmSide = 'yes';
     var stance = (card.dataset.stance || '').toLowerCase();
     q(vm, '[data-vm-q]').textContent = q(card, '.carousel__question').textContent;
+    q(vm, '[data-vm-img]').src = q(card, '.carousel__img').src;
     var st = q(vm, '[data-vm-stance]'); st.textContent = stance.toUpperCase(); st.className = 'thesis__stance heading thesis__stance--' + stance;
     q(vm, '[data-vm-est]').textContent = (card.dataset.estimate || '') + ' est.';
-    var dots = '', conv = parseInt(card.dataset.conviction || '0', 10);
-    for (var d = 1; d <= 5; d++) dots += '<span' + (d <= conv ? ' class="on"' : '') + '></span>';
-    q(vm, '[data-vm-conv]').innerHTML = dots;
+    q(vm, '[data-vm-conv]').innerHTML = card.dataset.conviction ? STAR_SVG + card.dataset.conviction : '';
     var tx = q(vm, '[data-vm-text]'); tx.textContent = card.dataset.thesis || ''; tx.classList.remove('vm__text--open'); q(vm, '[data-vm-more]').textContent = 'More';
     var contrib = []; try { contrib = JSON.parse(card.dataset.contributors || '[]'); } catch (e) {}
     var ch = '';
@@ -613,10 +632,10 @@
     paintTally('', tally(card), left);
     var bal = val(vm, 'balance', '12,400'), share = val(vm, 'share', '8%');
     q(vm, '[data-vm-balance]').textContent = bal + ' $PROPHET';
-    q(vm, '[data-vm-weight]').innerHTML = bal + ' $PROPHET<small>' + share + ' of votes so far</small>';
+    q(vm, '[data-vm-weight]').textContent = share + ' of votes so far';
     paintSide();
     q(vm, '[data-vm-ballot]').hidden = false; q(vm, '[data-vm-done]').hidden = true;
-    q(vm, '[data-vm-panel]').classList.remove('mdl__panel--glow');
+    q(vm, '[data-vm-panel]').classList.remove('mdl__panel--glow', 'mdl__panel--glow-no');
     openModal(vm);
   }
   function paintSide() {
@@ -645,7 +664,10 @@
       var nxt = nextOpenVote(vmCard);
       q(vm, '[data-vm-next]').textContent = nxt ? 'Next open vote' : 'Back to the markets';
       q(vm, '[data-vm-ballot]').hidden = true; q(vm, '[data-vm-done]').hidden = false;
-      var p = q(vm, '[data-vm-panel]'); p.classList.remove('mdl__panel--glow'); void p.offsetWidth; p.classList.add('mdl__panel--glow');
+      var mark = q(vm, '[data-vm-mark]'); mark.classList.toggle('vm__check--no', vmSide === 'no');
+      /* SVG elements have no .hidden property, so the icons swap by class */
+      q(mark, '.vm__ico--check').classList.toggle('is-hidden', vmSide === 'no'); q(mark, '.vm__ico--x').classList.toggle('is-hidden', vmSide !== 'no');
+      var p = q(vm, '[data-vm-panel]'); p.classList.remove('mdl__panel--glow', 'mdl__panel--glow-no'); void p.offsetWidth; p.classList.add(vmSide === 'no' ? 'mdl__panel--glow-no' : 'mdl__panel--glow');
     });
     q(vm, '[data-vm-next]').addEventListener('click', function () {
       var nxt = vmCard ? nextOpenVote(vmCard) : null;
@@ -670,8 +692,8 @@
     clearTimeout(tmTimer);
     tmTimer = setTimeout(function () {
       /* what the server returns for the take; the mock fallbacks are used only while the variables are unfilled */
-      var summary = val(tm, 'summary', 'Your claim, condensed to one line');
-      var stance = val(tm, 'stance', 'yes').toLowerCase();
+      var summary = val(tm, 'summary', 'Custody objections were withdrawn in the latest docket filing, so the timing risk on approval is smaller than the market is pricing');
+      var stance = val(tm, 'stance', stances[slug] || 'unsure').toLowerCase();
       var evidence = val(tm, 'evidence', (/https?:\/\/|\bsource\b|\bper\b|\breport\b/i).test(text) ? 'true' : 'false') === 'true';
       var ago = val(tm, 'ago', 'just now'), xp = val(tm, 'xp', '1'), user = val(vm, 'username', 'you');
       var sb = q(tm, '[data-tm-stance]'); sb.textContent = stance === 'unsure' ? 'unsure' : stance.toUpperCase(); sb.className = 'takes__stance takes__stance--' + stance;
@@ -679,7 +701,8 @@
       q(tm, '[data-tm-claim]').textContent = summary;
       q(tm, '[data-tm-ago]').textContent = ago;
       q(tm, '[data-tm-user]').textContent = user;
-      q(tm, '[data-tm-xp]').textContent = '+' + xp + ' XP';
+      q(tm, '[data-tm-xpcard]').textContent = '+' + xp + ' XP';
+      q(tm, '[data-tm-xp]').textContent = 'You earned +' + xp + ' XP for this contribution.';
       /* the summarised take lands at the top of the feed behind the modal; raw text never does */
       if (!TAKES[slug]) TAKES[slug] = [];
       TAKES[slug].unshift({ user: user, xp: parseInt(xp, 10) || 1, stance: stance === 'unsure' ? 'unsure' : stance.toUpperCase(), claim: summary, ago: ago });

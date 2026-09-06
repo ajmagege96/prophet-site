@@ -473,6 +473,7 @@ ul, ol { list-style: none; }
 .mdl[hidden] { display: none; }
 .mdl__backdrop { position: absolute; inset: 0; background: rgba(21, 27, 38, 0.84); }
 .mdl__panel { position: relative; width: 100%; max-width: 520px; background: var(--navy); padding: 44px 16px 16px; display: flex; flex-direction: column; gap: 14px; max-height: calc(100dvh - 24px); overflow-y: auto; scrollbar-width: thin; }
+.mdl__panel.mdl__panel--wide { max-width: 730px; }   /* the Vote modal: as wide as How it Works */
 .mdl__close { position: absolute; top: 0; right: 0; width: 44px; height: 44px; font-size: 22px; line-height: 1; opacity: 0.6; }
 .mdl__close:hover { opacity: 1; }
 .mdl__cta { min-height: 44px; padding: 0 16px; border: 1px solid var(--green); border-radius: 4px; color: var(--green); font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
@@ -484,27 +485,23 @@ ul, ol { list-style: none; }
 
 .vm { display: flex; flex-direction: column; gap: 14px; }
 .vm[hidden] { display: none; }
-.vm__q { font-size: 16px; line-height: 1.35; }
-.vm__thesis { padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
-.vm__row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.dots { display: inline-flex; gap: 3px; }                       /* conviction as five square dots */
-.dots span { width: 6px; height: 6px; background: rgba(242, 240, 230, 0.2); }
-.dots span.on { background: var(--purple-text); }
-.vm__text { font-size: 13px; line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.vm__text--open { display: block; }
-.vm__more { align-self: flex-start; padding: 8px 0; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--green); opacity: 0.8; }
-.vm__more:hover { opacity: 1; }
+.vm__head { display: flex; align-items: center; gap: 12px; }
+.vm__img { flex: 0 0 auto; }
+.vm__q { font-size: 16px; line-height: 1.35; margin: 0; }
+.vm__thesis { margin-bottom: 0; border-color: var(--outline); }      /* the page's thesis block, unchanged */
+.vm__more { display: none; }                                          /* phones only */
+.vm__side { display: inline-flex; align-items: baseline; gap: 6px; font-weight: 500; }
+.vm__act { width: 100%; max-width: 360px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px; }
 .vm__tally { display: flex; flex-direction: column; gap: 6px; width: 100%; }
 .vm__tallyrow { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; font-size: 12px; }
 .vm__left { opacity: 0.55; white-space: nowrap; }
-.bar { height: 6px; background: rgba(229, 57, 53, 0.55); overflow: hidden; }
+.bar { height: 6px; background: #e53935; overflow: hidden; }   /* same red as the NO text */
 .bar__yes { display: block; height: 100%; background: var(--green); transition: width 0.6s ease; }
 .vm__you { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0; }
 .vm__you div { border: 1px solid var(--outline); padding: 10px 12px; min-width: 0; }
 .vm__you dt { font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.55; }
 .vm__you dd { margin: 4px 0 0; font-size: 14px; font-weight: 500; }
-.vm__you small { display: block; font-size: 11px; font-weight: 400; opacity: 0.6; margin-top: 2px; }
-.vm__seg { display: flex; }
+.vm__seg { display: flex; width: 100%; }
 .vm__seg .seg__opt { flex: 1 1 0; min-height: 44px; font-size: 12px; font-weight: 700; }
 .vm__seg .seg__opt--no.seg__opt--on { color: #e53935; }
 
@@ -512,6 +509,11 @@ ul, ol { list-style: none; }
 .vm--done { align-items: center; text-align: center; padding-top: 6px; }
 .vm__check { width: 64px; height: 64px; border: 2px solid var(--green); border-radius: 4px; display: flex; align-items: center; justify-content: center; animation: mdl-pop 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.25) both; }
 .vm__check svg { width: 34px; height: 34px; fill: none; stroke: var(--green); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 40; stroke-dashoffset: 40; animation: mdl-draw 0.45s 0.3s ease-out forwards; }
+.vm__check svg.is-hidden { display: none; }
+.vm__check--no { border-color: #e53935; }
+.vm__check--no svg { stroke: #e53935; }
+.mdl__panel--glow-no { animation: mdl-glow-no 1.4s ease-out; }
+@keyframes mdl-glow-no { 0% { border-color: #e53935; box-shadow: 0 0 0 0 rgba(229, 57, 53, 0); } 30% { border-color: #e53935; box-shadow: 0 0 32px 0 rgba(229, 57, 53, 0.35); } 100% { box-shadow: 0 0 0 0 rgba(229, 57, 53, 0); } }
 .vm__voted { font-size: 22px; letter-spacing: 0.12em; }
 .vm__weightline { font-size: 13px; opacity: 0.8; }
 .mdl__panel--glow { animation: mdl-glow 1.4s ease-out; }
@@ -532,7 +534,9 @@ ul, ol { list-style: none; }
 .tm__ev svg { width: 11px; height: 11px; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
 .tm__claim { grid-column: 1 / -1; margin: 0; }
 .tm__meta { font-size: 11px; opacity: 0.55; text-align: right; }
-.tm__meta:last-child { grid-column: 1 / -1; text-align: left; }
+.tm__meta:nth-last-child(2) { text-align: left; }
+.tm__cardxp { text-align: right; }
+.tm--loading { justify-content: center; min-height: 359px; }   /* matches the confirmed state's height so the box never resizes */
 .tm__xp { color: var(--green); font-size: 14px; font-weight: 500; }
 
 /* ── Onboarding modal ─────────────────────────────────── */
@@ -743,6 +747,12 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
   color: var(--offwhite);
   opacity: 0.6;
 }
+
+/* Joint YES | NO switch, far left of the bar: the stance for what you type, never the vote.
+   Chosen YES reads green, chosen NO red. */
+.prompt-bar__vote { flex: 0 0 auto; }
+.prompt-bar__vote .seg__opt { font-size: 10px; padding: 5px 10px; font-weight: 700; }
+.prompt-bar__vote .seg__opt--no.seg__opt--on { color: #e53935; }
 
 .prompt-bar__send {
   flex: 0 0 auto;
@@ -1276,6 +1286,16 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
   .onb__line { font-size: 14px; }
   .onb__foot { padding-top: 2px; }
   .onb__back, .onb__next { min-height: 44px; flex: 1 1 0; width: auto; max-width: 160px; padding: 0 12px; }   /* capped so they never balloon on a wide phone or a small notebook */
+  /* Nothing shows above the header while the page scrolls (Telegram's browser paints the
+     overscroll region): a navy strip extends the header upward without touching layout. */
+  .site-header::before { content: ""; position: absolute; left: 0; right: 0; bottom: 100%; height: 120px; background: var(--navy); }
+  /* The menu's link row wraps to two rows here; only the first row keeps a separator. */
+  .site-header__mobile-panel .menu-links .site-footer__sep:last-of-type { display: none; }
+  /* Vote modal on a phone: the reasoning is clamped with a More / Less toggle */
+  .vm__thesis .thesis__text:not(.vm__text--open) { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .vm__more { display: inline-block; align-self: flex-start; padding: 8px 0; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--green); opacity: 0.8; }
+  .vm__act { max-width: none; }
+  .tm--loading { min-height: 359px; }
   /* Four chips have to fit a 390px screen without scrolling: 10px type, tighter gap */
   .filters { gap: 6px; }
   .filters__tag { font-size: 10px; }
@@ -1287,7 +1307,7 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
   .vote-btn, .vote__btn { min-height: 0; padding: 4px 12px; display: inline-flex; align-items: center; justify-content: center; gap: 4px; }
   /* An open-vote card's meta row also carries Buy $PROPHET; at 390px that only fits
      on one line with a smaller Buy and a tighter gap. */
-  .carousel__buy { padding: 1px 5px; line-height: 1.3; font-size: 9px; letter-spacing: 0.04em; bottom: 14px; }
+  .carousel__buy { padding: 2px 7px; line-height: 1.3; font-size: 9px; letter-spacing: 0.04em; top: 42px; bottom: auto; right: 18px; }   /* under the badge, top-right: the one spot on a phone card with room */
   .range__tab, .seg__opt { min-height: 32px; display: inline-flex; align-items: center; justify-content: center; }
   .range { gap: 6px; }
   .range__tab { padding: 0 6px; }
