@@ -129,7 +129,7 @@ MVP and kept only so they come back with the page. `{{explainer_record}}`,
 | Variable | Meaning |
 |---|---|
 | `{{take_result.summary}}` | One-line summary of the claim. Raw text is never shown. Preview mock: "Your claim, condensed to one line" |
-| `{{take_result.stance}}` | `yes` / `no` / `unsure` |
+| `{{take_result.stance}}` | `yes` / `no` |
 | `{{take_result.evidence}}` | `true` when a source was named; shows the "evidence noted" mark |
 | `{{take_result.ago}}` | Relative timestamp (e.g. `just now`) |
 | `{{take_result.xp}}` | XP earned (e.g. `1`) |

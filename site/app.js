@@ -648,7 +648,7 @@
   function paintSide() {
     var btns = vm.querySelectorAll('[data-vm-side-btn]');
     for (var i = 0; i < btns.length; i++) btns[i].classList.toggle('seg__opt--on', btns[i].dataset.vmSideBtn === vmSide);
-    q(vm, '[data-vm-cast]').textContent = 'Vote ' + vmSide.toUpperCase() + ' with ' + val(vm, 'balance', '12,400') + ' $PROPHET';
+    var cta = q(vm, '[data-vm-cast]'); cta.textContent = 'Vote ' + vmSide.toUpperCase(); cta.classList.toggle('mdl__cta--no', vmSide === 'no');
   }
   function nextOpenVote(after) {
     var v = visibleCards(), start = v.indexOf(after);
@@ -701,21 +701,21 @@
        height while the spinner shows; it is revealed, and the feed updated, on confirmation. */
       /* what the server returns for the take; the mock fallbacks are used only while the variables are unfilled */
       var summary = val(tm, 'summary', 'Custody objections were withdrawn in the latest docket filing, so the timing risk on approval is smaller than the market is pricing');
-      var stance = val(tm, 'stance', stances[slug] || 'unsure').toLowerCase();
+      var stance = val(tm, 'stance', stances[slug] || card.dataset.stance || 'yes').toLowerCase();   /* the bar switch; else the market's side */
       var evidence = val(tm, 'evidence', (/https?:\/\/|\bsource\b|\bper\b|\breport\b/i).test(text) ? 'true' : 'false') === 'true';
       var ago = val(tm, 'ago', 'just now'), xp = val(tm, 'xp', '1'), user = val(vm, 'username', 'you');
-      var sb = q(tm, '[data-tm-stance]'); sb.textContent = stance === 'unsure' ? 'unsure' : stance.toUpperCase(); sb.className = 'takes__stance takes__stance--' + stance;
+      var sb = q(tm, '[data-tm-stance]'); sb.textContent = stance.toUpperCase(); sb.className = 'takes__stance takes__stance--' + stance;
       q(tm, '[data-tm-ev]').hidden = !evidence;
       q(tm, '[data-tm-claim]').textContent = summary;
       q(tm, '[data-tm-ago]').textContent = ago;
       q(tm, '[data-tm-user]').textContent = user;
       q(tm, '[data-tm-xpcard]').textContent = '+' + xp + ' XP';
-      q(tm, '[data-tm-xp]').textContent = 'You earned +' + xp + ' XP for this contribution.';
+      q(tm, '[data-tm-xp]').innerHTML = 'You earned <span class="takes__xp">+' + xp + ' XP</span> for this contribution.';
     clearTimeout(tmTimer);
     tmTimer = setTimeout(function () {
       /* the summarised take lands at the top of the feed behind the modal; raw text never does */
       if (!TAKES[slug]) TAKES[slug] = [];
-      TAKES[slug].unshift({ user: user, xp: parseInt(xp, 10) || 1, stance: stance === 'unsure' ? 'unsure' : stance.toUpperCase(), claim: summary, ago: ago });
+      TAKES[slug].unshift({ user: user, xp: parseInt(xp, 10) || 1, stance: stance.toUpperCase(), claim: summary, ago: ago });
       renderTakes(slug);
       q(tm, '[data-tm-loading]').hidden = true; q(tm, '[data-tm-done]').hidden = false;
     }, 1200);

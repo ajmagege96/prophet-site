@@ -479,6 +479,7 @@ ul, ol { list-style: none; }
 .mdl__close:hover { opacity: 1; }
 .mdl__cta { min-height: 44px; padding: 0 16px; border: 1px solid var(--green); border-radius: 4px; color: var(--green); font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
 .mdl__cta:hover { opacity: 0.85; }
+.mdl__cta--no { color: #e53935; border-color: #e53935; }   /* Vote NO reads red */
 .mdl__actions { display: flex; gap: 10px; width: 100%; }
 .mdl__actions button { flex: 1 1 0; min-height: 44px; border: 1px solid var(--outline); border-radius: 4px; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.85; }
 .mdl__actions button:hover { opacity: 1; }
@@ -493,7 +494,7 @@ ul, ol { list-style: none; }
 .vm__meta { font-size: 11px; }
 .vm__pct { flex: 0 0 auto; margin-top: 0; font-size: 26px; align-self: center; }
 .vm__pct small { font-size: 11px; }
-.vm__thesis { margin-bottom: 0; border-color: var(--outline); }      /* the page's thesis block, unchanged */
+.vm__thesis { margin-bottom: 0; width: 100%; }      /* the page's thesis block, box and all, unchanged */
 .vm__more { display: none; }                                          /* phones only */
 .vm__side { display: inline-flex; align-items: baseline; gap: 6px; font-weight: 500; }
 .vm__act { width: 100%; max-width: 360px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px; }
@@ -528,21 +529,23 @@ ul, ol { list-style: none; }
 
 .tm { display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; padding: 8px 0 0; }
 .tm[hidden] { display: none; }
-.spinner { width: 28px; height: 28px; border: 2px solid rgba(16, 240, 95, 0.2); border-top-color: var(--green); border-radius: 50%; animation: mdl-spin 0.8s linear infinite; }
+.spinner { width: 64px; height: 64px; border: 3px solid rgba(16, 240, 95, 0.2); border-top-color: var(--green); border-radius: 50%; animation: mdl-spin 0.8s linear infinite; }   /* as big as the check */
 @keyframes mdl-spin { to { transform: rotate(360deg); } }
 .tm__label { font-size: 13px; opacity: 0.8; }
 .tm__title { font-size: 18px; letter-spacing: 0.12em; }
 .tm__ev { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--green); opacity: 0.85; }
 .tm__ev[hidden] { display: none; }
 .tm__ev svg { width: 11px; height: 11px; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
-.tm__card { width: 100%; text-align: left; padding: 12px 14px; margin: 4px 0; }   /* the feed's take row, shortened and outlined */
+.tm .tm__card { width: 100%; text-align: left; padding: 12px 16px; margin: 2px 0; }   /* the feed's take row, shortened and outlined; padding wins over the row's own */
+.tm .vm__head { width: 100%; text-align: left; }
 .tm__card .takes__claim { opacity: 0.7;
   line-height: 1.4; }   /* the feed's claim rule, mirrored: it is scoped to the feed there */
 .tm__stack { display: grid; width: 100%; }
 .tm__stack .tm { grid-area: 1 / 1; }
 .tm__stack .tm[hidden] { display: flex; visibility: hidden; pointer-events: none; }   /* hidden state keeps its height, so the box never resizes */
 .tm--loading { justify-content: center; }
-.tm__xp { font-size: 13px; opacity: 0.8; margin: 2px 0 6px; }   /* plain, not green: the XP itself is green on the card */
+.tm__xp { font-size: 13px; opacity: 0.85; margin: 2px 0 6px; }
+.tm__xp .takes__xp { font-size: inherit; }   /* the +1 XP in the line is green, the rest plain */
 
 /* ── Onboarding modal ─────────────────────────────────── */
 .onb { position: fixed; inset: 0; z-index: 1000;   /* above the header and the mobile menu */ display: flex; align-items: center; justify-content: center; padding: 16px; }
