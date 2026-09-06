@@ -29,7 +29,7 @@
   <meta name="twitter:description" content="An agent that reads prediction markets, publishes a thesis before the outcome, and keeps a public record of every call.">
   <meta name="twitter:image" content="https://ajmagege96.github.io/prophet-site/site/assets/prophet-og-1200x630.png">
 
-  <link rel="stylesheet" href="styles.css?v=7debf770">
+  <link rel="stylesheet" href="styles.css?v=5d167667">
 </head>
 <body>
 
@@ -127,7 +127,7 @@
              <span class="prow__outcome prow__outcome--won|lost">won|lost</span>; the big figure is the settled YES % (100% or 0%);
              meta row as for called. The resolved_* variables fill the "how it played out" line in the thesis block. -->
         <template>
-        <div class="carousel__card outline" data-card data-state="{{market.filter_state}}" data-slug="{{market.slug}}" data-stance="{{market.thesis_stance}}" data-estimate="{{market.estimate_pct}}" data-conviction="{{market.conviction}}" data-outcome="{{market.outcome}}" data-resolved-side="{{market.resolved_side}}" data-resolved-pct="{{market.resolved_pct}}" data-resolved-ago="{{market.resolved_ago}}" data-thesis="{{market.thesis}}" data-contributors="{{market.contributors_json}}">
+        <div class="carousel__card outline" data-card data-state="{{market.filter_state}}" data-slug="{{market.slug}}" data-vote-yes-pct="{{market.vote_yes_pct}}" data-vote-yes-weight="{{market.vote_yes_weight}}" data-vote-no-weight="{{market.vote_no_weight}}" data-vote-count="{{market.vote_count}}" data-vote-left="{{market.vote_time_left}}" data-stance="{{market.thesis_stance}}" data-estimate="{{market.estimate_pct}}" data-conviction="{{market.conviction}}" data-outcome="{{market.outcome}}" data-resolved-side="{{market.resolved_side}}" data-resolved-pct="{{market.resolved_pct}}" data-resolved-ago="{{market.resolved_ago}}" data-thesis="{{market.thesis}}" data-contributors="{{market.contributors_json}}">
           <div class="carousel__top">
             <img class="carousel__img" src="{{market.image_url}}" alt="" loading="lazy">
             <span class="carousel__state">{{market.state}}</span>
@@ -140,7 +140,7 @@
         </template>
         <!-- /repeat: market -->
 
-        <div class="carousel__card outline" data-card data-state="vote" data-slug="sec-exchange" data-stance="yes" data-estimate="78%" data-conviction="2" data-thesis="The SEC has approved every exchange that met the custody bar this cycle, and this one meets it. The remaining objections are procedural rather than substantive. Timing is the only real risk, not the outcome." data-contributors="[{&quot;user&quot;: &quot;delta_k&quot;, &quot;claim&quot;: &quot;Custody structure mirrors the two already approved&quot;, &quot;xp&quot;: 11}, {&quot;user&quot;: &quot;ines&quot;, &quot;claim&quot;: &quot;Public comment period closed without a formal objection&quot;, &quot;xp&quot;: 4}]">
+        <div class="carousel__card outline" data-card data-state="vote" data-slug="sec-exchange" data-vote-yes-pct="62" data-vote-yes-weight="94,200" data-vote-no-weight="57,700" data-vote-count="128" data-vote-left="2d" data-stance="yes" data-estimate="78%" data-conviction="2" data-thesis="The SEC has approved every exchange that met the custody bar this cycle, and this one meets it. The remaining objections are procedural rather than substantive. Timing is the only real risk, not the outcome." data-contributors="[{&quot;user&quot;: &quot;delta_k&quot;, &quot;claim&quot;: &quot;Custody structure mirrors the two already approved&quot;, &quot;xp&quot;: 11}, {&quot;user&quot;: &quot;ines&quot;, &quot;claim&quot;: &quot;Public comment period closed without a formal objection&quot;, &quot;xp&quot;: 4}]">
           <div class="carousel__top">
             <img class="carousel__img" src="https://polymarket-upload.s3.us-east-2.amazonaws.com/coinbase-stock-d8abe3f599.png" alt="" loading="lazy">
             <span class="carousel__state carousel__state--vote">vote open <span class="tally tally--yes">62% yes</span> <span class="votes" title="votes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><polyline points="8 12.5 11 15.5 16 9.5"/></svg>128</span> <span class="timer" title="time left"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>2d</span></span>
@@ -151,7 +151,7 @@
           <a class="carousel__buy" href="{{buy_url}}" target="_blank" rel="noopener">Buy $PROPHET</a>
         </div>
 
-        <div class="carousel__card outline" data-card data-state="vote" data-slug="dxy-100" data-stance="no" data-estimate="64%" data-conviction="2" data-thesis="Rate-cut pricing is already in the dollar, so the index holds 100 unless the Fed surprises dovish. Relative growth still favors the US and the alternatives are weak. A break below needs a catalyst that isn&#x27;t on the calendar yet." data-contributors="[{&quot;user&quot;: &quot;tessellate&quot;, &quot;claim&quot;: &quot;Euro-area PMIs keep undershooting&quot;, &quot;xp&quot;: 7}, {&quot;user&quot;: &quot;bram_o&quot;, &quot;claim&quot;: &quot;Futures already price two cuts; little left to remove&quot;, &quot;xp&quot;: 3}]">
+        <div class="carousel__card outline" data-card data-state="vote" data-slug="dxy-100" data-vote-yes-pct="45" data-vote-yes-weight="41,000" data-vote-no-weight="50,100" data-vote-count="74" data-vote-left="14h" data-stance="no" data-estimate="64%" data-conviction="2" data-thesis="Rate-cut pricing is already in the dollar, so the index holds 100 unless the Fed surprises dovish. Relative growth still favors the US and the alternatives are weak. A break below needs a catalyst that isn&#x27;t on the calendar yet." data-contributors="[{&quot;user&quot;: &quot;tessellate&quot;, &quot;claim&quot;: &quot;Euro-area PMIs keep undershooting&quot;, &quot;xp&quot;: 7}, {&quot;user&quot;: &quot;bram_o&quot;, &quot;claim&quot;: &quot;Futures already price two cuts; little left to remove&quot;, &quot;xp&quot;: 3}]">
           <div class="carousel__top">
             <img class="carousel__img" src="https://polymarket-upload.s3.us-east-2.amazonaws.com/us-canada-diplomatic-agreement-to-lower-tariffs-by-august-31-dHLeCIoNnnOg.jpg" alt="" loading="lazy">
             <span class="carousel__state carousel__state--vote">vote open <span class="tally tally--no">55% no</span> <span class="votes" title="votes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><polyline points="8 12.5 11 15.5 16 9.5"/></svg>74</span> <span class="timer" title="time left"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>14h</span></span>
@@ -373,14 +373,9 @@
                desktop; on phones an open vote's state line moves under the reasoning. -->
           <div class="thesis__stateline">
           <span class="thesis__state" data-thesis-state></span>
-          <!-- Vote: beside the badge, only while the vote is open; opens a small popup -->
+          <!-- Vote: beside the badge, only while the vote is open; opens the Vote modal. Reads "Voted YES" once cast; votes can't be changed. -->
           <div class="vote" data-vote-wrap hidden>
             <button class="vote__btn" data-vote-open>Vote</button>
-            <div class="vote__pop outline" data-vote-pop hidden>
-              <span class="vote__label heading">Your vote</span>
-              <button class="vote-btn vote-btn--yes" data-vote="yes">Yes</button>
-              <button class="vote-btn vote-btn--no" data-vote="no">No</button>
-            </div>
           </div>
           </div>
         </div>
@@ -425,12 +420,8 @@
     <!-- ── Bar ──────────────────────────────────────────── -->
     <div class="prompt-bar-wrap">
       <div class="prompt-bar outline">
-        <!-- Joint YES | NO switch, always shown: the stance for what you type, and for a market with an open vote it is also the vote, in step with the thesis block's popup -->
-        <div class="seg prompt-bar__vote" data-bar-vote>
-          <button class="seg__opt seg__opt--yes" data-bar-vote-btn="yes">Yes</button>
-          <button class="seg__opt seg__opt--no" data-bar-vote-btn="no">No</button>
-        </div>
         <input type="text" class="prompt-bar__input" data-prompt-input autocomplete="off">
+        <!-- Send opens the Take sent modal; the stance is inferred server-side, so there is no toggle on the bar -->
         <button class="prompt-bar__send" data-prompt-send aria-label="Send">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
         </button>
@@ -446,6 +437,90 @@
 
   </div>
 </main>
+
+<!-- modal:vote — opens from the Vote button on a market with an open vote. Per-market figures come from
+     the card's data-vote-* attributes; viewer.* comes from the signed-in account. If viewer.signed_in is
+     "false" the button fires a `prophet:signin` event on document instead and the server's sign-in takes over. -->
+<div class="mdl" data-modal data-vote-modal hidden role="dialog" aria-modal="true" aria-label="Vote"
+     data-signed-in="{{viewer.signed_in}}" data-balance="{{viewer.balance}}" data-share="{{viewer.vote_share}}" data-username="{{viewer.username}}">
+  <div class="mdl__backdrop" data-modal-close></div>
+  <div class="mdl__panel outline" data-vm-panel>
+    <button class="mdl__close" data-modal-close aria-label="Close">&times;</button>
+
+    <!-- the ballot -->
+    <div class="vm" data-vm-ballot>
+      <p class="vm__q" data-vm-q></p>
+      <div class="vm__thesis outline">
+        <div class="vm__row">
+          <span class="thesis__label heading">Thesis draft</span>
+          <span class="thesis__stance heading" data-vm-stance></span>
+          <span class="thesis__est" data-vm-est title="estimated probability"></span>
+          <span class="dots" data-vm-conv title="conviction"></span>
+        </div>
+        <p class="vm__text" data-vm-text></p>
+        <button class="vm__more" data-vm-more>More</button>
+        <ul class="thesis__list" data-vm-contrib></ul>
+      </div>
+      <div class="vm__tally">
+        <div class="vm__tallyrow"><span class="tally tally--yes" data-vm-yes></span><span class="vm__left" data-vm-left></span><span class="tally tally--no" data-vm-no></span></div>
+        <div class="bar"><span class="bar__yes" data-vm-bar></span></div>
+      </div>
+      <dl class="vm__you">
+        <div><dt>Your $PROPHET</dt><dd data-vm-balance></dd></div>
+        <div><dt>Your voting weight</dt><dd data-vm-weight></dd></div>
+      </dl>
+      <div class="seg vm__seg" data-vm-side>
+        <button class="seg__opt seg__opt--yes seg__opt--on" data-vm-side-btn="yes">Yes</button>
+        <button class="seg__opt seg__opt--no" data-vm-side-btn="no">No</button>
+      </div>
+      <!-- states the consequence; no second confirmation, votes can't be changed -->
+      <button class="mdl__cta" data-vm-cast></button>
+    </div>
+
+    <!-- voted: transforms in place -->
+    <div class="vm vm--done" data-vm-done hidden>
+      <div class="vm__check"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="5 12.5 10 17.5 19 7"/></svg></div>
+      <p class="vm__voted heading" data-vm-voted></p>
+      <p class="vm__weightline" data-vm-doneweight></p>
+      <div class="vm__tally">
+        <div class="vm__tallyrow"><span class="tally tally--yes" data-vm-yes2></span><span class="vm__left" data-vm-left2></span><span class="tally tally--no" data-vm-no2></span></div>
+        <div class="bar"><span class="bar__yes" data-vm-bar2></span></div>
+      </div>
+      <button class="mdl__cta" data-vm-next></button>
+    </div>
+  </div>
+</div>
+<!-- /modal:vote -->
+
+<!-- modal:take — opens the moment Send is pressed. Loading, then the confirmed take. The summary, stance,
+     evidence mark, timestamp and XP are what the server returns for the take (take_result.*). Raw text is never shown. -->
+<div class="mdl" data-modal data-take-modal hidden role="dialog" aria-modal="true" aria-label="Take sent"
+     data-summary="{{take_result.summary}}" data-stance="{{take_result.stance}}" data-evidence="{{take_result.evidence}}" data-ago="{{take_result.ago}}" data-xp="{{take_result.xp}}">
+  <div class="mdl__backdrop" data-modal-close></div>
+  <div class="mdl__panel outline">
+    <button class="mdl__close" data-modal-close aria-label="Close">&times;</button>
+    <div class="tm" data-tm-loading>
+      <div class="spinner" aria-hidden="true"></div>
+      <p class="tm__label">Synthesizing your take</p>
+    </div>
+    <div class="tm" data-tm-done hidden>
+      <div class="vm__check"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="5 12.5 10 17.5 19 7"/></svg></div>
+      <p class="tm__title heading">Take received</p>
+      <div class="tm__card outline">
+        <div class="tm__badges"><span class="takes__stance" data-tm-stance></span><span class="tm__ev" data-tm-ev hidden><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="5 12.5 10 17.5 19 7"/></svg>evidence noted</span></div>
+        <span class="tm__meta" data-tm-ago></span>
+        <p class="takes__claim tm__claim" data-tm-claim></p>
+        <span class="tm__meta" data-tm-user></span>
+      </div>
+      <p class="tm__xp" data-tm-xp></p>
+      <div class="mdl__actions">
+        <button class="is-primary" data-tm-again>Give another take</button>
+        <button data-modal-close>Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- /modal:take -->
 
 <!-- partial:onboarding -->
 <!-- Onboarding modal. Opens on a first visit (remembered on the device in localStorage) and from the
@@ -618,6 +693,6 @@
 </footer>
 <!-- /partial:footer -->
 
-<script src="app.js?v=7911889a"></script>
+<script src="app.js?v=9541602c"></script>
 </body>
 </html>

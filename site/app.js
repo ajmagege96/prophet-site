@@ -157,7 +157,6 @@
   var thesisState = document.querySelector('[data-thesis-state]');
   var thesisStance = document.querySelector('[data-thesis-stance]');
   var voteWrap = document.querySelector('[data-vote-wrap]');
-  var votePop = document.querySelector('[data-vote-pop]');
   var voteOpen = document.querySelector('[data-vote-open]');
   var thesisLabel = document.querySelector('[data-thesis-label]');
   var thesisList = document.querySelector('[data-thesis-contributors]');
@@ -354,8 +353,7 @@
   if (nextBtn) nextBtn.addEventListener('click', function () { page(1); });
 
   document.addEventListener('keydown', function (e) {
-    var onb = document.querySelector('[data-onboarding]');
-    if (onb && !onb.hidden) return;   /* the onboarding modal owns the keys while open */
+    if (document.querySelector('[data-modal]:not([hidden]), [data-onboarding]:not([hidden])')) return;   /* an open modal owns the keys */
     /* Tab cycles the four tags: No thesis → Open votes → Prophecies → History → …; Shift+Tab goes back */
     if (e.key === 'Tab') {
       e.preventDefault();
@@ -470,7 +468,7 @@
     if (!thesisBox) return;
     var text = card.dataset.thesis || '';
     var state = card.dataset.state || 'none';
-    if (!text || state === 'none') { thesisBox.hidden = true; paintBarVote(card); return; }
+    if (!text || state === 'none') { thesisBox.hidden = true; return; }
     thesisBox.hidden = false;
     thesisLabel.textContent = state === 'vote' ? 'Thesis draft' : 'Thesis';
     thesisBox.classList.toggle('thesis--vote', state === 'vote');
@@ -508,49 +506,15 @@
     }
     thesisList.innerHTML = html;
 
-    paintBarVote(card);
-
     voteWrap.hidden = state !== 'vote';
-    votePop.hidden = true;
     if (state === 'vote') {
       var chosen = votes[card.dataset.slug];
       voteOpen.innerHTML = chosen ? 'Voted <span class="tally tally--' + chosen + '">' + chosen.toUpperCase() + '</span>' : 'Vote';
-      var btns = votePop.querySelectorAll('[data-vote]');
-      for (var k = 0; k < btns.length; k++) {
-        btns[k].classList.toggle('vote-btn--chosen', btns[k].dataset.vote === chosen);
-      }
+      voteOpen.disabled = !!chosen;
     }
   }
-  /* YES | NO switch in the prompt bar, always shown: the stance for what you
-     type, and for an open vote it is the vote itself, in step with the block's
-     popup so the two never disagree. Remembered per market. */
-  var barVote = document.querySelector('[data-bar-vote]');
-  function paintBarVote(card) {
-    if (!barVote) return;
-    var chosen = votes[card.dataset.slug];
-    var btns = barVote.querySelectorAll('[data-bar-vote-btn]');
-    for (var i = 0; i < btns.length; i++) btns[i].classList.toggle('seg__opt--on', btns[i].dataset.barVoteBtn === chosen);
-  }
-  if (barVote) {
-    barVote.addEventListener('click', function (e) {
-      var btn = e.target.closest('[data-bar-vote-btn]');
-      if (!btn || activeIndex < 0) return;
-      votes[cards[activeIndex].dataset.slug] = btn.dataset.barVoteBtn;
-      paintBarVote(cards[activeIndex]);
-      renderThesis(cards[activeIndex]);
-    });
-  }
   if (voteWrap) {
-    voteOpen.addEventListener('click', function () { votePop.hidden = !votePop.hidden; });
-    votePop.addEventListener('click', function (e) {
-      var btn = e.target.closest('[data-vote]');
-      if (!btn || activeIndex < 0) return;
-      votes[cards[activeIndex].dataset.slug] = btn.dataset.vote;
-      renderThesis(cards[activeIndex]);
-    });
-    document.addEventListener('click', function (e) {
-      if (!voteWrap.contains(e.target)) votePop.hidden = true;
-    });
+    voteOpen.addEventListener('click', function () { if (activeIndex >= 0) openVote(cards[activeIndex]); });
   }
 
   /* ── Takes renderer ───────────────────────────────────── */
@@ -590,6 +554,143 @@
   }
 
   /* Init first card */
+
+  /* ── Modals: Vote, Take sent ──────────────────────────── */
+  /* Shared: close on X, Escape or the backdrop; body scroll locked while open. */
+  function anyModalOpen() { return !!document.querySelector('[data-modal]:not([hidden]), [data-onboarding]:not([hidden])'); }
+  function openModal(m) { m.hidden = false; document.documentElement.classList.add('onb-lock'); var c = m.querySelector('.mdl__close'); if (c) c.focus(); }
+  function closeModal(m) { m.hidden = true; if (!anyModalOpen()) document.documentElement.classList.remove('onb-lock'); }
+  var modals = document.querySelectorAll('[data-modal]');
+  for (var mi = 0; mi < modals.length; mi++) {
+    (function (m) { m.addEventListener('click', function (e) { if (e.target.closest('[data-modal-close]')) closeModal(m); }); })(modals[mi]);
+  }
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    var open = document.querySelector('[data-modal]:not([hidden])');
+    if (open) { e.preventDefault(); closeModal(open); }
+  }, true);
+
+  /* A data-* value that is still an unfilled {{variable}} falls back to the mock. */
+  function val(el, key, fallback) { var v = el ? (el.getAttribute('data-' + key) || '') : ''; return (!v || (/^\{\{/).test(v)) ? fallback : v; }
+  function num(s) { return parseInt(String(s).replace(/[^0-9]/g, ''), 10) || 0; }
+  function fmt(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+  function q(root, sel) { return root.querySelector(sel); }
+
+  /* ── Vote modal ── */
+  var vm = document.querySelector('[data-vote-modal]');
+  var vmCard = null, vmSide = 'yes';
+  function tally(card, addSide, addW) {
+    var y = num(val(card, 'vote-yes-weight', '94,200')), n = num(val(card, 'vote-no-weight', '57,700'));
+    if (addSide === 'yes') y += addW; else if (addSide === 'no') n += addW;
+    return { y: y, n: n, pct: (y + n) ? Math.round(100 * y / (y + n)) : 50 };
+  }
+  function paintTally(sfx, t, left) {
+    q(vm, '[data-vm-yes' + sfx + ']').textContent = fmt(t.y) + ' YES';
+    q(vm, '[data-vm-no' + sfx + ']').textContent = fmt(t.n) + ' NO';
+    q(vm, '[data-vm-left' + sfx + ']').textContent = left + ' left';
+    q(vm, '[data-vm-bar' + sfx + ']').style.width = t.pct + '%';
+  }
+  function openVote(card) {
+    if (!vm || !card || card.dataset.state !== 'vote') return;
+    if (val(vm, 'signed-in', 'true') === 'false') {          /* signed out: the server's sign-in takes over, then reopens this */
+      document.dispatchEvent(new CustomEvent('prophet:signin', { detail: { then: 'vote', slug: card.dataset.slug } }));
+      return;
+    }
+    vmCard = card; vmSide = 'yes';
+    var stance = (card.dataset.stance || '').toLowerCase();
+    q(vm, '[data-vm-q]').textContent = q(card, '.carousel__question').textContent;
+    var st = q(vm, '[data-vm-stance]'); st.textContent = stance.toUpperCase(); st.className = 'thesis__stance heading thesis__stance--' + stance;
+    q(vm, '[data-vm-est]').textContent = (card.dataset.estimate || '') + ' est.';
+    var dots = '', conv = parseInt(card.dataset.conviction || '0', 10);
+    for (var d = 1; d <= 5; d++) dots += '<span' + (d <= conv ? ' class="on"' : '') + '></span>';
+    q(vm, '[data-vm-conv]').innerHTML = dots;
+    var tx = q(vm, '[data-vm-text]'); tx.textContent = card.dataset.thesis || ''; tx.classList.remove('vm__text--open'); q(vm, '[data-vm-more]').textContent = 'More';
+    var contrib = []; try { contrib = JSON.parse(card.dataset.contributors || '[]'); } catch (e) {}
+    var ch = '';
+    for (var i = 0; i < contrib.length; i++) ch += '<li class="thesis__row"><span class="thesis__user">' + contrib[i].user + '</span><span class="thesis__claim">' + contrib[i].claim + '</span><span class="thesis__xp">+' + contrib[i].xp + ' XP</span></li>';
+    q(vm, '[data-vm-contrib]').innerHTML = ch;
+    var left = val(card, 'vote-left', '2d');
+    paintTally('', tally(card), left);
+    var bal = val(vm, 'balance', '12,400'), share = val(vm, 'share', '8%');
+    q(vm, '[data-vm-balance]').textContent = bal + ' $PROPHET';
+    q(vm, '[data-vm-weight]').innerHTML = bal + ' $PROPHET<small>' + share + ' of votes so far</small>';
+    paintSide();
+    q(vm, '[data-vm-ballot]').hidden = false; q(vm, '[data-vm-done]').hidden = true;
+    q(vm, '[data-vm-panel]').classList.remove('mdl__panel--glow');
+    openModal(vm);
+  }
+  function paintSide() {
+    var btns = vm.querySelectorAll('[data-vm-side-btn]');
+    for (var i = 0; i < btns.length; i++) btns[i].classList.toggle('seg__opt--on', btns[i].dataset.vmSideBtn === vmSide);
+    q(vm, '[data-vm-cast]').textContent = 'Vote ' + vmSide.toUpperCase() + ' with ' + val(vm, 'balance', '12,400') + ' $PROPHET';
+  }
+  function nextOpenVote(after) {
+    var v = visibleCards(), start = v.indexOf(after);
+    for (var k = 1; k <= v.length; k++) { var c = v[(start + k) % v.length]; if (c !== after && c.dataset.state === 'vote' && !votes[c.dataset.slug]) return c; }
+    return null;
+  }
+  if (vm) {
+    q(vm, '[data-vm-side]').addEventListener('click', function (e) { var b = e.target.closest('[data-vm-side-btn]'); if (b) { vmSide = b.dataset.vmSideBtn; paintSide(); } });
+    q(vm, '[data-vm-more]').addEventListener('click', function () {
+      var tx = q(vm, '[data-vm-text]'); var open = tx.classList.toggle('vm__text--open'); this.textContent = open ? 'Less' : 'More';
+    });
+    q(vm, '[data-vm-cast]').addEventListener('click', function () {
+      if (!vmCard) return;
+      var slug = vmCard.dataset.slug, bal = val(vm, 'balance', '12,400');
+      votes[slug] = vmSide;
+      if (activeIndex >= 0 && cards[activeIndex] === vmCard) renderThesis(vmCard);
+      q(vm, '[data-vm-voted]').innerHTML = 'Voted <span class="tally tally--' + vmSide + '">' + vmSide.toUpperCase() + '</span>';
+      q(vm, '[data-vm-doneweight]').textContent = bal + ' $PROPHET · ' + val(vm, 'share', '8%') + ' of votes so far';
+      paintTally('2', tally(vmCard, vmSide, num(bal)), val(vmCard, 'vote-left', '2d'));
+      var nxt = nextOpenVote(vmCard);
+      q(vm, '[data-vm-next]').textContent = nxt ? 'Next open vote' : 'Back to the markets';
+      q(vm, '[data-vm-ballot]').hidden = true; q(vm, '[data-vm-done]').hidden = false;
+      var p = q(vm, '[data-vm-panel]'); p.classList.remove('mdl__panel--glow'); void p.offsetWidth; p.classList.add('mdl__panel--glow');
+    });
+    q(vm, '[data-vm-next]').addEventListener('click', function () {
+      var nxt = vmCard ? nextOpenVote(vmCard) : null;
+      closeModal(vm);
+      if (nxt) { select(cards.indexOf(nxt)); openVote(nxt); }
+    });
+  }
+  window.prophetVote = { open: function (slug) { for (var i = 0; i < cards.length; i++) if (cards[i].dataset.slug === slug) return openVote(cards[i]); } };
+
+  /* ── Take sent modal ── */
+  var tm = document.querySelector('[data-take-modal]');
+  var sendBtn = document.querySelector('[data-prompt-send]');
+  var tmTimer = null;
+  function sendTake() {
+    if (!tm || !promptInput || activeIndex < 0) return;
+    var text = promptInput.value.trim();
+    if (!text) return;
+    var card = cards[activeIndex], slug = card.dataset.slug;
+    promptInput.value = '';
+    q(tm, '[data-tm-loading]').hidden = false; q(tm, '[data-tm-done]').hidden = true;
+    openModal(tm);
+    clearTimeout(tmTimer);
+    tmTimer = setTimeout(function () {
+      /* what the server returns for the take; the mock fallbacks are used only while the variables are unfilled */
+      var summary = val(tm, 'summary', 'Your claim, condensed to one line');
+      var stance = val(tm, 'stance', 'yes').toLowerCase();
+      var evidence = val(tm, 'evidence', (/https?:\/\/|\bsource\b|\bper\b|\breport\b/i).test(text) ? 'true' : 'false') === 'true';
+      var ago = val(tm, 'ago', 'just now'), xp = val(tm, 'xp', '1'), user = val(vm, 'username', 'you');
+      var sb = q(tm, '[data-tm-stance]'); sb.textContent = stance === 'unsure' ? 'unsure' : stance.toUpperCase(); sb.className = 'takes__stance takes__stance--' + stance;
+      q(tm, '[data-tm-ev]').hidden = !evidence;
+      q(tm, '[data-tm-claim]').textContent = summary;
+      q(tm, '[data-tm-ago]').textContent = ago;
+      q(tm, '[data-tm-user]').textContent = user;
+      q(tm, '[data-tm-xp]').textContent = '+' + xp + ' XP';
+      /* the summarised take lands at the top of the feed behind the modal; raw text never does */
+      if (!TAKES[slug]) TAKES[slug] = [];
+      TAKES[slug].unshift({ user: user, xp: parseInt(xp, 10) || 1, stance: stance === 'unsure' ? 'unsure' : stance.toUpperCase(), claim: summary, ago: ago });
+      renderTakes(slug);
+      q(tm, '[data-tm-loading]').hidden = true; q(tm, '[data-tm-done]').hidden = false;
+    }, 1200);
+  }
+  if (sendBtn) sendBtn.addEventListener('click', sendTake);
+  if (promptInput) promptInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); sendTake(); } });
+  if (tm) q(tm, '[data-tm-again]').addEventListener('click', function () { closeModal(tm); if (promptInput) promptInput.focus(); });
+
   if (cards.length > 0) applyFilter(null);   /* hides the History deck, selects the first card */
 })();
 

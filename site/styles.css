@@ -467,6 +467,74 @@ ul, ol { list-style: none; }
 .carousel__buy:hover { opacity: 1; border-color: currentColor; text-decoration: none; }
 
 
+/* ── Modals: Vote, Take sent ───────────────────────────── */
+/* Mobile first: full width, height from content, centred; 44px buttons; scroll locked behind. */
+.mdl { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 12px; }
+.mdl[hidden] { display: none; }
+.mdl__backdrop { position: absolute; inset: 0; background: rgba(21, 27, 38, 0.84); }
+.mdl__panel { position: relative; width: 100%; max-width: 520px; background: var(--navy); padding: 44px 16px 16px; display: flex; flex-direction: column; gap: 14px; max-height: calc(100dvh - 24px); overflow-y: auto; scrollbar-width: thin; }
+.mdl__close { position: absolute; top: 0; right: 0; width: 44px; height: 44px; font-size: 22px; line-height: 1; opacity: 0.6; }
+.mdl__close:hover { opacity: 1; }
+.mdl__cta { min-height: 44px; padding: 0 16px; border: 1px solid var(--green); border-radius: 4px; color: var(--green); font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+.mdl__cta:hover { opacity: 0.85; }
+.mdl__actions { display: flex; gap: 10px; width: 100%; }
+.mdl__actions button { flex: 1 1 0; min-height: 44px; border: 1px solid var(--outline); border-radius: 4px; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.85; }
+.mdl__actions button:hover { opacity: 1; }
+.mdl__actions .is-primary { color: var(--green); border-color: var(--green); }
+
+.vm { display: flex; flex-direction: column; gap: 14px; }
+.vm[hidden] { display: none; }
+.vm__q { font-size: 16px; line-height: 1.35; }
+.vm__thesis { padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.vm__row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.dots { display: inline-flex; gap: 3px; }                       /* conviction as five square dots */
+.dots span { width: 6px; height: 6px; background: rgba(242, 240, 230, 0.2); }
+.dots span.on { background: var(--purple-text); }
+.vm__text { font-size: 13px; line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.vm__text--open { display: block; }
+.vm__more { align-self: flex-start; padding: 8px 0; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--green); opacity: 0.8; }
+.vm__more:hover { opacity: 1; }
+.vm__tally { display: flex; flex-direction: column; gap: 6px; width: 100%; }
+.vm__tallyrow { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; font-size: 12px; }
+.vm__left { opacity: 0.55; white-space: nowrap; }
+.bar { height: 6px; background: rgba(229, 57, 53, 0.55); overflow: hidden; }
+.bar__yes { display: block; height: 100%; background: var(--green); transition: width 0.6s ease; }
+.vm__you { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0; }
+.vm__you div { border: 1px solid var(--outline); padding: 10px 12px; min-width: 0; }
+.vm__you dt { font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.55; }
+.vm__you dd { margin: 4px 0 0; font-size: 14px; font-weight: 500; }
+.vm__you small { display: block; font-size: 11px; font-weight: 400; opacity: 0.6; margin-top: 2px; }
+.vm__seg { display: flex; }
+.vm__seg .seg__opt { flex: 1 1 0; min-height: 44px; font-size: 12px; font-weight: 700; }
+.vm__seg .seg__opt--no.seg__opt--on { color: #e53935; }
+
+/* the reward for voting */
+.vm--done { align-items: center; text-align: center; padding-top: 6px; }
+.vm__check { width: 64px; height: 64px; border: 2px solid var(--green); border-radius: 4px; display: flex; align-items: center; justify-content: center; animation: mdl-pop 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.25) both; }
+.vm__check svg { width: 34px; height: 34px; fill: none; stroke: var(--green); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 40; stroke-dashoffset: 40; animation: mdl-draw 0.45s 0.3s ease-out forwards; }
+.vm__voted { font-size: 22px; letter-spacing: 0.12em; }
+.vm__weightline { font-size: 13px; opacity: 0.8; }
+.mdl__panel--glow { animation: mdl-glow 1.4s ease-out; }
+@keyframes mdl-pop { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes mdl-draw { to { stroke-dashoffset: 0; } }
+@keyframes mdl-glow { 0% { border-color: var(--green); box-shadow: 0 0 0 0 rgba(16, 240, 95, 0); } 30% { border-color: var(--green); box-shadow: 0 0 32px 0 rgba(16, 240, 95, 0.35); } 100% { box-shadow: 0 0 0 0 rgba(16, 240, 95, 0); } }
+
+.tm { display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; padding: 8px 0 0; }
+.tm[hidden] { display: none; }
+.spinner { width: 28px; height: 28px; border: 2px solid rgba(16, 240, 95, 0.2); border-top-color: var(--green); border-radius: 50%; animation: mdl-spin 0.8s linear infinite; }
+@keyframes mdl-spin { to { transform: rotate(360deg); } }
+.tm__label { font-size: 13px; opacity: 0.8; }
+.tm__title { font-size: 18px; letter-spacing: 0.12em; }
+.tm__card { width: 100%; text-align: left; padding: 12px 14px; display: grid; grid-template-columns: 1fr auto; gap: 6px 12px; align-items: center; }
+.tm__badges { display: flex; align-items: center; gap: 10px; }
+.tm__ev { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--green); opacity: 0.85; }
+.tm__ev[hidden] { display: none; }
+.tm__ev svg { width: 11px; height: 11px; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.tm__claim { grid-column: 1 / -1; margin: 0; }
+.tm__meta { font-size: 11px; opacity: 0.55; text-align: right; }
+.tm__meta:last-child { grid-column: 1 / -1; text-align: left; }
+.tm__xp { color: var(--green); font-size: 14px; font-weight: 500; }
+
 /* ── Onboarding modal ─────────────────────────────────── */
 .onb { position: fixed; inset: 0; z-index: 1000;   /* above the header and the mobile menu */ display: flex; align-items: center; justify-content: center; padding: 16px; }
 .onb[hidden] { display: none; }
@@ -513,12 +581,16 @@ ul, ol { list-style: none; }
 .onb__dots { display: flex; gap: 8px; }
 .onb__dot { width: 6px; height: 6px; background: rgba(242, 240, 230, 0.25); }   /* square, like the roadmap */
 .onb__dot--on { background: var(--green); }
-html.onb-lock, html.onb-lock body { overflow: hidden; }
+html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every modal */
 
 /* Short desktop windows: the panel is narrower, so a long line may wrap; give the copy
    block a second line so nothing is clipped. */
 @media (min-width: 768px) and (max-height: 720px) {
   .onb__copy { height: 83px; }
+}
+@media (min-width: 768px) {
+  .mdl__panel { padding: 44px 24px 24px; }
+  .vm__q { font-size: 17px; }
 }
 
 /* ── Feed (thesis + takes) ────────────────────────────── */
@@ -568,19 +640,6 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }
   color: var(--purple-text);
 }
 .vote__btn:hover { opacity: 0.85; }
-.vote__pop {
-  position: absolute;
-  top: calc(100% + 6px);
-  right: 0;
-  z-index: 5;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 10px;
-  background: var(--navy);
-}
-.vote__pop[hidden] { display: none; }
-.vote__label { font-size: 10px; opacity: 0.7; white-space: nowrap; }
 .thesis__list { display: flex; flex-direction: column; gap: 3px; padding-top: 6px; border-top: 1px solid var(--outline); }
 .thesis__row { display: flex; align-items: baseline; gap: 8px; font-size: 12px; }
 .thesis__user { flex: 0 0 auto; font-weight: 500; opacity: 0.85; }
@@ -684,10 +743,6 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }
   color: var(--offwhite);
   opacity: 0.6;
 }
-/* Joint YES | NO switch, far left of the bar, always shown. Chosen YES reads green, chosen NO red. */
-.prompt-bar__vote { flex: 0 0 auto; }
-.prompt-bar__vote .seg__opt { font-size: 10px; padding: 5px 10px; font-weight: 700; }
-.prompt-bar__vote .seg__opt--no.seg__opt--on { color: #e53935; }
 
 .prompt-bar__send {
   flex: 0 0 auto;

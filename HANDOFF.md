@@ -309,3 +309,20 @@ The bottom row of a card depends on its state — see the comment on the card
 thesis block's popup share one vote; the JS keeps them in step.
 
 The Edge-chart JS is still in `app.js`, inert without the Record page.
+
+## Vote and Take-sent modals
+
+Both live in `site/index.html` between `<!-- modal:vote -->` and `<!-- modal:take -->`
+markers; the JS is the "Modals" block in `app.js`.
+
+- **Vote** reads the selected card's `data-vote-*` attributes and the viewer
+  attributes on the modal root. If `viewer.signed_in` is `false` the Vote
+  button dispatches `prophet:signin` on `document` (detail: `{then: 'vote',
+  slug}`) and stops — wire your sign-in to that, then call
+  `window.prophetVote.open(slug)` to resume. Casting a vote is a client-side
+  mock today: hook the CTA to your endpoint and re-render with the server's
+  tally.
+- **Take sent** opens on Send / Enter. The 1.2s spinner is a placeholder for
+  your round trip; fill `take_result.*` on the modal root from the response
+  and the confirmed state renders from them. The summarised take is prepended
+  to the feed; the raw text is cleared and never rendered.

@@ -31,6 +31,7 @@
 | `{{market.resolved_side}}` | `yes` / `no` — the side the market settled on |
 | `{{market.resolved_pct}}` | Closing YES % at settlement, e.g. `97%` |
 | `{{market.resolved_ago}}` | Relative time since resolution, e.g. `2w ago` |
+| `{{market.vote_yes_pct}}`, `{{market.vote_yes_weight}}`, `{{market.vote_no_weight}}`, `{{market.vote_count}}`, `{{market.vote_time_left}}` | Open-vote tally for the Vote modal: YES share, weight cast on each side (e.g. `94,200`), number of votes, time left (e.g. `2d`) |
 | `{{market.called_pct}}` | Odds when the thesis was called, e.g. `84%`; rendered on called cards only |
 | `{{market.contributors_json}}` | JSON array of `{user, claim, xp}` set as `data-contributors` on the card; listed under the thesis as Contributors |
 | `{{contributor.username}}` | Contributor's username (used in `<!-- repeat: contributor -->` inside the Thesis block) |
@@ -113,3 +114,22 @@ MVP and kept only so they come back with the page. `{{explainer_record}}`,
 | `{{wallet_war_chest_value}}`, `{{wallet_rewards_value}}`, `{{wallet_pools_value}}` | Live balances, green |
 | `{{wallet_burn_value}}` | Tokens burned, red (e.g. "8.4M"); the "$PROPHET" ticker after it stays gray, then a red flame icon |
 | `{{pool_last_week}}` | Last week's reward pool; the line reads "paid to the community" |
+
+### Viewer (signed-in account)
+
+| Variable | Meaning |
+|---|---|
+| `{{viewer.signed_in}}` | `true` / `false`. When false the Vote button fires a `prophet:signin` event on `document` instead of opening the modal |
+| `{{viewer.username}}` | Shown on the viewer's own take card and feed row. Never an address |
+| `{{viewer.balance}}` | $PROPHET balance, formatted (e.g. `12,400`); also the voting weight |
+| `{{viewer.vote_share}}` | The viewer's share of the weight cast so far on the selected market (e.g. `8%`) |
+
+### Take result (what the server returns after Send)
+
+| Variable | Meaning |
+|---|---|
+| `{{take_result.summary}}` | One-line summary of the claim. Raw text is never shown. Preview mock: "Your claim, condensed to one line" |
+| `{{take_result.stance}}` | `yes` / `no` / `unsure` |
+| `{{take_result.evidence}}` | `true` when a source was named; shows the "evidence noted" mark |
+| `{{take_result.ago}}` | Relative timestamp (e.g. `just now`) |
+| `{{take_result.xp}}` | XP earned (e.g. `1`) |
