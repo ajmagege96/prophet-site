@@ -614,6 +614,8 @@
   }
   function paintTally(sfx, t, left) {
     q(vm, '[data-vm-yes' + sfx + ']').textContent = fmt(t.y) + ' $PROPHET';
+    q(vm, '[data-vm-yespct' + sfx + ']').textContent = t.pct + '%';
+    q(vm, '[data-vm-nopct' + sfx + ']').textContent = (100 - t.pct) + '%';
     q(vm, '[data-vm-no' + sfx + ']').textContent = fmt(t.n) + ' $PROPHET';
     q(vm, '[data-vm-left' + sfx + ']').textContent = left + ' left';
     q(vm, '[data-vm-bar' + sfx + ']').style.width = t.pct + '%';
