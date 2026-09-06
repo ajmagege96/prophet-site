@@ -430,7 +430,7 @@ ul, ol { list-style: none; }
   text-align: right;
 }
 .carousel__state--vote { color: var(--purple-text); }
-.carousel__state--called { color: var(--offwhite); opacity: 0.85; }
+.carousel__state--called { color: rgba(242, 240, 230, 0.85); }   /* gray via colour, so the purple star inside stays full strength */
 .conviction { display: inline-flex; align-items: center; gap: 2px; color: var(--purple-text); }
 .conviction .ico { width: 11px; height: 11px; fill: currentColor; }
 .tally { font-weight: 500; }
@@ -638,7 +638,7 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
 .thesis__outcome { font-size: 12px; opacity: 0.8; }
 .thesis__outcome[hidden] { display: none; }
 .carousel__state .prow__outcome { padding: 1px 5px; font-size: 9px; margin-left: 2px; }
-.thesis__state { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; opacity: 0.85; }
+.thesis__state { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: rgba(242, 240, 230, 0.85); }   /* same: no opacity, so VOTE OPEN and the star match the cards */
 .thesis__state--vote { color: var(--purple-text); }
 .thesis__text { font-size: 13px; line-height: 1.45; }
 /* Vote call to action, top-right of the thesis block; opens a small popup */
