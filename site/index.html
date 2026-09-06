@@ -29,7 +29,7 @@
   <meta name="twitter:description" content="An agent that reads prediction markets, publishes a thesis before the outcome, and keeps a public record of every call.">
   <meta name="twitter:image" content="https://ajmagege96.github.io/prophet-site/site/assets/prophet-og-1200x630.png">
 
-  <link rel="stylesheet" href="styles.css?v=fe09c846">
+  <link rel="stylesheet" href="styles.css?v=615b8b37">
 </head>
 <body>
 
@@ -527,12 +527,20 @@
     <div class="tm" data-tm-done hidden>
       <div class="vm__check"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="5 12.5 10 17.5 19 7"/></svg></div>
       <p class="tm__title heading">Take received</p>
-      <div class="tm__card outline">
-        <div class="tm__badges"><span class="takes__stance" data-tm-stance></span><span class="tm__ev" data-tm-ev hidden><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="5 12.5 10 17.5 19 7"/></svg>evidence noted</span></div>
-        <span class="tm__meta" data-tm-ago></span>
-        <p class="takes__claim tm__claim" data-tm-claim></p>
-        <span class="tm__meta" data-tm-user></span>
-        <span class="takes__xp tm__cardxp" data-tm-xpcard></span>
+      <!-- your take, as the feed will show it: the same row as the takes list, narrower -->
+      <div class="takes__item tm__card outline">
+        <div class="takes__main">
+          <div class="takes__head">
+            <span class="takes__user" data-tm-user></span>
+            <span class="takes__stance" data-tm-stance></span>
+            <span class="tm__ev" data-tm-ev hidden><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="5 12.5 10 17.5 19 7"/></svg>evidence noted</span>
+          </div>
+          <p class="takes__claim" data-tm-claim></p>
+        </div>
+        <div class="takes__side">
+          <span class="takes__ago" data-tm-ago></span>
+          <span class="takes__xp" data-tm-xpcard></span>
+        </div>
       </div>
       <p class="tm__xp" data-tm-xp></p>
       <div class="mdl__actions">
