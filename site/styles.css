@@ -438,8 +438,8 @@ ul, ol { list-style: none; }
 .carousel__state--vote .tally, .prow__state--vote .tally, .thesis__state--vote .tally { text-transform: capitalize; }
 .timer { text-transform: none; }
 /* In the vote badge only the icons are purple; the counts and text stay gray. */
-.votes, .timer { display: inline-flex; align-items: center; gap: 3px; color: var(--offwhite); opacity: 0.55; }
-.votes .ico, .timer .ico { width: 11px; height: 11px; fill: none; stroke: var(--purple-text); }
+.votes, .timer { display: inline-flex; align-items: center; gap: 3px; color: rgba(242, 240, 230, 0.55); }   /* gray via colour, not opacity, so the purple icons stay full strength */
+.votes .ico, .timer .ico { width: 11px; height: 11px; fill: none; stroke: var(--purple-text); opacity: 1; }   /* the same purple as VOTE OPEN and the conviction */
 .timer { text-transform: none; }
 .tally--yes { color: var(--green); }
 .tally--no  { color: #e53935; }
@@ -487,10 +487,8 @@ ul, ol { list-style: none; }
 
 .vm { display: flex; flex-direction: column; gap: 14px; }
 .vm[hidden] { display: none; }
-/* Ballot and voted state share one grid cell: the box keeps its exact width and height when it transforms */
-.vm__stack { display: grid; width: 100%; }
-.vm__stack .vm { grid-area: 1 / 1; }
-.vm__stack .vm[hidden] { display: flex; visibility: hidden; pointer-events: none; }
+/* Ballot and voted state: same width (the panel's), each its own height */
+.vm__stack { width: 100%; }
 .vm__head { display: flex; align-items: center; gap: 12px; }
 .vm__img { flex: 0 0 auto; }
 .vm__headmain { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
@@ -516,7 +514,7 @@ ul, ol { list-style: none; }
 .vm__seg .seg__opt--no.seg__opt--on { color: #e53935; }
 
 /* the reward for voting */
-.vm--done { align-items: center; justify-content: center; text-align: center; gap: 22px; }   /* roomier than the ballot */
+.vm--done { align-items: center; text-align: center; gap: 22px; padding: 10px 0 4px; }   /* roomier than the ballot */
 .vm--done .vm__act { margin-top: 10px; }   /* air between the bar and the button */
 .vm__check { width: 64px; height: 64px; border: 2px solid var(--green); border-radius: 4px; display: flex; align-items: center; justify-content: center; animation: mdl-pop 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.25) both; }
 .vm__check svg { width: 34px; height: 34px; fill: none; stroke: var(--green); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 40; stroke-dashoffset: 40; animation: mdl-draw 0.45s 0.3s ease-out forwards; }
@@ -536,7 +534,7 @@ ul, ol { list-style: none; }
 .tm[hidden] { display: none; }
 .spinner { width: 64px; height: 64px; border: 3px solid rgba(16, 240, 95, 0.2); border-top-color: var(--green); border-radius: 50%; animation: mdl-spin 0.8s linear infinite; }   /* as big as the check */
 @keyframes mdl-spin { to { transform: rotate(360deg); } }
-.tm__label { font-size: 13px; opacity: 0.8; }
+.tm__label { font-size: 16px; opacity: 0.85; }
 .tm__title { font-size: 18px; letter-spacing: 0.12em; }
 .tm__ev { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--green); opacity: 0.85; }
 .tm__ev[hidden] { display: none; }
