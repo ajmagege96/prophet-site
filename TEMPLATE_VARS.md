@@ -14,7 +14,6 @@
 | `{{tl_tg_url}}` | TradeLeague on Telegram (footer) |
 | `{{tl_linkedin_url}}` | TradeLeague on LinkedIn (footer) |
 | `{{contract_address}}` | $PROPHET contract address; the header pill shows first 6 … last 6 and copies the full value |
-| `{{username}}` | Signed-in user's display name; replaced with a [COPY] label when signed out |
 | `{{polymarket_as_of}}` | Relative timestamp of last Polymarket status check (shown on hover in home panel) |
 | `{{polymarket_status}}` | Polymarket feed status: `up` (green pulsing dot, also the default if the class is unset) or `down` (red dot) |
 | `{{market.slug}}` | URL-safe identifier for the market (used in `<!-- repeat: market -->`) |
@@ -41,7 +40,7 @@
 | `{{market.thesis}}` | Full thesis text (called) or draft thesis (vote open), set as `data-thesis` on the card; shown in the Thesis block above the takes when the card is selected; empty otherwise |
 | `{{market.vote_time_left}}` | Time left on the vote, relative (purple clock in the badge) |
 | `{{market.vote_count}}` | Votes cast so far on an open vote (shown after a vote icon in the badge) |
-| `{{market.filter_state}}` | `none` (no thesis yet), `vote` (vote open), or `called`; drives the filter tags above the carousel |
+| `{{market.filter_state}}` | `none` (no thesis yet), `vote` (vote open), `called`, or `resolved` (History deck); drives the filter tags above the carousel |
 | `{{take.username}}` | Username of the person who posted the take (used in `<!-- repeat: take -->`) |
 | `{{take.stance}}` | Take stance: YES or NO (used in `<!-- repeat: take -->`) |
 | `{{take.xp}}` | XP earned by the take, rendered as "+N XP" under the timestamp |
