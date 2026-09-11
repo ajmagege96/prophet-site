@@ -140,5 +140,6 @@ MVP and kept only so they come back with the page. `{{explainer_record}}`,
 |---|---|
 | `{{takes.per_market}}` | Takes a viewer gets per market (e.g. `3`) |
 | `{{takes.interval}}` | How often a new take is granted, as words (e.g. `15 minutes`) |
-| `{{takes.next_in}}` | Relative time until the viewer's next take on the selected market (e.g. `9m`) |
+| `{{takes.next_in}}` | Relative time until the viewer's next take (e.g. `9m`) |
+| `{{viewer.take_cooldown}}` | `true` while the viewer must wait for their next take; Send then shows the cooldown notice. Console: `prophetNotices.open('cooldown')` to preview it |
 | `{{market.viewer_takes_used}}` | On each card: takes the viewer has already given on that market; the out-of-takes notice fires when it reaches the allowance |

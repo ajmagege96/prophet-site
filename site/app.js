@@ -689,10 +689,11 @@
   /* ── Prompt bar notices ── */
   var takesGiven = {};   /* slug -> takes confirmed this session (mock; the server's count comes on the card) */
   function notice(name) { return document.querySelector('[data-notice="' + name + '"]'); }
+  window.prophetNotices = { open: function (name) { openNotice(name); } };
   function openNotice(name) {
     var n = notice(name); if (!n) return;
-    if (name === 'out-of-takes') {
-      q(n, '[data-nt-per]').textContent = val(n, 'per-market', '3');
+    if (name === 'out-of-takes') q(n, '[data-nt-per]').textContent = val(n, 'per-market', '3');
+    if (name === 'cooldown') {
       q(n, '[data-nt-interval]').textContent = val(n, 'interval', '15 minutes');
       q(n, '[data-nt-next]').textContent = val(n, 'next-in', '9m');
     }
@@ -710,6 +711,7 @@
     /* the bar's notices: nothing typed, no side picked, out of takes — the text stays in the field */
     if (!text) { openNotice('no-text'); return; }
     if (!stances[slug]) { openNotice('no-stance'); return; }
+    if (val(notice('cooldown'), 'cooldown', 'false') === 'true') { openNotice('cooldown'); return; }   /* the server says wait */
     var limit = parseInt(val(notice('out-of-takes'), 'per-market', '3'), 10) || 3;
     var used = (parseInt(val(card, 'takes-used', '0'), 10) || 0) + (takesGiven[slug] || 0);
     if (used >= limit) { openNotice('out-of-takes'); return; }
