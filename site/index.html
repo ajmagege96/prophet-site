@@ -29,7 +29,7 @@
   <meta name="twitter:description" content="An agent that reads prediction markets, publishes a thesis before the outcome, and keeps a public record of every call.">
   <meta name="twitter:image" content="https://ajmagege96.github.io/prophet-site/site/assets/prophet-og-1200x630.png">
 
-  <link rel="stylesheet" href="styles.css?v=f564a1d5">
+  <link rel="stylesheet" href="styles.css?v=5c77b8fc">
 </head>
 <body>
 
@@ -51,6 +51,8 @@
   <nav class="site-header__nav">
     <a href="prophet.html">$Prophet</a>
     <a href="{{docs_url}}" target="_blank" rel="noopener">Docs</a>
+    <!-- only when the viewer is signed in ({{viewer.signed_in}}); hover reads red -->
+    <a href="{{logout_url}}" class="site-header__logout" data-logout>Log out</a>
     <button class="site-header__ca" data-ca="{{contract_address}}" data-ca-copy title="Copy contract address" aria-label="Copy contract address">
       <span class="site-header__ca-text" data-ca-text></span>
       <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="1.5"/><path d="M5 15V5a1 1 0 0 1 1-1h10"/></svg>
@@ -71,6 +73,8 @@
     <a href="#how-it-works" data-onboarding-open>How it Works</a>
     <a href="prophet.html">$Prophet</a>
     <a href="{{docs_url}}" target="_blank" rel="noopener">Docs</a>
+    <!-- only when the viewer is signed in ({{viewer.signed_in}}); reads red -->
+    <a href="{{logout_url}}" class="site-header__logout" data-logout>Log out</a>
     <div class="menu-links">
         <div class="site-footer__group">
           <img src="assets/tradeleague-mark.svg" alt="TradeLeague" class="site-footer__mark site-footer__mark--tl">
@@ -602,7 +606,7 @@
     <div class="nt">
       <p class="nt__title heading">Out of takes</p>
       <p class="nt__line">You get <span data-nt-per></span> takes per market.</p>
-      <p class="nt__sub">Check out some other markets.</p>
+      <p class="nt__sub">Check out some other markets!</p>
       <button class="mdl__cta" data-modal-close>Close</button>
     </div>
   </div>
@@ -615,8 +619,20 @@
     <div class="nt">
       <p class="nt__title heading">Out of takes</p>
       <p class="nt__line">You get one take every <span data-nt-interval></span>.</p>
-      <p class="nt__sub">Next take in <span data-nt-next></span></p>
+      <p class="nt__sub">Next take available in <span data-nt-next></span></p>
       <button class="mdl__cta" data-modal-close>Close</button>
+    </div>
+  </div>
+</div>
+<!-- after Log out: the server signs the viewer out and shows this on the way back -->
+<div class="mdl" data-modal data-notice="logged-out" hidden role="alertdialog" aria-modal="true" aria-label="Logged out">
+  <div class="mdl__backdrop" data-modal-close></div>
+  <div class="mdl__panel mdl__panel--small outline">
+    <button class="mdl__close" data-modal-close aria-label="Close">&times;</button>
+    <div class="nt">
+      <p class="nt__title heading">Logged out</p>
+      <p class="nt__line">You've logged out.</p>
+      <button class="mdl__cta" data-modal-close>OK</button>
     </div>
   </div>
 </div>
@@ -793,6 +809,6 @@
 </footer>
 <!-- /partial:footer -->
 
-<script src="app.js?v=fae99e3a"></script>
+<script src="app.js?v=88b77cc6"></script>
 </body>
 </html>

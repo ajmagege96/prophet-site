@@ -690,6 +690,18 @@
   var takesGiven = {};   /* slug -> takes confirmed this session (mock; the server's count comes on the card) */
   function notice(name) { return document.querySelector('[data-notice="' + name + '"]'); }
   window.prophetNotices = { open: function (name) { openNotice(name); } };
+  /* Log out: the real link is {{logout_url}}; while it is unfilled, the click fires prophet:logout and shows the notice */
+  var logouts = document.querySelectorAll('[data-logout]');
+  for (var li = 0; li < logouts.length; li++) {
+    logouts[li].addEventListener('click', function (e) {
+      if ((/^\{\{/).test(this.getAttribute('href') || '')) {
+        e.preventDefault();
+        document.dispatchEvent(new CustomEvent('prophet:logout'));
+        var menu = document.querySelector('[data-menu-panel]'); if (menu) menu.classList.remove('open');
+        openNotice('logged-out');
+      }
+    });
+  }
   function openNotice(name) {
     var n = notice(name); if (!n) return;
     if (name === 'out-of-takes') q(n, '[data-nt-per]').textContent = val(n, 'per-market', '3');
