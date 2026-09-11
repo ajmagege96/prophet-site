@@ -133,3 +133,12 @@ MVP and kept only so they come back with the page. `{{explainer_record}}`,
 | `{{take_result.evidence}}` | `true` when a source was named; shows the "evidence noted" mark |
 | `{{take_result.ago}}` | Relative timestamp (e.g. `just now`) |
 | `{{take_result.xp}}` | XP earned (e.g. `1`) |
+
+### Takes allowance (prompt bar notices)
+
+| Variable | Meaning |
+|---|---|
+| `{{takes.per_market}}` | Takes a viewer gets per market (e.g. `3`) |
+| `{{takes.interval}}` | How often a new take is granted, as words (e.g. `15 minutes`) |
+| `{{takes.next_in}}` | Relative time until the viewer's next take on the selected market (e.g. `9m`) |
+| `{{market.viewer_takes_used}}` | On each card: takes the viewer has already given on that market; the out-of-takes notice fires when it reaches the allowance |

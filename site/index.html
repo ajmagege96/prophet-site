@@ -29,7 +29,7 @@
   <meta name="twitter:description" content="An agent that reads prediction markets, publishes a thesis before the outcome, and keeps a public record of every call.">
   <meta name="twitter:image" content="https://ajmagege96.github.io/prophet-site/site/assets/prophet-og-1200x630.png">
 
-  <link rel="stylesheet" href="styles.css?v=3c7f8851">
+  <link rel="stylesheet" href="styles.css?v=f564a1d5">
 </head>
 <body>
 
@@ -127,7 +127,7 @@
              <span class="prow__outcome prow__outcome--won|lost">won|lost</span>; the big figure is the settled YES % (100% or 0%);
              meta row as for called. The resolved_* variables fill the "how it played out" line in the thesis block. -->
         <template>
-        <div class="carousel__card outline" data-card data-state="{{market.filter_state}}" data-slug="{{market.slug}}" data-vote-yes-pct="{{market.vote_yes_pct}}" data-vote-yes-weight="{{market.vote_yes_weight}}" data-vote-no-weight="{{market.vote_no_weight}}" data-vote-count="{{market.vote_count}}" data-vote-left="{{market.vote_time_left}}" data-stance="{{market.thesis_stance}}" data-estimate="{{market.estimate_pct}}" data-conviction="{{market.conviction}}" data-outcome="{{market.outcome}}" data-resolved-side="{{market.resolved_side}}" data-resolved-pct="{{market.resolved_pct}}" data-resolved-ago="{{market.resolved_ago}}" data-thesis="{{market.thesis}}" data-contributors="{{market.contributors_json}}">
+        <div class="carousel__card outline" data-card data-state="{{market.filter_state}}" data-slug="{{market.slug}}" data-vote-yes-pct="{{market.vote_yes_pct}}" data-vote-yes-weight="{{market.vote_yes_weight}}" data-vote-no-weight="{{market.vote_no_weight}}" data-vote-count="{{market.vote_count}}" data-vote-left="{{market.vote_time_left}}" data-takes-used="{{market.viewer_takes_used}}" data-stance="{{market.thesis_stance}}" data-estimate="{{market.estimate_pct}}" data-conviction="{{market.conviction}}" data-outcome="{{market.outcome}}" data-resolved-side="{{market.resolved_side}}" data-resolved-pct="{{market.resolved_pct}}" data-resolved-ago="{{market.resolved_ago}}" data-thesis="{{market.thesis}}" data-contributors="{{market.contributors_json}}">
           <div class="carousel__top">
             <img class="carousel__img" src="{{market.image_url}}" alt="" loading="lazy">
             <span class="carousel__state">{{market.state}}</span>
@@ -570,6 +570,45 @@
 </div>
 <!-- /modal:take -->
 
+<!-- modal:notices — three small notices for the prompt bar. Each is its own block so the lines can be filled
+     per notice; the figures on the third are template variables. All close on the X, Escape, the backdrop or the button. -->
+<div class="mdl" data-modal data-notice="no-text" hidden role="alertdialog" aria-modal="true" aria-label="Nothing to send">
+  <div class="mdl__backdrop" data-modal-close></div>
+  <div class="mdl__panel mdl__panel--small outline">
+    <button class="mdl__close" data-modal-close aria-label="Close">&times;</button>
+    <div class="nt">
+      <p class="nt__title heading">Nothing to send</p>
+      <p class="nt__line">Type your take first.</p>
+      <button class="mdl__cta" data-modal-close>OK</button>
+    </div>
+  </div>
+</div>
+<div class="mdl" data-modal data-notice="no-stance" hidden role="alertdialog" aria-modal="true" aria-label="Pick a side">
+  <div class="mdl__backdrop" data-modal-close></div>
+  <div class="mdl__panel mdl__panel--small outline">
+    <button class="mdl__close" data-modal-close aria-label="Close">&times;</button>
+    <div class="nt">
+      <p class="nt__title heading">Pick a side</p>
+      <p class="nt__line">Choose YES or NO before you send.</p>
+      <button class="mdl__cta" data-modal-close>OK</button>
+    </div>
+  </div>
+</div>
+<div class="mdl" data-modal data-notice="out-of-takes" hidden role="alertdialog" aria-modal="true" aria-label="Out of takes"
+     data-per-market="{{takes.per_market}}" data-interval="{{takes.interval}}" data-next-in="{{takes.next_in}}">
+  <div class="mdl__backdrop" data-modal-close></div>
+  <div class="mdl__panel mdl__panel--small outline">
+    <button class="mdl__close" data-modal-close aria-label="Close">&times;</button>
+    <div class="nt">
+      <p class="nt__title heading">Out of takes</p>
+      <p class="nt__line">You get <span data-nt-per></span> takes per market. A new one every <span data-nt-interval></span>.</p>
+      <p class="nt__sub">Next take in <span data-nt-next></span></p>
+      <button class="mdl__cta" data-modal-close>Close</button>
+    </div>
+  </div>
+</div>
+<!-- /modal:notices -->
+
 <!-- partial:onboarding -->
 <!-- Onboarding modal. Opens on a first visit (remembered on the device in localStorage) and from the
      How it Works link every time. Three slides; Next / Back / Get Started, dots, swipe on touch.
@@ -741,6 +780,6 @@
 </footer>
 <!-- /partial:footer -->
 
-<script src="app.js?v=ae48b0c0"></script>
+<script src="app.js?v=a4a35372"></script>
 </body>
 </html>

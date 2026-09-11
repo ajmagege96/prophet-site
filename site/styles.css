@@ -474,7 +474,13 @@ ul, ol { list-style: none; }
 .mdl__backdrop { position: absolute; inset: 0; background: rgba(21, 27, 38, 0.84); }
 .mdl__panel { position: relative; width: 100%; max-width: 520px; background: var(--navy); padding: 44px 16px 16px; display: flex; flex-direction: column; gap: 14px; max-height: calc(100dvh - 24px); overflow-y: auto; scrollbar-width: thin; }
 .mdl__panel.mdl__panel--wide { max-width: 730px; }
-.mdl__panel.mdl__panel--take { max-width: 640px; }   /* the Vote modal: as wide as How it Works */
+.mdl__panel.mdl__panel--take { max-width: 640px; }
+.mdl__panel.mdl__panel--small { max-width: 380px; padding-bottom: 22px; }   /* the prompt bar's notices */
+.nt { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px; }
+.nt__title { font-size: 15px; letter-spacing: 0.12em; }
+.nt__line { font-size: 14px; line-height: 1.5; opacity: 0.85; }
+.nt__sub { font-size: 13px; opacity: 0.6; }
+.nt .mdl__cta { min-width: 160px; margin-top: 6px; }   /* the Vote modal: as wide as How it Works */
 .mdl__close { position: absolute; top: 0; right: 0; width: 44px; height: 44px; font-size: 22px; line-height: 1; opacity: 0.6; }
 .mdl__close:hover { opacity: 1; }
 .mdl__cta { min-height: 44px; padding: 0 16px; border: 1px solid var(--green); border-radius: 4px; color: var(--green); font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }

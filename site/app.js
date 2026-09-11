@@ -686,6 +686,19 @@
   }
   window.prophetVote = { open: function (slug) { for (var i = 0; i < cards.length; i++) if (cards[i].dataset.slug === slug) return openVote(cards[i]); } };
 
+  /* ── Prompt bar notices ── */
+  var takesGiven = {};   /* slug -> takes confirmed this session (mock; the server's count comes on the card) */
+  function notice(name) { return document.querySelector('[data-notice="' + name + '"]'); }
+  function openNotice(name) {
+    var n = notice(name); if (!n) return;
+    if (name === 'out-of-takes') {
+      q(n, '[data-nt-per]').textContent = val(n, 'per-market', '3');
+      q(n, '[data-nt-interval]').textContent = val(n, 'interval', '15 minutes');
+      q(n, '[data-nt-next]').textContent = val(n, 'next-in', '9m');
+    }
+    openModal(n);
+  }
+
   /* ── Take sent modal ── */
   var tm = document.querySelector('[data-take-modal]');
   var sendBtn = document.querySelector('[data-prompt-send]');
@@ -693,8 +706,14 @@
   function sendTake() {
     if (!tm || !promptInput || activeIndex < 0) return;
     var text = promptInput.value.trim();
-    if (!text) return;
     var card = cards[activeIndex], slug = card.dataset.slug;
+    /* the bar's notices: nothing typed, no side picked, out of takes — the text stays in the field */
+    if (!text) { openNotice('no-text'); return; }
+    if (!stances[slug]) { openNotice('no-stance'); return; }
+    var limit = parseInt(val(notice('out-of-takes'), 'per-market', '3'), 10) || 3;
+    var used = (parseInt(val(card, 'takes-used', '0'), 10) || 0) + (takesGiven[slug] || 0);
+    if (used >= limit) { openNotice('out-of-takes'); return; }
+    takesGiven[slug] = (takesGiven[slug] || 0) + 1;   /* a take is spent when it is sent */
     promptInput.value = '';
     fillMarketHead(tm, card);
     q(tm, '[data-tm-loading]').hidden = false; q(tm, '[data-tm-done]').hidden = true;
@@ -703,7 +722,7 @@
        height while the spinner shows; it is revealed, and the feed updated, on confirmation. */
       /* what the server returns for the take; the mock fallbacks are used only while the variables are unfilled */
       var summary = val(tm, 'summary', 'Custody objections were withdrawn in the latest docket filing, so the timing risk on approval is smaller than the market is pricing');
-      var stance = val(tm, 'stance', stances[slug] || card.dataset.stance || 'yes').toLowerCase();   /* the bar switch; else the market's side */
+      var stance = val(tm, 'stance', stances[slug]).toLowerCase();   /* the bar switch, required */
       var evidence = val(tm, 'evidence', (/https?:\/\/|\bsource\b|\bper\b|\breport\b/i).test(text) ? 'true' : 'false') === 'true';
       var ago = val(tm, 'ago', 'just now'), xp = val(tm, 'xp', '1'), user = val(vm, 'username', 'you');
       var sb = q(tm, '[data-tm-stance]'); sb.textContent = stance.toUpperCase(); sb.className = 'takes__stance takes__stance--' + stance;
