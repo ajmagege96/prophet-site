@@ -467,9 +467,9 @@ ul, ol { list-style: none; }
 .carousel__buy:hover { opacity: 1; border-color: currentColor; text-decoration: none; }
 
 
- /* Log out: red on hover in the desktop nav; red outright in the phone menu, where there is no hover */
-.site-header__nav .site-header__logout:hover, .site-header__nav .site-header__logout:focus-visible { color: #e53935; }
-.site-header__mobile-panel .site-header__logout { color: #e53935; }
+/* Logout: gray like its neighbours, red on hover / press, in the desktop nav and the phone menu alike */
+.site-header__nav .site-header__logout:hover, .site-header__nav .site-header__logout:focus-visible,
+.site-header__mobile-panel .site-header__logout:hover, .site-header__mobile-panel .site-header__logout:focus-visible, .site-header__mobile-panel .site-header__logout:active { color: #e53935; }
 
 /* ── Modals: Vote, Take sent ───────────────────────────── */
 /* Mobile first: full width, height from content, centred; 44px buttons; scroll locked behind. */
