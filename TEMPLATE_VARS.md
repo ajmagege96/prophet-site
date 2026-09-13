@@ -24,7 +24,8 @@
 | `{{market.ends_in}}` | Relative time until the market ends (e.g. "12d", "3mo"), shown after a clock icon |
 | `{{market.take_count}}` | Number of takes on this market |
 | `{{market.state}}` | State badge, top-right of the card, rendered only for vote/called: `vote open · <span class="tally tally--yes">62% YES</span>` or `called <span class="tally tally--no">NO</span> <span class="conviction">[star icon]N</span>` (no dot); tally colors green/red by side; empty for open markets with no thesis |
-| `{{market.estimate_pct}}` | The Prophet's estimated probability for his position, e.g. `78%`; shown in the thesis block head as "78% est." |
+| `{{prophet_probability}}` | The Prophet's number for the market, a whole integer with `%` (e.g. `78%`). Set as `data-estimate` on the card; shown as a plain purple percentage in the thesis block head for open votes, prophecies and history, and beside "Thesis draft" on a no-thesis market that has been evaluated; leave it empty when not evaluated |
+| `{{no_edge_line}}` | On a no-thesis card, as `data-no-edge-line`: the one-line no-edge copy when the market has been evaluated, or the not-evaluated line when it has not (also after a rejected vote). The thesis block shows it under the "Draft" title, with the purple percentage beside the title when evaluated |
 | `{{market.conviction}}` | Star conviction, 1–5; shown in the thesis block head and the called badge |
 | `{{market.outcome}}` | `won` / `lost` — resolved markets only, drives the tag in the badge |
 | `{{market.resolved_side}}` | `yes` / `no` — the side the market settled on |

@@ -470,9 +470,22 @@
     var text = card.dataset.thesis || '';
     var state = card.dataset.state || 'none';
     paintBarStance(card);
-    if (!text || state === 'none') { thesisBox.hidden = true; return; }
-    thesisBox.hidden = false;
-    thesisLabel.textContent = state === 'vote' ? 'Thesis draft' : 'Thesis';
+    var hasThesis = !!text && state !== 'none';
+    /* No thesis: the box stays, titled "Thesis draft", holding the no-edge line and nothing else */
+    thesisBox.hidden = !hasThesis && !card.dataset.noEdgeLine;
+    thesisBox.classList.toggle('thesis--none', !hasThesis);
+    if (!hasThesis) {
+      thesisLabel.textContent = 'Draft';
+      thesisStance.textContent = ''; thesisStance.className = 'thesis__stance heading';
+      if (thesisEst) thesisEst.textContent = card.dataset.estimate || '';   /* the number, when the market has been evaluated */
+      if (thesisConv) thesisConv.innerHTML = '';
+      thesisText.textContent = card.dataset.noEdgeLine || '';
+      thesisState.innerHTML = ''; thesisState.className = 'thesis__state';
+      thesisList.innerHTML = ''; if (thesisOutcome) thesisOutcome.hidden = true;
+      thesisBox.classList.remove('thesis--vote'); voteWrap.hidden = true;
+      return;
+    }
+    thesisLabel.textContent = state === 'vote' ? 'Draft' : 'Thesis';
     thesisBox.classList.toggle('thesis--vote', state === 'vote');
     var stance = (card.dataset.stance || '').toLowerCase();
     thesisStance.textContent = stance ? stance.toUpperCase() : '';
@@ -480,7 +493,7 @@
     thesisText.textContent = text;
     /* position · estimated probability · conviction */
     var est = card.dataset.estimate || '', conv = card.dataset.conviction || '';
-    if (thesisEst) thesisEst.textContent = est ? est + ' est.' : '';
+    if (thesisEst) thesisEst.textContent = est;   /* the number alone */
     if (thesisConv) thesisConv.innerHTML = conv ? STAR_SVG + conv : '';
     /* resolved: how it played out */
     if (thesisOutcome) {
@@ -630,7 +643,7 @@
     var stance = (card.dataset.stance || '').toLowerCase();
     fillMarketHead(vm, card);
     var st = q(vm, '[data-vm-stance]'); st.textContent = stance.toUpperCase(); st.className = 'thesis__stance heading thesis__stance--' + stance;
-    q(vm, '[data-vm-est]').textContent = (card.dataset.estimate || '') + ' est.';
+    q(vm, '[data-vm-est]').textContent = card.dataset.estimate || '';
     q(vm, '[data-vm-conv]').innerHTML = card.dataset.conviction ? STAR_SVG + card.dataset.conviction : '';
     var tx = q(vm, '[data-vm-text]'); tx.textContent = card.dataset.thesis || ''; tx.classList.remove('vm__text--open'); q(vm, '[data-vm-more]').textContent = 'More';
     var contrib = []; try { contrib = JSON.parse(card.dataset.contributors || '[]'); } catch (e) {}

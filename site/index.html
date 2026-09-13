@@ -29,7 +29,7 @@
   <meta name="twitter:description" content="An agent that reads prediction markets, publishes a thesis before the outcome, and keeps a public record of every call.">
   <meta name="twitter:image" content="https://ajmagege96.github.io/prophet-site/site/assets/prophet-og-1200x630.png">
 
-  <link rel="stylesheet" href="styles.css?v=cad849cb">
+  <link rel="stylesheet" href="styles.css?v=4468f53a">
 </head>
 <body>
 
@@ -124,6 +124,11 @@
              Called: called <span class="tally tally--yes|no">YES</span> <span class="conviction">[star icon]N</span> (no dot).
              Order: markets with an open vote first, then markets with a live thesis (most recently called first,
              at most twelve), then markets with no thesis. The tags above filter that one list.
+             No thesis: the thesis block still shows, titled "Draft", holding data-no-edge-line — the server's
+             one-line no-edge copy when the market has been evaluated, or the not-evaluated line when it has not
+             (also after a rejected vote). When evaluated, data-estimate ({{prophet_probability}}) shows as the purple
+             percentage beside the title; when not, leave data-estimate empty and nothing shows. No position, badge,
+             vote or credits in either case.
              Bottom row: the meta row, identical on every card. Vote: also render the Buy $PROPHET link after the meta row; it floats over the card's bottom-right corner. The YES | NO switch in the prompt bar is always shown;
              called: the meta row with "{{market.called_pct}} at call" first; none: the meta row as is.
              History: filter_state "resolved" for the last ten to twelve resolved markets, newest first. They render in
@@ -131,7 +136,7 @@
              <span class="prow__outcome prow__outcome--won|lost">won|lost</span>; the big figure is the settled YES % (100% or 0%);
              meta row as for called. The resolved_* variables fill the "how it played out" line in the thesis block. -->
         <template>
-        <div class="carousel__card outline" data-card data-state="{{market.filter_state}}" data-slug="{{market.slug}}" data-vote-yes-pct="{{market.vote_yes_pct}}" data-vote-yes-weight="{{market.vote_yes_weight}}" data-vote-no-weight="{{market.vote_no_weight}}" data-vote-count="{{market.vote_count}}" data-vote-left="{{market.vote_time_left}}" data-takes-used="{{market.viewer_takes_used}}" data-stance="{{market.thesis_stance}}" data-estimate="{{market.estimate_pct}}" data-conviction="{{market.conviction}}" data-outcome="{{market.outcome}}" data-resolved-side="{{market.resolved_side}}" data-resolved-pct="{{market.resolved_pct}}" data-resolved-ago="{{market.resolved_ago}}" data-thesis="{{market.thesis}}" data-contributors="{{market.contributors_json}}">
+        <div class="carousel__card outline" data-card data-state="{{market.filter_state}}" data-slug="{{market.slug}}" data-vote-yes-pct="{{market.vote_yes_pct}}" data-vote-yes-weight="{{market.vote_yes_weight}}" data-vote-no-weight="{{market.vote_no_weight}}" data-vote-count="{{market.vote_count}}" data-vote-left="{{market.vote_time_left}}" data-takes-used="{{market.viewer_takes_used}}" data-stance="{{market.thesis_stance}}" data-estimate="{{prophet_probability}}" data-conviction="{{market.conviction}}" data-outcome="{{market.outcome}}" data-resolved-side="{{market.resolved_side}}" data-resolved-pct="{{market.resolved_pct}}" data-resolved-ago="{{market.resolved_ago}}" data-thesis="{{market.thesis}}" data-no-edge-line="{{no_edge_line}}" data-contributors="{{market.contributors_json}}">
           <div class="carousel__top">
             <img class="carousel__img" src="{{market.image_url}}" alt="" loading="lazy">
             <span class="carousel__state">{{market.state}}</span>
@@ -155,7 +160,7 @@
           <a class="carousel__buy" href="{{buy_url}}" target="_blank" rel="noopener">Buy $PROPHET</a>
         </div>
 
-        <div class="carousel__card outline" data-card data-state="vote" data-slug="dxy-100" data-vote-yes-pct="45" data-vote-yes-weight="41,000" data-vote-no-weight="50,100" data-vote-count="74" data-vote-left="14h" data-stance="no" data-estimate="64%" data-conviction="2" data-thesis="Rate-cut pricing is already in the dollar, so the index holds 100 unless the Fed surprises dovish. Relative growth still favors the US and the alternatives are weak. A break below needs a catalyst that isn&#x27;t on the calendar yet." data-contributors="[{&quot;user&quot;: &quot;tessellate&quot;, &quot;claim&quot;: &quot;Euro-area PMIs keep undershooting&quot;, &quot;xp&quot;: 7}, {&quot;user&quot;: &quot;bram_o&quot;, &quot;claim&quot;: &quot;Futures already price two cuts; little left to remove&quot;, &quot;xp&quot;: 3}]">
+        <div class="carousel__card outline" data-card data-state="vote" data-slug="dxy-100" data-vote-yes-pct="45" data-vote-yes-weight="41,000" data-vote-no-weight="50,100" data-vote-count="74" data-vote-left="14h" data-stance="no" data-estimate="64%" data-conviction="2" data-thesis="Rate-cut pricing is already in the dollar, so the index holds 100 unless the Fed surprises dovish. Relative growth still favors the US and the alternatives are weak. A break below needs a catalyst that isn&#x27;t on the calendar yet." data-contributors="[]">
           <div class="carousel__top">
             <img class="carousel__img" src="https://polymarket-upload.s3.us-east-2.amazonaws.com/us-canada-diplomatic-agreement-to-lower-tariffs-by-august-31-dHLeCIoNnnOg.jpg" alt="" loading="lazy">
             <span class="carousel__state carousel__state--vote">vote open <span class="tally tally--no">55% no</span> <span class="votes" title="votes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><polyline points="8 12.5 11 15.5 16 9.5"/></svg>74</span> <span class="timer" title="time left"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>14h</span></span>
@@ -186,7 +191,7 @@
           <span class="carousel__meta"><span title="odds at call">22% at call</span><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>$760K</span><span title="ends in"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>7mo</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>22</span></span>
         </div>
 
-        <div class="carousel__card outline" data-card data-state="none" data-slug="btc-100k">
+        <div class="carousel__card outline" data-card data-state="none" data-slug="btc-100k" data-estimate="71%" data-no-edge-line="Nothing the price is missing yet.">
           <div class="carousel__top">
             <img class="carousel__img" src="https://polymarket-upload.s3.us-east-2.amazonaws.com/BTC+fullsize.png" alt="" loading="lazy">
           </div>
@@ -195,7 +200,7 @@
           <span class="carousel__meta"><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>$4.1M</span><span title="ends in"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>3mo</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>184</span></span>
         </div>
 
-        <div class="carousel__card outline" data-card data-state="none" data-slug="fed-rate-cut">
+        <div class="carousel__card outline" data-card data-state="none" data-slug="fed-rate-cut" data-estimate="55%" data-no-edge-line="The price is missing something, too early to call.">
           <div class="carousel__top">
             <img class="carousel__img" src="https://polymarket-upload.s3.us-east-2.amazonaws.com/fed-decision-in-september-762-c4RyWuxRPo1L.jpg" alt="" loading="lazy">
           </div>
@@ -204,7 +209,7 @@
           <span class="carousel__meta"><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>$2.8M</span><span title="ends in"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>12d</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>97</span></span>
         </div>
 
-        <div class="carousel__card outline" data-card data-state="none" data-slug="eth-flippening">
+        <div class="carousel__card outline" data-card data-state="none" data-slug="eth-flippening" data-no-edge-line="[NOT_EVALUATED_COPY]">
           <div class="carousel__top">
             <img class="carousel__img" src="https://polymarket-upload.s3.us-east-2.amazonaws.com/ETH+fullsize.jpg" alt="" loading="lazy">
           </div>
@@ -213,7 +218,7 @@
           <span class="carousel__meta"><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>$610K</span><span title="ends in"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>1y</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>43</span></span>
         </div>
 
-        <div class="carousel__card outline" data-card data-state="none" data-slug="us-inflation">
+        <div class="carousel__card outline" data-card data-state="none" data-slug="us-inflation" data-no-edge-line="[NOT_EVALUATED_COPY]">
           <div class="carousel__top">
             <img class="carousel__img" src="https://polymarket-upload.s3.us-east-2.amazonaws.com/january-inflation-annual-vp5qkgK2R7Et.jpg" alt="" loading="lazy">
           </div>
@@ -222,7 +227,7 @@
           <span class="carousel__meta"><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>$1.2M</span><span title="ends in"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>2mo</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>156</span></span>
         </div>
 
-        <div class="carousel__card outline" data-card data-state="none" data-slug="gold-ath">
+        <div class="carousel__card outline" data-card data-state="none" data-slug="gold-ath" data-no-edge-line="[NOT_EVALUATED_COPY]">
           <div class="carousel__top">
             <img class="carousel__img" src="https://polymarket-upload.s3.us-east-2.amazonaws.com/gold-logo-0d00c80498.png" alt="" loading="lazy">
           </div>
@@ -231,7 +236,7 @@
           <span class="carousel__meta"><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>$890K</span><span title="ends in"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>4mo</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>78</span></span>
         </div>
 
-        <div class="carousel__card outline" data-card data-state="none" data-slug="sp500-6000">
+        <div class="carousel__card outline" data-card data-state="none" data-slug="sp500-6000" data-no-edge-line="[NOT_EVALUATED_COPY]">
           <div class="carousel__top">
             <img class="carousel__img" src="https://polymarket-upload.s3.us-east-2.amazonaws.com/s-and-p-500-1e40af6979.png" alt="" loading="lazy">
           </div>
@@ -240,7 +245,7 @@
           <span class="carousel__meta"><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>$3.3M</span><span title="ends in"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>6w</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>201</span></span>
         </div>
 
-        <div class="carousel__card outline" data-card data-state="none" data-slug="sol-etf">
+        <div class="carousel__card outline" data-card data-state="none" data-slug="sol-etf" data-no-edge-line="[NOT_EVALUATED_COPY]">
           <div class="carousel__top">
             <img class="carousel__img" src="https://polymarket-upload.s3.us-east-2.amazonaws.com/SOL-logo.png" alt="" loading="lazy">
           </div>
@@ -249,7 +254,7 @@
           <span class="carousel__meta"><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>$1.9M</span><span title="ends in"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>5mo</span><span title="takes"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>62</span></span>
         </div>
 
-        <div class="carousel__card outline" data-card data-state="none" data-slug="china-stimulus">
+        <div class="carousel__card outline" data-card data-state="none" data-slug="china-stimulus" data-no-edge-line="[NOT_EVALUATED_COPY]">
           <div class="carousel__top">
             <img class="carousel__img" src="https://polymarket-upload.s3.us-east-2.amazonaws.com/china-invades-taiwan-in-2025-CCSd9dX2mrea.jpg" alt="" loading="lazy">
           </div>
@@ -370,7 +375,7 @@
           <div class="thesis__top">
             <span class="thesis__label heading" data-thesis-label>Thesis</span>
             <span class="thesis__stance heading" data-thesis-stance></span>
-            <span class="thesis__est" data-thesis-est title="estimated probability"></span>
+            <span class="thesis__est heading" data-thesis-est></span>
             <span class="thesis__conv conviction" data-thesis-conv title="conviction"></span>
           </div>
           <!-- State line: the badge and, while the vote is open, the Vote button. Right of the head on
@@ -472,7 +477,7 @@
       <div class="thesis outline vm__thesis">
         <div class="thesis__head">
           <div class="thesis__top">
-            <span class="thesis__label heading">Thesis draft</span>
+            <span class="thesis__label heading">Draft</span>
             <span class="thesis__stance heading" data-vm-stance></span>
             <span class="thesis__est" data-vm-est title="estimated probability"></span>
             <span class="thesis__conv conviction" data-vm-conv title="conviction"></span>
@@ -809,6 +814,6 @@
 </footer>
 <!-- /partial:footer -->
 
-<script src="app.js?v=88b77cc6"></script>
+<script src="app.js?v=da11629f"></script>
 </body>
 </html>

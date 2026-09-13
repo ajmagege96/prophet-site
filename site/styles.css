@@ -642,7 +642,7 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
 .thesis__stance--yes { color: var(--green); }
 .thesis__stance--no  { color: #e53935; }
 /* Position · estimated probability · conviction, in a row after the label */
-.thesis__est { font-size: 11px; opacity: 0.7; white-space: nowrap; }
+.thesis__est { font-size: 11px; color: var(--purple-text); white-space: nowrap; }   /* The Prophet's number: a plain purple percentage, no label, no box */
 .thesis__est:empty, .thesis__conv:empty { display: none; }
 .thesis__conv { font-size: 11px; }
 .thesis__outcome { font-size: 12px; opacity: 0.8; }
@@ -666,6 +666,8 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
 }
 .vote__btn:hover { opacity: 0.85; }
 .thesis__list { display: flex; flex-direction: column; gap: 3px; padding-top: 6px; border-top: 1px solid var(--outline); }
+.thesis--none .thesis__list { display: none; }   /* no credits row in the no-thesis box */
+.thesis__list:empty::after { content: '[NO_CONTRIBUTORS_COPY]'; font-size: 12px; opacity: 0.6; }   /* open vote with no credits yet */
 .thesis__row { display: flex; align-items: baseline; gap: 8px; font-size: 12px; }
 .thesis__user { flex: 0 0 auto; font-weight: 500; opacity: 0.85; }
 .thesis__claim { flex: 1 1 auto; min-width: 0; opacity: 0.6; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -714,10 +716,7 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  padding: 1px 5px;
-  border: 1px solid var(--outline);
-  border-radius: 2px;
-}
+ }   /* the word alone, coloured; no box */
 .takes__stance--yes { color: var(--green); }
 .takes__stance--no  { color: #e53935; }
 .takes__ago {
