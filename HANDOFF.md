@@ -29,10 +29,18 @@ now lives on the home carousel.
   (bottom-right, `{{buy_url}}`); a called card's meta row starts with
   `{{market.called_pct}} at call`; a resolved card shows a WON / LOST tag and the
   settled YES % (100% or 0%).
-- Thesis block: position, `{{market.estimate_pct}}` as "78% est.", star
-  conviction, the full reasoning, contributors. **No sources.** For an open vote
-  the purple **Vote** button opens the Vote modal; once cast it reads "Voted YES"
-  and is disabled — votes are final.
+- Thesis block, shown for **every** selected market: label "Thesis" (prophecy,
+  history) or "Draft" (open vote, no thesis); position; The Prophet's number
+  `{{prophet_probability}}` as a plain purple percentage, no label, no box; star
+  conviction; the full reasoning; contributors — when there are none, nothing
+  shows, not even the hairline. **No sources.** For an open vote the purple
+  **Vote** button opens the Vote modal; once cast it reads "Voted YES" and is
+  disabled — votes are final.
+- A market with **no thesis** keeps the box: "Draft", the number if the market
+  has been evaluated (nothing if not), and one line from `{{no_edge_line}}` —
+  your no-edge copy, or the not-evaluated line (also after a rejected vote).
+  No position, badge, vote or credits. The market's price stays on every card.
+- Take rows show the stance as a bare YES / NO in green / red — no box.
 
 **Prompt bar.**
 - A joint **YES | NO switch** on the left: the stance attached to what the viewer
@@ -134,8 +142,9 @@ or modal root is the whole contract.
 |---|---|---|
 | `data-state` | `market.filter_state` | `none` · `vote` · `called` · `resolved` |
 | `data-slug` | `market.slug` | row key |
-| `data-stance`, `data-estimate`, `data-conviction` | `market.thesis_stance`, `market.estimate_pct`, `market.conviction` | thesis head |
-| `data-thesis`, `data-contributors` | `market.thesis`, `market.contributors_json` | reasoning and `[{user, claim, xp}]` |
+| `data-stance`, `data-estimate`, `data-conviction` | `market.thesis_stance`, `prophet_probability`, `market.conviction` | thesis head; `data-estimate` is The Prophet's number, a whole integer with `%`, shown in purple. Leave it empty on a market not yet evaluated |
+| `data-thesis`, `data-contributors` | `market.thesis`, `market.contributors_json` | reasoning and `[{user, claim, xp}]`; an empty array shows nothing |
+| `data-no-edge-line` | `no_edge_line` | no-thesis markets only: the no-edge copy when evaluated, the not-evaluated line when not (also after a rejected vote) |
 | `data-vote-yes-pct`, `data-vote-yes-weight`, `data-vote-no-weight`, `data-vote-count`, `data-vote-left` | `market.vote_*` | open votes only; weights formatted (`94,200`) |
 | `data-outcome`, `data-resolved-side`, `data-resolved-pct`, `data-resolved-ago` | `market.outcome`, `market.resolved_*` | resolved only |
 | `data-takes-used` | `market.viewer_takes_used` | takes this viewer has given here; drives the per-market notice |
@@ -179,6 +188,8 @@ Other globals: `window.prophetOnboarding.open()`, `window.prophetBoard.set({beat
 
 - Carousel order and caps as in section 1; History is `resolved` in the same list.
 - A take needs a side. `take_result.stance` is `yes` or `no` — there is no "unsure".
+- `prophet_probability` is a whole integer with `%`. It is present on open votes, prophecies, history and evaluated no-thesis markets, and empty on a market that has not been evaluated.
+- `no_edge_line` on a no-thesis card is one sentence: your no-edge copy for an evaluated market ("Nothing the price is missing yet." / "The price is missing something, too early to call." are the two lines in the mocks), or the not-evaluated line otherwise.
 - Allowance: `takes.per_market` per market, one every `takes.interval`. Check
   order on Send is text → side → cooldown → per-market.
 - Votes can't be changed. Weight is the viewer's `viewer.balance`.
@@ -222,7 +233,7 @@ Other globals: `window.prophetOnboarding.open()`, `window.prophetBoard.set({beat
 
 ## 10. Variable reference
 
-88 variables actually present in the files right now, with where each appears.
+89 variables actually present in the files right now, with where each appears.
 
 | Variable | Where | Holds |
 |---|---|---|
@@ -240,7 +251,6 @@ Other globals: `window.prophetOnboarding.open()`, `window.prophetBoard.set({beat
 | `{{market.contributors_json}}` | Home | JSON array of `{user, claim, xp}` set as `data-contributors` on the card; listed under the thesis as Contributors |
 | `{{market.conviction}}` | Home | Star conviction, 1–5; shown in the thesis block head and the called badge |
 | `{{market.ends_in}}` | Home | Relative time until the market ends (e.g. "12d", "3mo"), shown after a clock icon |
-| `{{market.estimate_pct}}` | Home | The Prophet's estimated probability for his position, e.g. `78%`; shown in the thesis block head as "78% est." |
 | `{{market.filter_state}}` | Home | `none` (no thesis yet), `vote` (vote open), `called`, or `resolved` (History deck); drives the filter tags above the carousel |
 | `{{market.image_url}}` | Home | Market image, imported from Polymarket (44px square on the card) |
 | `{{market.outcome}}` | Home | `won` / `lost` — resolved markets only, drives the tag in the badge |
@@ -261,9 +271,11 @@ Other globals: `window.prophetOnboarding.open()`, `window.prophetBoard.set({beat
 | `{{market.vote_yes_pct}}` | Home | Open-vote tally for the Vote modal: YES share, weight cast on each side (e.g. `94,200`), number of votes, time left (e.g. `2d`) |
 | `{{market.vote_yes_weight}}` | Home | Open-vote tally for the Vote modal: YES share, weight cast on each side (e.g. `94,200`), number of votes, time left (e.g. `2d`) |
 | `{{market.yes_pct}}` | Home | Current YES percentage (e.g. "72%") |
+| `{{no_edge_line}}` | Home | On a no-thesis card, as `data-no-edge-line`: the one-line no-edge copy when the market has been evaluated, or the not-evaluated line when it has not (also after a rejected vote). The thesis block shows it under the "Draft" title, with the purple percentage beside the title when evaluated |
 | `{{polymarket_as_of}}` | Home | Relative timestamp of last Polymarket status check (shown on hover in home panel) |
 | `{{polymarket_status}}` | Home | Polymarket feed status: `up` (green pulsing dot, also the default if the class is unset) or `down` (red dot) |
 | `{{pool_last_week}}` | $PROPHET | Last week's reward pool; the line reads "paid to the community" |
+| `{{prophet_probability}}` | Home | The Prophet's number for the market, a whole integer with `%` (e.g. `78%`). Set as `data-estimate` on the card; shown as a plain purple percentage in the thesis block head for open votes, prophecies and history, and beside "Thesis draft" on a no-thesis market that has been evaluated; leave it empty when not evaluated |
 | `{{pumpfun_url}}` | $PROPHET; Home; footer; header | $PROPHET on pump.fun (footer token link) |
 | `{{solscan_url}}` | $PROPHET; Home; footer; header | $PROPHET on Solscan (footer token link) |
 | `{{swap_impact}}` | $PROPHET | Swap meta line, left: slip and price impact |
