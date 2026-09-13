@@ -614,6 +614,10 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
   .onb__copy { height: 83px; }
 }
 @media (min-width: 768px) {
+  /* The Vote button is taller than the head's text; let it overhang the row rather than stretch it,
+     so the label sits at the same offset whether or not a button is there. */
+  .thesis__head { align-items: flex-start; }
+  .thesis__stateline { align-items: center; margin: -5px 0; }
   .mdl__panel { padding: 44px 24px 24px; }
   .vm__q { font-size: 17px; }
 }

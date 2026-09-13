@@ -37,9 +37,12 @@ now lives on the home carousel.
   **Vote** button opens the Vote modal; once cast it reads "Voted YES" and is
   disabled — votes are final.
 - A market with **no thesis** keeps the box: "Draft", the number if the market
-  has been evaluated (nothing if not), and one line from `{{no_edge_line}}` —
-  your no-edge copy, or the not-evaluated line (also after a rejected vote).
-  No position, badge, vote or credits. The market's price stays on every card.
+  has been evaluated (nothing if not), and one line from `{{no_edge_line}}`:
+  **"Nothing the price is missing yet."** when his number equals the market
+  price, or **"The price is missing something, too early to call."** when it
+  differs by under 5 or the market has not been evaluated yet (also after a
+  rejected vote). No position, badge, vote or credits. The market's price stays
+  on every card.
 - Take rows show the stance as a bare YES / NO in green / red — no box.
 
 **Prompt bar.**
@@ -189,7 +192,7 @@ Other globals: `window.prophetOnboarding.open()`, `window.prophetBoard.set({beat
 - Carousel order and caps as in section 1; History is `resolved` in the same list.
 - A take needs a side. `take_result.stance` is `yes` or `no` — there is no "unsure".
 - `prophet_probability` is a whole integer with `%`. It is present on open votes, prophecies, history and evaluated no-thesis markets, and empty on a market that has not been evaluated.
-- `no_edge_line` on a no-thesis card is one sentence: your no-edge copy for an evaluated market ("Nothing the price is missing yet." / "The price is missing something, too early to call." are the two lines in the mocks), or the not-evaluated line otherwise.
+- `no_edge_line` on a no-thesis card is exactly one of two sentences: "Nothing the price is missing yet." (his number equals the market price) or "The price is missing something, too early to call." (differs by under 5, or not yet evaluated, also after a rejected vote). A gap of 5 or more is a draft, not a no-thesis card.
 - Allowance: `takes.per_market` per market, one every `takes.interval`. Check
   order on Send is text → side → cooldown → per-market.
 - Votes can't be changed. Weight is the viewer's `viewer.balance`.
