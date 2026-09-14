@@ -29,7 +29,7 @@
   <meta name="twitter:description" content="An agent that reads prediction markets, publishes a thesis before the outcome, and keeps a public record of every call.">
   <meta name="twitter:image" content="https://ajmagege96.github.io/prophet-site/site/assets/prophet-og-1200x630.png">
 
-  <link rel="stylesheet" href="styles.css?v=9268dcce">
+  <link rel="stylesheet" href="styles.css?v=980ec6f4">
 </head>
 <body>
 
@@ -202,22 +202,19 @@
     <div class="wallets">
         <a class="wallet outline" href="{{wallet_war_chest_url}}" target="_blank" rel="noopener">
           <span class="wallet__main">
-            <span class="wallet__name">Trading Wallet</span>
-            <span class="wallet__label heading">Public wallet <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></span>
+            <span class="wallet__name">Trading Wallet <svg class="wallet__ext" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></span>
           </span>
           <span class="wallet__num wallet__num--up" data-mock="$48,200">{{wallet_war_chest_value}}</span>
         </a>
         <a class="wallet outline" href="{{wallet_rewards_url}}" target="_blank" rel="noopener">
           <span class="wallet__main">
-            <span class="wallet__name">Rewards Pool</span>
-            <span class="wallet__label heading">Public wallet <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></span>
+            <span class="wallet__name">Rewards Pool <svg class="wallet__ext" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></span>
           </span>
           <span class="wallet__num wallet__num--up" data-mock="$12,400">{{wallet_rewards_value}}</span>
         </a>
         <a class="wallet outline" href="{{wallet_burn_url}}" target="_blank" rel="noopener">
           <span class="wallet__main">
-            <span class="wallet__name">Buy-and-Burn</span>
-            <span class="wallet__label heading">Public wallet <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></span>
+            <span class="wallet__name">Buy-and-Burn <svg class="wallet__ext" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></span>
           </span>
           <span class="wallet__num wallet__num--burn"><span data-mock="8.4M">{{wallet_burn_value}}</span> <span class="wallet__ticker">$PROPHET</span><svg class="wallet__fire" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22a6 6 0 0 0 6-6c0-4-3-6-4-9-2.5 1.5-3 4-3 4s-1-1-1.5-2.5C7 10 6 12.8 6 16a6 6 0 0 0 6 6z"/><path d="M12 22a2.6 2.6 0 0 0 2.6-2.6c0-1.7-1.3-2.6-1.7-3.9-1.1.6-1.3 1.7-1.3 1.7s-.6-.6-.9-1.3c-.7 1.1-1.3 2.2-1.3 3.5A2.6 2.6 0 0 0 12 22z"/></svg></span>
         </a>
@@ -311,7 +308,7 @@
   </table>
 
   <ul class="notes">
-    <li>Fair launch on pump.fun via ClawPump. 1B supply, no team allocation, no presale. One founder wallet bought in the launch transaction; it is public and held. The token never migrates.</li>
+    <li>Fair launch on pump.fun via ClawPump. 1B supply, no presale. The token never migrates.</li>
     <li>The streams run weekly from public wallets. Every transaction is visible.</li>
     <li>The streams are fixed. No vote moves them.</li>
     <li>When product revenue arrives beyond trading fees, 30% of it flows into the same streams. The team is paid last, and only from real revenue.</li>
