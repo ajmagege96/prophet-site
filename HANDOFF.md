@@ -69,7 +69,7 @@ separator; 16px between the takes and the bar.
 rejected, he goes back to the drawing board.", "Every call lives on the record."
 Onboarding slide 2: "credited by wallet". Tokenomics: three streams — Trading
 Wallet 30%, Rewards Pool 50%, Buy-and-Burn 20% — the TradeLeague Pools row is
-gone; launch line: "1B supply, no presale. The token never migrates." Token page: the TradeLeague Pools wallet card is removed along with
+gone; launch line: "1B supply, no presale, vested team allocation. The token never migrates." Token page: the TradeLeague Pools wallet card is removed along with
 its two variables (`wallet_pools_url`, `wallet_pools_value`); three cards in
 one row, each just the name with a gray external-link icon (no "Public wallet"
 label). Roadmap and header untouched.
