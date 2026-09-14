@@ -65,6 +65,20 @@ phone menu; gray, red on hover; render it only when the viewer is signed in.
 Telegram's browser; the menu's link groups are always two rows with one
 separator; 16px between the takes and the bar.
 
+**Copy, pre-launch (Sept 13).** How it Works: "credited by wallet", "If
+rejected, he goes back to the drawing board.", "Every call lives on the record."
+Onboarding slide 2: "credited by wallet". Tokenomics: three streams — Trading
+Wallet 30%, Rewards Pool 50%, Buy-and-Burn 20% — the TradeLeague Pools row is
+gone; launch line: "1B supply, no team allocation, no presale. One founder
+wallet bought in the launch transaction; it is public and held. The token never
+migrates." Token page: the TradeLeague Pools wallet card is removed along with
+its two variables (`wallet_pools_url`, `wallet_pools_value`); three cards in
+one row. Roadmap and header untouched.
+
+**Post-token (once the contract exists):** `{{contract_address}}`, the Jupiter
+link, the DexScreener chart source, the three wallet links, the ClawPump
+(`{{buy_url}}`) and Solscan links.
+
 **Meta.** Every page has description, absolute `og:*` and `twitter:*` tags, and a
 180px apple-touch icon. `robots.txt` still disallows search crawlers but allows
 link-preview bots (Twitterbot, TelegramBot, facebookexternalhit, Discordbot,
@@ -85,7 +99,7 @@ to the real domain.**
 | `index.html` (repo root) | Redirect to `site/index.html` so the bare Pages URL is not a 404. Delete once `site/` is the document root. |
 | `tools-stamp.py` | Rewrites the `?v=<hash>` on `app.js` / `styles.css` in every page from the file's content. Run after editing either. Delete it and the query strings once your server sets cache headers. |
 | `site/index.html` | Home: carousel, thesis block, takes, prompt bar, all modals. |
-| `site/prophet.html` | $PROPHET: stat strip, chart, swap, live trades, wallets. |
+| `site/prophet.html` | $PROPHET: stat strip, chart, swap, live trades, three wallets in one row. |
 | `site/partials/header.html` | **Canonical** header. |
 | `site/partials/onboarding.html` | **Canonical** onboarding modal. |
 | `site/partials/below-fold.html` | **Canonical** How it Works, Tokenomics, Roadmap. |
@@ -236,7 +250,7 @@ Other globals: `window.prophetOnboarding.open()`, `window.prophetBoard.set({beat
 
 ## 10. Variable reference
 
-89 variables actually present in the files right now, with where each appears.
+87 variables actually present in the files right now, with where each appears.
 
 | Variable | Where | Holds |
 |---|---|---|
@@ -320,12 +334,10 @@ Other globals: `window.prophetOnboarding.open()`, `window.prophetBoard.set({beat
 | `{{viewer.take_cooldown}}` | Home | `true` while the viewer must wait for their next take; Send then shows the cooldown notice. Console: `prophetNotices.open('cooldown')` to preview it |
 | `{{viewer.username}}` | Home | Shown on the viewer's own take card and feed row. Never an address |
 | `{{viewer.vote_share}}` | Home | The viewer's share of the weight cast so far on the selected market (e.g. `8%`) |
-| `{{wallet_burn_url}}` | $PROPHET | Explorer links for the four public wallets; shown as labels, never as addresses |
+| `{{wallet_burn_url}}` | $PROPHET | Explorer links for the three public wallets (Trading Wallet, Rewards Pool, Buy-and-Burn); shown as labels, never as addresses |
 | `{{wallet_burn_value}}` | $PROPHET | Tokens burned, red (e.g. "8.4M"); the "$PROPHET" ticker after it stays gray, then a red flame icon |
-| `{{wallet_pools_url}}` | $PROPHET | Explorer links for the four public wallets; shown as labels, never as addresses |
-| `{{wallet_pools_value}}` | $PROPHET | Live balances, green |
-| `{{wallet_rewards_url}}` | $PROPHET | Explorer links for the four public wallets; shown as labels, never as addresses |
+| `{{wallet_rewards_url}}` | $PROPHET | Explorer links for the three public wallets (Trading Wallet, Rewards Pool, Buy-and-Burn); shown as labels, never as addresses |
 | `{{wallet_rewards_value}}` | $PROPHET | Live balances, green |
-| `{{wallet_war_chest_url}}` | $PROPHET | Explorer links for the four public wallets; shown as labels, never as addresses |
+| `{{wallet_war_chest_url}}` | $PROPHET | Explorer links for the three public wallets (Trading Wallet, Rewards Pool, Buy-and-Burn); shown as labels, never as addresses |
 | `{{wallet_war_chest_value}}` | $PROPHET | Live balances, green |
 | `{{x_url}}` | $PROPHET; Home; footer; header | Link to the project's X (Twitter) account |
