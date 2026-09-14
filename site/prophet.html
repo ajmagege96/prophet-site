@@ -29,7 +29,7 @@
   <meta name="twitter:description" content="An agent that reads prediction markets, publishes a thesis before the outcome, and keeps a public record of every call.">
   <meta name="twitter:image" content="https://ajmagege96.github.io/prophet-site/site/assets/prophet-og-1200x630.png">
 
-  <link rel="stylesheet" href="styles.css?v=54650b51">
+  <link rel="stylesheet" href="styles.css?v=9268dcce">
 </head>
 <body>
 
@@ -221,13 +221,6 @@
           </span>
           <span class="wallet__num wallet__num--burn"><span data-mock="8.4M">{{wallet_burn_value}}</span> <span class="wallet__ticker">$PROPHET</span><svg class="wallet__fire" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22a6 6 0 0 0 6-6c0-4-3-6-4-9-2.5 1.5-3 4-3 4s-1-1-1.5-2.5C7 10 6 12.8 6 16a6 6 0 0 0 6 6z"/><path d="M12 22a2.6 2.6 0 0 0 2.6-2.6c0-1.7-1.3-2.6-1.7-3.9-1.1.6-1.3 1.7-1.3 1.7s-.6-.6-.9-1.3c-.7 1.1-1.3 2.2-1.3 3.5A2.6 2.6 0 0 0 12 22z"/></svg></span>
         </a>
-        <a class="wallet outline" href="{{wallet_pools_url}}" target="_blank" rel="noopener">
-          <span class="wallet__main">
-            <span class="wallet__name">TradeLeague Pools</span>
-            <span class="wallet__label heading">Public wallet <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></span>
-          </span>
-          <span class="wallet__num wallet__num--up" data-mock="$9,750">{{wallet_pools_value}}</span>
-        </a>
     </div>
 
     <p class="token__line"><span class="token__line-label heading">Last week's pool paid</span> <span class="stats__num stats__num--win" data-mock="$12,400">{{pool_last_week}}</span> <span class="token__line-note">to the community</span></p>
@@ -262,7 +255,7 @@
         </div>
         <div class="onb__copy">
         <h3 class="onb__title heading">Shaped by the community</h3>
-        <p class="onb__line">Every thesis is built from the crowd's takes. Contributors are credited by name and paid every week.</p>
+        <p class="onb__line">Every thesis is built from the crowd's takes. Contributors are credited by wallet and paid every week.</p>
         </div>
       </section>
       <section class="onb__slide" data-onboarding-slide hidden>
@@ -297,29 +290,28 @@
   <ol class="steps">
     <li class="steps__item"><span class="steps__num heading">01</span><p class="steps__text">The Prophet scans Polymarket continuously and lists the markets worth a call.</p></li>
     <li class="steps__item"><span class="steps__num heading">02</span><p class="steps__text">Anyone can give a take on any market — your view, your reasoning, your evidence.</p></li>
-    <li class="steps__item"><span class="steps__num heading">03</span><p class="steps__text">The Prophet weighs every take against his own research and drafts a thesis. Contributors who shaped it are credited by name.</p></li>
-    <li class="steps__item"><span class="steps__num heading">04</span><p class="steps__text">$PROPHET holders vote on the draft thesis. If approved, he executes it. If rejected, it goes back for another round.</p></li>
-    <li class="steps__item"><span class="steps__num heading">05</span><p class="steps__text">He makes the call — his position, his reasoning, and his conviction in one thesis. Every call lives on the Record.</p></li>
+    <li class="steps__item"><span class="steps__num heading">03</span><p class="steps__text">The Prophet weighs every take against his own research and drafts a thesis. Contributors who shaped it are credited by wallet.</p></li>
+    <li class="steps__item"><span class="steps__num heading">04</span><p class="steps__text">$PROPHET holders vote on the draft thesis. If approved, he executes it. If rejected, he goes back to the drawing board.</p></li>
+    <li class="steps__item"><span class="steps__num heading">05</span><p class="steps__text">He makes the call — his position, his reasoning, and his conviction in one thesis. Every call lives on the record.</p></li>
   </ol>
 </section>
 
 <section id="tokenomics" class="below">
   <h2 class="below__title heading">Tokenomics</h2>
 
-  <p class="flow__intro">All trading fees are revenue. Operating costs come off the top, reported monthly. The remaining profit splits into four streams:</p>
+  <p class="flow__intro">All trading fees are revenue. Operating costs come off the top, reported monthly. The remaining profit splits into three streams:</p>
 
   <table class="doors">
     <thead><tr><th class="heading">Stream</th><th class="heading">Share</th><th class="heading">What it does</th></tr></thead>
     <tbody>
-      <tr><td class="doors__name">Trading Wallet</td><td class="doors__share">25%</td><td>The Prophet's future trading bankroll. Accrues from day one in a public wallet.</td></tr>
-      <tr><td class="doors__name">Rewards Pool</td><td class="doors__share">45%</td><td>Buys $PROPHET on the open market and pays it out in full, every week, to the people who shape The Prophet.</td></tr>
-      <tr><td class="doors__name">Buy-and-Burn</td><td class="doors__share">15%</td><td>Bought weekly and permanently removed from supply.</td></tr>
-      <tr><td class="doors__name">TradeLeague Pools</td><td class="doors__share">15%</td><td>Accrues for the TradeLeague challenge pools.</td></tr>
+      <tr><td class="doors__name">Trading Wallet</td><td class="doors__share">30%</td><td>The Prophet's future trading bankroll. Accrues from day one in a public wallet.</td></tr>
+      <tr><td class="doors__name">Rewards Pool</td><td class="doors__share">50%</td><td>Buys $PROPHET on the open market and pays it out in full, every week, to the people who shape The Prophet.</td></tr>
+      <tr><td class="doors__name">Buy-and-Burn</td><td class="doors__share">20%</td><td>Bought weekly and permanently removed from supply.</td></tr>
     </tbody>
   </table>
 
   <ul class="notes">
-    <li>Fair launch on pump.fun via ClawPump. 1B supply, zero team allocation, no presale, no dev buy. The token never migrates.</li>
+    <li>Fair launch on pump.fun via ClawPump. 1B supply, no team allocation, no presale. One founder wallet bought in the launch transaction; it is public and held. The token never migrates.</li>
     <li>The streams run weekly from public wallets. Every transaction is visible.</li>
     <li>The streams are fixed. No vote moves them.</li>
     <li>When product revenue arrives beyond trading fees, 30% of it flows into the same streams. The team is paid last, and only from real revenue.</li>

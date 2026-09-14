@@ -1230,7 +1230,7 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
   .tstats { grid-template-columns: repeat(6, 1fr); }
   .token__grid { grid-template-columns: 1fr 320px; }
   .tchart__plot { height: 210px; }
-  .wallets { grid-template-columns: repeat(2, 1fr); }
+  .wallets { grid-template-columns: repeat(3, 1fr); }   /* three wallets in one row */
 
   .below { padding: 72px 48px; }
   .site-footer__inner { padding: 16px 48px; }

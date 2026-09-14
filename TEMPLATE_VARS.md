@@ -110,8 +110,8 @@ MVP and kept only so they come back with the page. `{{explainer_record}}`,
 | `{{swap_slippage}}`, `{{swap_impact}}` | Swap meta line, left: slip and price impact |
 | `{{swap_sol_balance}}` | The viewer's SOL balance, right of the swap meta line (e.g. "2.41 SOL") |
 | `{{trade.side}}`, `{{trade.amount}}` | Live-trades strip (`<!-- repeat: trade -->`): `buy` / `sell` and the amount |
-| `{{wallet_war_chest_url}}`, `{{wallet_rewards_url}}`, `{{wallet_burn_url}}`, `{{wallet_pools_url}}` | Explorer links for the four public wallets; shown as labels, never as addresses |
-| `{{wallet_war_chest_value}}`, `{{wallet_rewards_value}}`, `{{wallet_pools_value}}` | Live balances, green |
+| `{{wallet_war_chest_url}}`, `{{wallet_rewards_url}}`, `{{wallet_burn_url}}` | Explorer links for the three public wallets (Trading Wallet, Rewards Pool, Buy-and-Burn); shown as labels, never as addresses |
+| `{{wallet_war_chest_value}}`, `{{wallet_rewards_value}}` | Live balances, green |
 | `{{wallet_burn_value}}` | Tokens burned, red (e.g. "8.4M"); the "$PROPHET" ticker after it stays gray, then a red flame icon |
 | `{{pool_last_week}}` | Last week's reward pool; the line reads "paid to the community" |
 
