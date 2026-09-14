@@ -1042,8 +1042,8 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
 .wallet { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px; color: var(--offwhite); }
 .wallet:hover { text-decoration: none; border-color: rgba(242, 240, 230, 0.35); }
 .wallet__main { display: flex; flex-direction: column; gap: 3px; }
-.wallet__name { font-size: 13px; font-weight: 500; }
-.wallet__ext { width: 12px; height: 12px; opacity: 0.55; margin-left: 4px; vertical-align: -1px; }   /* link-out icon after the name, gray */
+.wallet__name { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 500; }
+.wallet__ext { display: inline-block; width: 12px; height: 12px; opacity: 0.55; flex: 0 0 auto; }   /* link-out icon beside the name, gray */
 .wallet__label { display: inline-flex; align-items: center; gap: 6px; font-size: 9px; opacity: 0.45; }
 .wallet__num { display: inline-flex; align-items: center; gap: 5px; font-size: 17px; font-weight: 500; line-height: 1; }
 .wallet__num--up { color: var(--green); }
