@@ -163,6 +163,12 @@
   var thesisEst = document.querySelector('[data-thesis-est]');
   var thesisConv = document.querySelector('[data-thesis-conv]');
   var thesisOutcome = document.querySelector('[data-thesis-outcome]');
+  var thesisLeg = document.querySelector('[data-thesis-leg]');
+  var HOLD_LINES = { no_gap: 'Nothing the price is missing yet.', under_gap: 'The price is missing something, too early to call.' };
+  var NOT_EVALUATED = 'The price is missing something, too early to call.';
+  var VOID_LINE = 'Market closed by Polymarket before resolution.';
+  function labelHTML(key) { return key === 'buy_yes' ? '<span class="lbl lbl--yes">Buy YES</span>' : key === 'buy_no' ? '<span class="lbl lbl--no">Buy NO</span>' : key === 'hold' ? '<span class="lbl lbl--hold">Hold</span>' : ''; }
+  function cardLabel(card) { var l = card.dataset.label; if (l && l !== 'none') return l; var st = (card.dataset.stance || '').toLowerCase(); return (card.dataset.state !== 'none' && st) ? 'buy_' + st : 'none'; }
   var votes = {};   /* slug -> 'yes' | 'no': the vote cast in the Vote modal (mock, in-memory) */
   var stances = {}; /* slug -> 'yes' | 'no': the bar switch, the stance for what you type; never the vote */
   var prevBtn = document.querySelector('[data-carousel-prev]');
@@ -471,15 +477,17 @@
     var state = card.dataset.state || 'none';
     paintBarStance(card);
     var hasThesis = !!text && state !== 'none';
-    /* No thesis: the box stays, titled "Thesis draft", holding the no-edge line and nothing else */
-    thesisBox.hidden = !hasThesis && !card.dataset.noEdgeLine;
+    var label = cardLabel(card);
+    if (thesisLeg) thesisLeg.textContent = card.dataset.legDate || '';
+    /* No thesis: the box stays — "Draft", the label, the number when evaluated, and one line from hold_reason */
+    thesisBox.hidden = false;
     thesisBox.classList.toggle('thesis--none', !hasThesis);
     if (!hasThesis) {
       thesisLabel.textContent = 'Draft';
-      thesisStance.textContent = ''; thesisStance.className = 'thesis__stance heading';
-      if (thesisEst) thesisEst.textContent = card.dataset.estimate || '';   /* the number, when the market has been evaluated */
+      thesisStance.innerHTML = labelHTML(label); thesisStance.className = 'thesis__stance heading';
+      if (thesisEst) thesisEst.textContent = label === 'hold' ? (card.dataset.estimate || '') : '';
       if (thesisConv) thesisConv.innerHTML = '';
-      thesisText.textContent = card.dataset.noEdgeLine || '';
+      thesisText.textContent = label === 'hold' ? (HOLD_LINES[card.dataset.holdReason] || '') : NOT_EVALUATED;
       thesisState.innerHTML = ''; thesisState.className = 'thesis__state';
       thesisList.innerHTML = ''; if (thesisOutcome) thesisOutcome.hidden = true;
       thesisBox.classList.remove('thesis--vote'); voteWrap.hidden = true;
@@ -488,8 +496,8 @@
     thesisLabel.textContent = state === 'vote' ? 'Draft' : 'Thesis';
     thesisBox.classList.toggle('thesis--vote', state === 'vote');
     var stance = (card.dataset.stance || '').toLowerCase();
-    thesisStance.textContent = stance ? stance.toUpperCase() : '';
-    thesisStance.className = 'thesis__stance heading' + (stance ? ' thesis__stance--' + stance : '');
+    thesisStance.innerHTML = labelHTML(label);   /* the label, never the bare position */
+    thesisStance.className = 'thesis__stance heading';
     thesisText.textContent = text;
     /* position · estimated probability · conviction */
     var est = card.dataset.estimate || '', conv = card.dataset.conviction || '';
@@ -498,8 +506,10 @@
     /* resolved: how it played out */
     if (thesisOutcome) {
       var rs = (card.dataset.resolvedSide || '').toLowerCase();
-      thesisOutcome.hidden = state !== 'resolved' || !rs;
-      if (!thesisOutcome.hidden) {
+      var isVoid = card.dataset.callState === 'void';
+      thesisOutcome.hidden = state !== 'resolved' || (!rs && !isVoid);
+      if (isVoid) { thesisOutcome.textContent = VOID_LINE; }
+      else if (!thesisOutcome.hidden) {
         thesisOutcome.innerHTML = 'Resolved <span class="tally tally--' + rs + '">' + rs.toUpperCase() + '</span>' +
           ' · market closed at ' + (card.dataset.resolvedPct || '') +
           (card.dataset.resolvedAgo ? ' · ' + card.dataset.resolvedAgo : '');
@@ -642,7 +652,8 @@
     vmCard = card; vmSide = 'yes';
     var stance = (card.dataset.stance || '').toLowerCase();
     fillMarketHead(vm, card);
-    var st = q(vm, '[data-vm-stance]'); st.textContent = stance.toUpperCase(); st.className = 'thesis__stance heading thesis__stance--' + stance;
+    var st = q(vm, '[data-vm-stance]'); st.innerHTML = labelHTML(cardLabel(card)); st.className = 'thesis__stance heading';
+    q(vm, '[data-vm-leg]').textContent = card.dataset.legDate || '';
     q(vm, '[data-vm-est]').textContent = card.dataset.estimate || '';
     q(vm, '[data-vm-conv]').innerHTML = card.dataset.conviction ? STAR_SVG + card.dataset.conviction : '';
     var tx = q(vm, '[data-vm-text]'); tx.textContent = card.dataset.thesis || ''; tx.classList.remove('vm__text--open'); q(vm, '[data-vm-more]').textContent = 'More';
@@ -700,7 +711,29 @@
   window.prophetVote = { open: function (slug) { for (var i = 0; i < cards.length; i++) if (cards[i].dataset.slug === slug) return openVote(cards[i]); } };
 
   /* ── Prompt bar notices ── */
-  var takesGiven = {};   /* slug -> takes confirmed this session (mock; the server's count comes on the card) */
+  var takesGiven = {};   /* slug -> takes sent on that market today (mock; the server enforces the real limits) */
+  var tmRoot = document.querySelector('[data-take-modal]');
+  var takesLeft = parseInt(val(tmRoot, 'takes-left', '4'), 10); if (isNaN(takesLeft)) takesLeft = 4;
+  var dayLimit = parseInt(val(tmRoot, 'day-limit', '5'), 10) || 5, marketLimit = parseInt(val(tmRoot, 'market-limit', '2'), 10) || 2;
+  var WORDS = { 1: 'one', 2: 'two', 3: 'three', 4: 'four', 5: 'five', 6: 'six' };
+  var LIMIT_COPY = {
+    day: "That's " + (WORDS[dayLimit] || dayLimit) + " takes today. Each one is read in full and feeds his next run, so fewer, better takes are what he wants. Back tomorrow.",
+    market: ((WORDS[marketLimit] || String(marketLimit)).replace(/^./, function (ch) { return ch.toUpperCase(); })) + " take" + (marketLimit === 1 ? '' : 's') + " on this market today is the limit. Give one on another market, or come back tomorrow."
+  };
+  var barCount = document.querySelector('[data-takes-left-count]'), sendBtnEl = document.querySelector('[data-prompt-send]');
+  function paintTakesLeft() {
+    var signedIn = val(document.querySelector('[data-vote-modal]'), 'signed-in', 'true') !== 'false';
+    if (barCount) { barCount.textContent = takesLeft; barCount.hidden = !signedIn; }
+    if (sendBtnEl) { sendBtnEl.classList.toggle('is-off', takesLeft <= 0); sendBtnEl.setAttribute('aria-disabled', takesLeft <= 0 ? 'true' : 'false'); }
+  }
+  function showLimit(reason) {
+    if (!tmRoot) return;
+    q(tmRoot, '[data-tm-loading]').hidden = true; q(tmRoot, '[data-tm-done]').hidden = true;
+    q(tmRoot, '[data-tm-limit-line]').textContent = LIMIT_COPY[reason] || LIMIT_COPY.day;
+    q(tmRoot, '[data-tm-limit]').hidden = false;
+    openModal(tmRoot);
+  }
+  paintTakesLeft();
   function notice(name) { return document.querySelector('[data-notice="' + name + '"]'); }
   window.prophetNotices = { open: function (name) { openNotice(name); } };
   /* Log out: the real link is {{logout_url}}; while it is unfilled, the click fires prophet:logout and shows the notice */
@@ -717,11 +750,6 @@
   }
   function openNotice(name) {
     var n = notice(name); if (!n) return;
-    if (name === 'out-of-takes') q(n, '[data-nt-per]').textContent = val(n, 'per-market', '3');
-    if (name === 'cooldown') {
-      q(n, '[data-nt-interval]').textContent = val(n, 'interval', '15 minutes');
-      q(n, '[data-nt-next]').textContent = val(n, 'next-in', '9m');
-    }
     openModal(n);
   }
 
@@ -736,14 +764,17 @@
     /* the bar's notices: nothing typed, no side picked, out of takes — the text stays in the field */
     if (!text) { openNotice('no-text'); return; }
     if (!stances[slug]) { openNotice('no-stance'); return; }
-    if (val(notice('cooldown'), 'cooldown', 'false') === 'true') { openNotice('cooldown'); return; }   /* the server says wait */
-    var limit = parseInt(val(notice('out-of-takes'), 'per-market', '3'), 10) || 3;
-    var used = (parseInt(val(card, 'takes-used', '0'), 10) || 0) + (takesGiven[slug] || 0);
-    if (used >= limit) { openNotice('out-of-takes'); return; }
-    takesGiven[slug] = (takesGiven[slug] || 0) + 1;   /* a take is spent when it is sent */
+    /* Limits: the server answers with take_limit_reason (day | market); the preview counts for itself */
+    var reason = val(tm, 'limit-reason', '');
+    if (reason !== 'day' && reason !== 'market') {
+      if (takesLeft <= 0) reason = 'day';
+      else if ((takesGiven[slug] || 0) >= marketLimit) reason = 'market';
+    }
+    if (reason === 'day' || reason === 'market') { showLimit(reason); return; }
+    takesGiven[slug] = (takesGiven[slug] || 0) + 1; takesLeft -= 1; paintTakesLeft();   /* a take is spent when it is sent */
     promptInput.value = '';
     fillMarketHead(tm, card);
-    q(tm, '[data-tm-loading]').hidden = false; q(tm, '[data-tm-done]').hidden = true;
+    q(tm, '[data-tm-limit]').hidden = true; q(tm, '[data-tm-loading]').hidden = false; q(tm, '[data-tm-done]').hidden = true;
     openModal(tm);
     /* The confirmed card is filled now (the result is known here) so the box already has its final
        height while the spinner shows; it is revealed, and the feed updated, on confirmation. */
@@ -759,6 +790,7 @@
       q(tm, '[data-tm-user]').textContent = user;
       q(tm, '[data-tm-xpcard]').textContent = '+' + xp + ' XP';
       q(tm, '[data-tm-xp]').innerHTML = 'You earned <span class="takes__xp">+' + xp + ' XP</span> for this contribution.';
+      q(tm, '[data-tm-left]').textContent = takesLeft + ' take' + (takesLeft === 1 ? '' : 's') + ' left today.';
     clearTimeout(tmTimer);
     tmTimer = setTimeout(function () {
       /* the summarised take lands at the top of the feed behind the modal; raw text never does */

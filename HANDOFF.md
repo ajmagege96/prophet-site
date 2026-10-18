@@ -65,6 +65,34 @@ phone menu; gray, red on hover; render it only when the viewer is signed in.
 Telegram's browser; the menu's link groups are always two rows with one
 separator; 16px between the takes and the bar.
 
+**Logic update (Oct 15 spec, built Oct 17).**
+- `{{label}}` (buy_yes · buy_no · hold · none) is one component that replaces
+  the YES / NO position tag everywhere: the card badge, the thesis block head,
+  the Vote modal header. Buy YES green, Buy NO red, Hold gray and quieter, none
+  renders nothing. Never inside the thesis text; both numbers always refer to
+  the listed outcome.
+- Card states: not evaluated (no badge, static line) · Hold no_gap / under_gap
+  (gray Hold badge, the number, the hold line from `{{hold_reason}}`) · open
+  vote · live call · resolved · void. The market price stays on every face;
+  his number lives in the thesis block.
+- History: `{{call_state}}` void shows a VOID tag and "Market closed by
+  Polymarket before resolution." with its thesis, never hidden. Ladder markets
+  print `{{listed_leg_date}}` under the question and in the thesis header;
+  when a leg rolls, the card resets to not evaluated with the next date and
+  the old leg goes to History.
+- Vote modal: the label in the header; `{{window_class}}` short sends time
+  left in hours and minutes.
+- Take limits replace the old per-market / cooldown notices: the Take-sent
+  modal gains a Limit state driven by `{{take_limit_reason}}` (day / market)
+  with the two copy lines; Confirmed gains "{n} takes left today."; the bar
+  shows `{{takes_remaining_today}}` beside Send when signed in and turns Send
+  off at zero. Limits are config: `{{takes.per_day}}` (5), `{{takes.per_market}}` (2).
+- Decided with the founder: no last-run line; empty credits render nothing;
+  dates are allowed for a market's own dates (ladder legs).
+- Open question for the logic doc: which leg of a ladder the card shows is
+  not specified. "Current leg" is the default built here; the leg he has a
+  view on may be the better rule.
+
 **Copy, pre-launch (Sept 13).** How it Works: "credited by wallet", "If
 rejected, he goes back to the drawing board.", "Every call lives on the record."
 Onboarding slide 2: "credited by wallet". Tokenomics: three streams — Trading
@@ -158,9 +186,13 @@ or modal root is the whole contract.
 |---|---|---|
 | `data-state` | `market.filter_state` | `none` · `vote` · `called` · `resolved` |
 | `data-slug` | `market.slug` | row key |
+| `data-label` | `label` | buy_yes · buy_no · hold · none; drives the badge, the thesis head and the Vote modal header |
 | `data-stance`, `data-estimate`, `data-conviction` | `market.thesis_stance`, `prophet_probability`, `market.conviction` | thesis head; `data-estimate` is The Prophet's number, a whole integer with `%`, shown in purple. Leave it empty on a market not yet evaluated |
 | `data-thesis`, `data-contributors` | `market.thesis`, `market.contributors_json` | reasoning and `[{user, claim, xp}]`; an empty array shows nothing |
-| `data-no-edge-line` | `no_edge_line` | no-thesis markets only: the no-edge copy when evaluated, the not-evaluated line when not (also after a rejected vote) |
+| `data-hold-reason` | `hold_reason` | Hold markets: no_gap / under_gap selects the hold line |
+| `data-call-state` | `call_state` | live / resolved / void |
+| `data-leg-date` | `listed_leg_date` | ladder markets: the leg's date; also printed on the face |
+| `data-window` | `window_class` | standard / short; short votes send time left as "1h 40m" |
 | `data-vote-yes-pct`, `data-vote-yes-weight`, `data-vote-no-weight`, `data-vote-count`, `data-vote-left` | `market.vote_*` | open votes only; weights formatted (`94,200`) |
 | `data-outcome`, `data-resolved-side`, `data-resolved-pct`, `data-resolved-ago` | `market.outcome`, `market.resolved_*` | resolved only |
 | `data-takes-used` | `market.viewer_takes_used` | takes this viewer has given here; drives the per-market notice |
@@ -173,9 +205,9 @@ or modal root is the whole contract.
 `data-evidence`, `data-ago`, `data-xp` ← `take_result.*`. These are what your
 endpoint returns for a take; the confirmed state renders from them.
 
-**Notices**: `[data-notice="out-of-takes"]` carries `takes.per_market`;
-`[data-notice="cooldown"]` carries `viewer.take_cooldown`, `takes.interval`,
-`takes.next_in`.
+**Take limits** (on the Take-sent modal root): `data-takes-left`,
+`data-limit-reason`, `data-day-limit`, `data-market-limit` ←
+`takes_remaining_today`, `take_limit_reason`, `takes.per_day`, `takes.per_market`.
 
 While a variable is unfilled (`{{…}}` still literal) the JS falls back to mock
 values so the page previews. Once filled, the mocks are never used.
@@ -189,7 +221,8 @@ values so the page previews. Once filled, the mocks are never used.
 | **Onboarding** | First visit (flag `prophet.onboarded` in `localStorage`) and every How it Works click. | Drop the real recordings in as `assets/onboarding-N.mp4` and add each `<source>` inside its slide's `<video>`; the placeholder PNG stays as the poster. Copy is final. |
 | **Vote** | Thesis block's Vote button on an open vote. If `viewer.signed_in` is `false` it instead dispatches `prophet:signin` on `document` (detail `{then:'vote', slug}`) and stops. | Wire sign-in to that event, then call `window.prophetVote.open(slug)` to resume. Casting is a client-side mock: hook the "Vote YES / NO" button to your endpoint and re-render with the server's tally. Votes are final — the button disables after one cast. |
 | **Take sent** | Send / Enter, after the four checks pass. A take is counted as spent the moment it is sent. The 1.2s spinner stands in for your round trip. | Fill `take_result.*` from the response. The summary is prepended to the feed; **the raw text is never rendered anywhere.** |
-| **Notices** | See section 1. `window.prophetNotices.open('no-text' \| 'no-stance' \| 'cooldown' \| 'out-of-takes' \| 'logged-out')` previews any of them. | Set `viewer.take_cooldown`, `takes.*`, and `market.viewer_takes_used`. |
+| **Notices** | Nothing to send, Pick a side, Logged out. `window.prophetNotices.open('no-text' \| 'no-stance' \| 'logged-out')` previews them. | Nothing. |
+| **Take limit** | Inside Take sent: when `take_limit_reason` is day or market the modal opens straight to its Limit state. The preview counts for itself (5 a day, 2 per market). | Return `take_limit_reason` on a rejected take; keep `takes_remaining_today` current. |
 | **Logged out** | While `{{logout_url}}` is unfilled, clicking Logout dispatches `prophet:logout` and shows the notice. | Point the link at the real URL; show the notice on the way back. |
 
 All modals: close on X, Escape or the backdrop; scroll locked behind; 44px
@@ -205,13 +238,14 @@ Other globals: `window.prophetOnboarding.open()`, `window.prophetBoard.set({beat
 - Carousel order and caps as in section 1; History is `resolved` in the same list.
 - A take needs a side. `take_result.stance` is `yes` or `no` — there is no "unsure".
 - `prophet_probability` is a whole integer with `%`. It is present on open votes, prophecies, history and evaluated no-thesis markets, and empty on a market that has not been evaluated.
-- `no_edge_line` on a no-thesis card is exactly one of two sentences: "Nothing the price is missing yet." (his number equals the market price) or "The price is missing something, too early to call." (differs by under 5, or not yet evaluated, also after a rejected vote). A gap of 5 or more is a draft, not a no-thesis card.
-- Allowance: `takes.per_market` per market, one every `takes.interval`. Check
-  order on Send is text → side → cooldown → per-market.
+- `hold_reason` on a Hold card is `no_gap` ("Nothing the price is missing yet.") or `under_gap` ("The price is missing something, too early to call."). Not evaluated (label `none`, also after a rejected vote) shows the static not-evaluated line. A gap of 5 or more is a draft, not a Hold.
+- Allowance: `takes.per_day` a day, `takes.per_market` per market per day, enforced
+  server-side and reported as `take_limit_reason`. Check order on Send is text →
+  side → limit. A take is spent when it is sent.
 - Votes can't be changed. Weight is the viewer's `viewer.balance`.
 - Never show a wallet address. The viewer is `viewer.username`; the token
   contract in the header is the one address on the site.
-- Relative times only. No calendar dates anywhere except the $PROPHET chart axis.
+- Relative times only, except a market's own dates: the chart axis and a ladder leg's `listed_leg_date`.
 - `[COPY]` marks lines in the character's voice that have not been written. The
   notice, modal and onboarding copy in the files is final unless you're told
   otherwise; `empty_no_takes` and the take `summary` are yours to generate.
@@ -249,19 +283,23 @@ Other globals: `window.prophetOnboarding.open()`, `window.prophetBoard.set({beat
 
 ## 10. Variable reference
 
-87 variables actually present in the files right now, with where each appears.
+90 variables actually present in the files right now, with where each appears.
 
 | Variable | Where | Holds |
 |---|---|---|
 | `{{buy_url}}` | $PROPHET; Home; below-fold | Buy $PROPHET link (pump.fun) |
+| `{{call_state}}` | Home | `live` / `resolved` / `void`. Void (History): the badge carries a VOID tag instead of WON / LOST and the block reads "Market closed by Polymarket before resolution." Never hidden |
 | `{{contract_address}}` | $PROPHET; Home; header | $PROPHET contract address; the header pill shows first 6 … last 6 and copies the full value |
 | `{{contributor.claim}}` | Home | The contribution that fed the thesis, one line |
 | `{{contributor.username}}` | Home | Contributor's username (used in `<!-- repeat: contributor -->` inside the Thesis block) |
 | `{{contributor.xp}}` | Home | XP earned for that contribution |
 | `{{docs_url}}` | $PROPHET; Home; header | External link to documentation site |
 | `{{empty_no_takes}}` | Home | Line shown in the take slot when the selected market has no takes (generated later; mock: "Nobody's taken this one yet. The first contributor earns the most credit. What do you think?") |
+| `{{hold_reason}}` | Home | Hold markets only: `no_gap` → "Nothing the price is missing yet." · `under_gap` → "The price is missing something, too early to call." Not-evaluated markets (label `none`, also after a rejected vote) show the static not-evaluated line |
 | `{{jupiter_url}}` | $PROPHET; Home; footer; header | $PROPHET on Jupiter (footer token link) |
+| `{{label}}` | Home | `buy_yes` / `buy_no` / `hold` / `none`. One component replacing the YES / NO position tag: in the card badge, the thesis block head and the Vote modal header. Buy YES green, Buy NO red, Hold gray and quieter, none renders nothing. Never inside the thesis text |
 | `{{linkedin_url}}` | $PROPHET; Home; footer; header | Link to the project's LinkedIn page |
+| `{{listed_leg_date}}` | Home | Ladder markets only: the leg's date (e.g. `Oct 20`), under the question on the face and in the thesis header. Empty otherwise. When a leg rolls, the card returns to not evaluated with the next date and the old leg goes to History as resolved |
 | `{{logout_url}}` | $PROPHET; Home; header | The Logout link in the header and menu; render the link only when `{{viewer.signed_in}}` is true. While unfilled, the click fires a `prophet:logout` event and shows the Logged out notice |
 | `{{market.called_pct}}` | Home | Odds when the thesis was called, e.g. `84%`; rendered on called cards only |
 | `{{market.contributors_json}}` | Home | JSON array of `{user, claim, xp}` set as `data-contributors` on the card; listed under the thesis as Contributors |
@@ -279,7 +317,6 @@ Other globals: `window.prophetOnboarding.open()`, `window.prophetBoard.set({beat
 | `{{market.take_count}}` | Home | Number of takes on this market |
 | `{{market.thesis}}` | Home | Full thesis text (called) or draft thesis (vote open), set as `data-thesis` on the card; shown in the Thesis block above the takes when the card is selected; empty otherwise |
 | `{{market.thesis_stance}}` | Home | `yes` or `no`: which way the thesis (or draft) calls it; shown bold beside the Thesis label |
-| `{{market.viewer_takes_used}}` | Home | On each card: takes the viewer has already given on that market; the out-of-takes notice fires when it reaches the allowance |
 | `{{market.volume}}` | Home | Polymarket volume, short form (e.g. "$4.1M"), shown after a bar-chart icon |
 | `{{market.vote_count}}` | Home | Open-vote tally for the Vote modal: YES share, weight cast on each side (e.g. `94,200`), number of votes, time left (e.g. `2d`) |
 | `{{market.vote_no_weight}}` | Home | Open-vote tally for the Vote modal: YES share, weight cast on each side (e.g. `94,200`), number of votes, time left (e.g. `2d`) |
@@ -287,11 +324,10 @@ Other globals: `window.prophetOnboarding.open()`, `window.prophetBoard.set({beat
 | `{{market.vote_yes_pct}}` | Home | Open-vote tally for the Vote modal: YES share, weight cast on each side (e.g. `94,200`), number of votes, time left (e.g. `2d`) |
 | `{{market.vote_yes_weight}}` | Home | Open-vote tally for the Vote modal: YES share, weight cast on each side (e.g. `94,200`), number of votes, time left (e.g. `2d`) |
 | `{{market.yes_pct}}` | Home | Current YES percentage (e.g. "72%") |
-| `{{no_edge_line}}` | Home | On a no-thesis card, as `data-no-edge-line`: the one-line no-edge copy when the market has been evaluated, or the not-evaluated line when it has not (also after a rejected vote). The thesis block shows it under the "Draft" title, with the purple percentage beside the title when evaluated |
 | `{{polymarket_as_of}}` | Home | Relative timestamp of last Polymarket status check (shown on hover in home panel) |
 | `{{polymarket_status}}` | Home | Polymarket feed status: `up` (green pulsing dot, also the default if the class is unset) or `down` (red dot) |
 | `{{pool_last_week}}` | $PROPHET | Last week's reward pool; the line reads "paid to the community" |
-| `{{prophet_probability}}` | Home | The Prophet's number for the market, a whole integer with `%` (e.g. `78%`). Set as `data-estimate` on the card; shown as a plain purple percentage in the thesis block head for open votes, prophecies and history, and beside "Thesis draft" on a no-thesis market that has been evaluated; leave it empty when not evaluated |
+| `{{prophet_probability}}` | Home | The Prophet's number for the market, a whole integer with `%` (e.g. `78%`). Set as `data-estimate` on the card; shown as a plain purple percentage in the thesis block head for open votes, prophecies, history and Hold markets; empty when not evaluated. Always refers to the listed outcome; nothing flips on Buy NO |
 | `{{pumpfun_url}}` | $PROPHET; Home; footer; header | $PROPHET on pump.fun (footer token link) |
 | `{{solscan_url}}` | $PROPHET; Home; footer; header | $PROPHET on Solscan (footer token link) |
 | `{{swap_impact}}` | $PROPHET | Swap meta line, left: slip and price impact |
@@ -302,14 +338,15 @@ Other globals: `window.prophetOnboarding.open()`, `window.prophetBoard.set({beat
 | `{{take.stance}}` | Home | Take stance: YES or NO (used in `<!-- repeat: take -->`) |
 | `{{take.username}}` | Home | Username of the person who posted the take (used in `<!-- repeat: take -->`) |
 | `{{take.xp}}` | Home | XP earned by the take, rendered as "+N XP" under the timestamp |
+| `{{take_limit_reason}}` | Home | `day` / `market` / `none`. When the server rejects a take, the Take-sent modal shows its Limit state with the matching copy |
 | `{{take_result.ago}}` | Home | Relative timestamp (e.g. `just now`) |
 | `{{take_result.evidence}}` | Home | `true` when a source was named; shows the "evidence noted" mark |
 | `{{take_result.stance}}` | Home | `yes` / `no` |
 | `{{take_result.summary}}` | Home | One-line summary of the claim. Raw text is never shown. Preview mock: "Your claim, condensed to one line" |
 | `{{take_result.xp}}` | Home | XP earned (e.g. `1`) |
-| `{{takes.interval}}` | Home | How often a new take is granted, as words (e.g. `15 minutes`) |
-| `{{takes.next_in}}` | Home | Relative time until the viewer's next take (e.g. `9m`) |
-| `{{takes.per_market}}` | Home | Takes a viewer gets per market (e.g. `3`) |
+| `{{takes.per_day}}` | Home | Config values behind the limit copy (today 5 a day, 2 per market per day). The copy reads them: "That's five takes today…" / "Two takes on this market today is the limit…" |
+| `{{takes.per_market}}` | Home | Config values behind the limit copy (today 5 a day, 2 per market per day). The copy reads them: "That's five takes today…" / "Two takes on this market today is the limit…" |
+| `{{takes_remaining_today}}` | Home | Takes the viewer has left today. Shown as a small count beside Send when signed in, and as "{n} takes left today." in the Take-sent confirmed state. At zero Send is off and a tap shows the day-limit copy |
 | `{{tg_url}}` | $PROPHET; Home; footer; header | Link to the project's Telegram channel |
 | `{{tl_linkedin_url}}` | $PROPHET; Home; footer; header | TradeLeague on LinkedIn (footer) |
 | `{{tl_tg_url}}` | $PROPHET; Home; footer; header | TradeLeague on Telegram (footer) |
@@ -330,7 +367,6 @@ Other globals: `window.prophetOnboarding.open()`, `window.prophetBoard.set({beat
 | `{{tradeleague_url}}` | $PROPHET; Home; footer | Link for the "Automated by TradeLeague" footer lockup |
 | `{{viewer.balance}}` | Home | $PROPHET balance, formatted (e.g. `12,400`); also the voting weight |
 | `{{viewer.signed_in}}` | $PROPHET; Home; header | `true` / `false`. When false the Vote button fires a `prophet:signin` event on `document` instead of opening the modal |
-| `{{viewer.take_cooldown}}` | Home | `true` while the viewer must wait for their next take; Send then shows the cooldown notice. Console: `prophetNotices.open('cooldown')` to preview it |
 | `{{viewer.username}}` | Home | Shown on the viewer's own take card and feed row. Never an address |
 | `{{viewer.vote_share}}` | Home | The viewer's share of the weight cast so far on the selected market (e.g. `8%`) |
 | `{{wallet_burn_url}}` | $PROPHET | Explorer links for the three public wallets (Trading Wallet, Rewards Pool, Buy-and-Burn); shown as labels, never as addresses |
@@ -339,4 +375,5 @@ Other globals: `window.prophetOnboarding.open()`, `window.prophetBoard.set({beat
 | `{{wallet_rewards_value}}` | $PROPHET | Live balances, green |
 | `{{wallet_war_chest_url}}` | $PROPHET | Explorer links for the three public wallets (Trading Wallet, Rewards Pool, Buy-and-Burn); shown as labels, never as addresses |
 | `{{wallet_war_chest_value}}` | $PROPHET | Live balances, green |
+| `{{window_class}}` | Home | `standard` / `short`. Short-window votes send `{{market.vote_time_left}}` in hours and minutes (e.g. `1h 40m`) |
 | `{{x_url}}` | $PROPHET; Home; footer; header | Link to the project's X (Twitter) account |
