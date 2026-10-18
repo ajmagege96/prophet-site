@@ -163,7 +163,6 @@
   var thesisEst = document.querySelector('[data-thesis-est]');
   var thesisConv = document.querySelector('[data-thesis-conv]');
   var thesisOutcome = document.querySelector('[data-thesis-outcome]');
-  var thesisLeg = document.querySelector('[data-thesis-leg]');
   var HOLD_LINES = { no_gap: 'Nothing the price is missing yet.', under_gap: 'The price is missing something, too early to call.' };
   var NOT_EVALUATED = 'The price is missing something, too early to call.';
   var VOID_LINE = 'Market closed by Polymarket before resolution.';
@@ -364,7 +363,7 @@
     /* Tab cycles the four tags: No thesis → Open votes → Prophecies → History → …; Shift+Tab goes back */
     if (e.key === 'Tab') {
       e.preventDefault();
-      var order = ['none', 'vote', 'called', 'resolved'];
+      var order = ['none', 'vote', 'called'];
       var at = order.indexOf(activeFilter);
       applyFilter(order[(at + (e.shiftKey ? -1 : 1) + order.length) % order.length]);
       return;
@@ -478,7 +477,6 @@
     paintBarStance(card);
     var hasThesis = !!text && state !== 'none';
     var label = cardLabel(card);
-    if (thesisLeg) thesisLeg.textContent = card.dataset.legDate || '';
     /* No thesis: the box stays — "Draft", the label, the number when evaluated, and one line from hold_reason */
     thesisBox.hidden = false;
     thesisBox.classList.toggle('thesis--none', !hasThesis);
@@ -653,7 +651,6 @@
     var stance = (card.dataset.stance || '').toLowerCase();
     fillMarketHead(vm, card);
     var st = q(vm, '[data-vm-stance]'); st.innerHTML = labelHTML(cardLabel(card)); st.className = 'thesis__stance heading';
-    q(vm, '[data-vm-leg]').textContent = card.dataset.legDate || '';
     q(vm, '[data-vm-est]').textContent = card.dataset.estimate || '';
     q(vm, '[data-vm-conv]').innerHTML = card.dataset.conviction ? STAR_SVG + card.dataset.conviction : '';
     var tx = q(vm, '[data-vm-text]'); tx.textContent = card.dataset.thesis || ''; tx.classList.remove('vm__text--open'); q(vm, '[data-vm-more]').textContent = 'More';

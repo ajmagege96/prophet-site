@@ -75,11 +75,11 @@ separator; 16px between the takes and the bar.
   (gray Hold badge, the number, the hold line from `{{hold_reason}}`) · open
   vote · live call · resolved · void. The market price stays on every face;
   his number lives in the thesis block.
-- History: `{{call_state}}` void shows a VOID tag and "Market closed by
-  Polymarket before resolution." with its thesis, never hidden. Ladder markets
-  print `{{listed_leg_date}}` under the question and in the thesis header;
-  when a leg rolls, the card resets to not evaluated with the next date and
-  the old leg goes to History.
+- History is out of the MVP (tab and deck removed); `{{call_state}}` is carried
+  for its return, when a void leg will read "Market closed by Polymarket before
+  resolution." Ladder markets print `{{listed_leg_date}}` on the card face under
+  the question (not in the thesis header); when a leg rolls, the card resets to
+  not evaluated with the next date.
 - Vote modal: the label in the header; `{{window_class}}` short sends time
   left in hours and minutes.
 - Take limits replace the old per-market / cooldown notices: the Take-sent
@@ -184,7 +184,7 @@ or modal root is the whole contract.
 
 | Attribute | Variable | Notes |
 |---|---|---|
-| `data-state` | `market.filter_state` | `none` · `vote` · `called` · `resolved` |
+| `data-state` | `market.filter_state` | `none` · `vote` · `called` (`resolved` returns with History) |
 | `data-slug` | `market.slug` | row key |
 | `data-label` | `label` | buy_yes · buy_no · hold · none; drives the badge, the thesis head and the Vote modal header |
 | `data-stance`, `data-estimate`, `data-conviction` | `market.thesis_stance`, `prophet_probability`, `market.conviction` | thesis head; `data-estimate` is The Prophet's number, a whole integer with `%`, shown in purple. Leave it empty on a market not yet evaluated |

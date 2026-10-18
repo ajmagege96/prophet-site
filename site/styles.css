@@ -427,8 +427,6 @@ ul, ol { list-style: none; }
 .carousel__question:has(+ .carousel__leg:not(:empty)) { min-height: 1.35em; -webkit-line-clamp: 1; }
 .carousel__leg:empty { display: none; }
 .prow__outcome--void { color: rgba(242, 240, 230, 0.55); }
-.thesis__leg { font-size: 11px; opacity: 0.55; }
-.thesis__leg:empty { display: none; }
 
 /* State badge, top-right of the card; only rendered for vote / called */
 .carousel__state {
