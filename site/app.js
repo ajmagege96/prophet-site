@@ -728,6 +728,7 @@
   }
   function showLimit(reason) {
     if (!tmRoot) return;
+    clearTimeout(tmTimer);   /* a previous send's reveal must not land on top of the limit */
     q(tmRoot, '[data-tm-loading]').hidden = true; q(tmRoot, '[data-tm-done]').hidden = true;
     q(tmRoot, '[data-tm-limit-line]').textContent = LIMIT_COPY[reason] || LIMIT_COPY.day;
     q(tmRoot, '[data-tm-limit]').hidden = false;
