@@ -152,12 +152,9 @@
   var cards = Array.prototype.slice.call(track.querySelectorAll('[data-card]'));
   var thesisBox = document.querySelector('[data-thesis-box]');
   var thesisText = document.querySelector('[data-thesis-text]');
-  var thesisState = document.querySelector('[data-thesis-state]');
-  var thesisStance = document.querySelector('[data-thesis-stance]');
   var thesisLabel = document.querySelector('[data-thesis-label]');
-  var thesisEst = document.querySelector('[data-thesis-est]');
   var thesisOutcome = document.querySelector('[data-thesis-outcome]');
-  var thesisAtCall = document.querySelector('[data-thesis-atcall]'), thesisRevised = document.querySelector('[data-thesis-revised]'), thesisMoved = document.querySelector('[data-thesis-moved]'), thesisSplit = document.querySelector('[data-thesis-split]'), adWrap = document.querySelector('[data-ad]');
+  var thesisRevised = document.querySelector('[data-thesis-revised]'), thesisMoved = document.querySelector('[data-thesis-moved]'), thesisSplit = document.querySelector('[data-thesis-split]'), adWrap = document.querySelector('[data-ad]');
   var taps = {};   /* slug -> 'agree' | 'disagree' (mock, in-memory; the server keeps the real side) */
   var VOID_LINE = 'Market closed by Polymarket before resolution.';
   function labelHTML(key) { return key === 'buy_yes' ? '<span class="lbl lbl--yes">Buy YES</span>' : key === 'buy_no' ? '<span class="lbl lbl--no">Buy NO</span>' : key === 'hold' ? '<span class="lbl lbl--hold">Hold</span>' : ''; }
@@ -356,15 +353,9 @@
     if (!thesisBox) return;
     var state = card.dataset.state || 'called';
     var history = state === 'resolved';
-    var label = cardLabel(card);
     var revised = !!card.dataset.revisedAgo;
     thesisBox.hidden = false;
     thesisLabel.textContent = 'Thesis';
-    thesisStance.innerHTML = labelHTML(label);
-    thesisStance.className = 'thesis__stance heading';
-    /* the latest number; when revised, the number at the call keeps its own field */
-    if (thesisEst) thesisEst.textContent = revised && card.dataset.revisedNumber ? card.dataset.revisedNumber : (card.dataset.estimate || '');
-    if (thesisAtCall) thesisAtCall.textContent = revised && card.dataset.revisedNumber ? (card.dataset.estimate || '') + ' at call' : '';
     if (thesisRevised) thesisRevised.textContent = revised ? 'Revised ' + card.dataset.revisedAgo : '';
     thesisText.textContent = card.dataset.thesis || '';
     if (thesisMoved) thesisMoved.hidden = !(revised && card.dataset.numberMoved === 'true');
@@ -378,9 +369,6 @@
         else thesisOutcome.innerHTML = 'Resolved <span class="tally tally--' + rs + '">' + rs.toUpperCase() + '</span> · ' + (card.dataset.outcome === 'right' ? '<span class="lbl lbl--yes">right</span>' : '<span class="lbl lbl--no">wrong</span>') + (card.dataset.resolvedAgo ? ' · ' + card.dataset.resolvedAgo : '');
       }
     }
-    var badge = card.querySelector('.carousel__state');
-    thesisState.innerHTML = badge ? badge.innerHTML : '';
-    thesisState.className = 'thesis__state';
     paintAgree(card);
   }
   /* ── Agree / Disagree ── */
@@ -393,9 +381,9 @@
     var closed = card.dataset.marketClosed === 'true';
     var btns = adWrap.querySelectorAll('[data-ad-btn]');
     for (var i = 0; i < btns.length; i++) { btns[i].classList.toggle('ad__btn--on', btns[i].dataset.adBtn === side); btns[i].disabled = closed; }
-    var n = parseInt(card.dataset.tapCount || '0', 10) || 0, pct = card.dataset.agreePct || '';
+    var n = parseInt(card.dataset.tradeCount || '0', 10) || 0, pct = card.dataset.agreePct || '';
     if (thesisSplit) {
-      if (n >= 3 && pct) { thesisSplit.textContent = pct + '% agree · ' + n + ' tap' + (n === 1 ? '' : 's'); thesisSplit.hidden = false; }
+      if (n >= 3 && pct) { thesisSplit.textContent = pct + '% agree · ' + n + ' trade' + (n === 1 ? '' : 's'); thesisSplit.hidden = false; }
       else if (side) { thesisSplit.textContent = 'You ' + side; thesisSplit.hidden = false; }
     }
   }
@@ -409,11 +397,11 @@
       var next = prev === b.dataset.adBtn ? '' : b.dataset.adBtn;   /* tap the chosen side again to deselect */
       taps[slug] = next;
       /* mock tally: a new tap counts, a switch moves one, a deselect removes one */
-      var n = parseInt(card.dataset.tapCount || '0', 10) || 0, a = Math.round(n * (parseInt(card.dataset.agreePct || '50', 10) || 50) / 100);
+      var n = parseInt(card.dataset.tradeCount || '0', 10) || 0, a = Math.round(n * (parseInt(card.dataset.agreePct || '50', 10) || 50) / 100);
       if (!prev && next) { n += 1; if (next === 'agree') a += 1; }
       else if (prev && !next) { n = Math.max(0, n - 1); if (prev === 'agree') a = Math.max(0, a - 1); }
       else if (prev !== next) { a += next === 'agree' ? 1 : -1; }
-      card.dataset.tapCount = n; card.dataset.agreePct = n ? Math.round(100 * a / n) : '';
+      card.dataset.tradeCount = n; card.dataset.agreePct = n ? Math.round(100 * a / n) : '';
       paintAgree(card);
     });
   }

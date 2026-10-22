@@ -329,7 +329,7 @@ ul, ol { list-style: none; }
 .carousel__card {
   position: relative;           /* anchors the Buy link on open-vote cards */
   flex: 0 0 calc(100% - 32px);
-  height: 200px;               /* fixed: cards never change size */
+  height: 184px;               /* fixed: cards never change size */
   overflow: hidden;
   scroll-snap-align: start;
   padding: 18px;
@@ -420,6 +420,15 @@ ul, ol { list-style: none; }
 .carousel__question:has(+ .carousel__leg:not(:empty)) { min-height: 1.35em; -webkit-line-clamp: 1; }
 .carousel__leg:empty { display: none; }
 .prow__outcome--void { color: rgba(242, 240, 230, 0.55); }
+
+/* The market's odds, small, top-right of the card */
+.carousel__odds { margin-left: auto; display: inline-flex; align-items: baseline; gap: 4px; font-size: 14px; line-height: 1; color: var(--green); padding-top: 4px; white-space: nowrap; }
+.carousel__odds small { font-size: 9px; letter-spacing: 0.12em; opacity: 0.7; }
+.carousel__odds .prow__outcome { margin-left: 6px; align-self: center; }
+/* The call, big, where the figure was */
+.carousel__call { margin-top: auto; font-size: 24px; line-height: 1; letter-spacing: 0.06em; }
+.carousel__call--yes { color: var(--green); }
+.carousel__call--no { color: #e53935; }
 
 /* State badge, top-right of the card; only rendered for vote / called */
 .carousel__state {
@@ -609,15 +618,16 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
 .hero--home .home-panel { height: auto; }
 
 /* Agree / Disagree: a row under the thesis. Agree green, Disagree red, on hover and when chosen */
-.ad { display: flex; align-items: center; gap: 8px; margin: 4px 0 8px; flex: 0 0 auto; }
+.ad { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 6px 0 10px; flex: 0 0 auto; }
 .ad[hidden] { display: none; }
-.ad__btn { min-height: 28px; padding: 0 12px; border: 1px solid var(--outline); border-radius: 4px; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--offwhite); opacity: 0.7; transition: opacity 0.15s, border-color 0.15s; }
-.ad__btn:hover { opacity: 1; }
-.ad__btn--agree:hover, .ad__btn--agree.ad__btn--on { opacity: 1; color: var(--green); border-color: var(--green); }
-.ad__btn--disagree:hover, .ad__btn--disagree.ad__btn--on { opacity: 1; color: #e53935; border-color: #e53935; }
+.ad__btn { min-height: 32px; padding: 0 18px; border: 1px solid; border-radius: 4px; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; transition: color 0.15s, border-color 0.15s; }
+.ad__btn--agree { color: rgba(16, 240, 95, 0.5); border-color: rgba(16, 240, 95, 0.35); }
+.ad__btn--disagree { color: rgba(229, 57, 53, 0.55); border-color: rgba(229, 57, 53, 0.4); }
+.ad__btn--agree:hover, .ad__btn--agree.ad__btn--on { color: var(--green); border-color: var(--green); }
+.ad__btn--disagree:hover, .ad__btn--disagree.ad__btn--on { color: #e53935; border-color: #e53935; }
 .ad__btn[disabled] { opacity: 0.35; cursor: default; color: var(--offwhite); border-color: var(--outline); }
 .thesis__stateline { flex-direction: column; align-items: flex-end; gap: 6px; }
-.thesis__split { font-size: 11px; opacity: 0.55; white-space: nowrap; margin-left: 4px; }
+.thesis__split { font-size: 11px; opacity: 0.55; white-space: nowrap; margin-left: 6px; }
 .thesis__split[hidden] { display: none; }
 .thesis__revised { font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--purple-text); opacity: 0.85; white-space: nowrap; }
 .thesis__revised:empty { display: none; }
@@ -1004,7 +1014,7 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
   .carousel__track--sliding { transition: transform 0.3s ease; }
   .carousel__card {
     flex: 0 0 calc(33.333% - 11px);
-    height: 220px;
+    height: 196px;
     padding: 20px;
   }
 

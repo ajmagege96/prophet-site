@@ -17,18 +17,17 @@ sections 5–7 are the contracts your side has to honour.
 product; the two verbs are Agree and Disagree.
 - **Deck** = live calls only, ordered by you, most interesting first. Two tabs,
   Calls · History, one always on. An empty tab shows one `[COPY]` line.
-- **Card face**: label (Buy YES / Buy NO) in the badge — conviction is gone, he just calls it; the live
-  price; the meta row reads "{{market.called_pct}} at call · called
+- **Card face**: the market's odds small top-right (with the History tag after them), the question, then the call big where the figure was — Buy YES green / Buy NO red (`{{market.thesis_stance}}`, `{{market.thesis_stance_upper}}`); no conviction, no label elsewhere. The card is shorter. The meta row reads "{{market.called_pct}} at call · called
   {{market.called_ago}} · volume · ends-in". No take count, no Buy link.
-- **Thesis block** (one, under the carousel): label, his number, the thesis. Revised calls add "Revised {{revised_ago}}", show
+- **Thesis block** (one, under the carousel): "Thesis", the Revised marker when re-run, the thesis. No label, numbers or badge in the block; his number is not shown anywhere for now. Revised calls add "Revised {{revised_ago}}", show
   `{{revised_number}}` as the number with `{{prophet_probability}} at call`
   in its own field, and — when `{{number_moved}}` is true — "His number has
   moved. The call stands to resolution." The block carries
   `data-signed-in="{{viewer.signed_in}}"`.
-- **Agree / Disagree** in its own row under the thesis block. Agree green, Disagree red on hover and when chosen; tapping the chosen one deselects. `{{user_side}}` marks
+- **Agree / Disagree** centred under the thesis block; muted green and red at rest, bright on hover and when chosen; tapping the chosen one deselects. The count is in trades. `{{user_side}}` marks
   the user's button; tapping the other switches it; `{{market_closed}}` true
   disables both. From three taps the split "{{agree_pct}}% agree ·
-  {{tap_count}} taps" shows; below that only the user's side. A signed-out
+  {{trade_count}} trades" shows; below that only the user's side. A signed-out
   tap dispatches `prophet:signin` with `{then: 'agree', slug}` and does
   nothing else — wire sign-in to that. Taps are a client-side mock: post the
   side to your endpoint and return the new split.
@@ -315,17 +314,17 @@ Other globals: `window.prophetOnboarding.open()`, `window.prophetBoard.set({beat
 
 ## 10. Variable reference
 
-65 variables actually present in the files right now, with where each appears.
+66 variables actually present in the files right now, with where each appears.
 
 | Variable | Where | Holds |
 |---|---|---|
-| `{{agree_pct}}` | Home | Agree / Disagree under the thesis: the user's side (`agree` / `disagree` / empty) is marked; from three taps the split reads "62% agree · 14 taps", below that only the user's side; `market_closed` `true` disables both buttons. Signed-in only: a signed-out tap fires `prophet:signin` with `{then: 'agree', slug}` |
+| `{{agree_pct}}` | Home | Agree / Disagree under the thesis: the user's side (`agree` / `disagree` / empty) is marked; from three trades the split reads "62% agree · 14 trades", below that only the user's side; `market_closed` `true` disables both buttons. Signed-in only: a signed-out tap fires `prophet:signin` with `{then: 'agree', slug}` |
 | `{{buy_url}}` | $PROPHET; Home; below-fold | Buy $PROPHET link (pump.fun) |
 | `{{call_state}}` | Home | `live` / `resolved` / `void` / `closed`. Void shows "Market closed by Polymarket before resolution."; closed shows "Awaiting resolution" |
 | `{{contract_address}}` | $PROPHET; Home; header | $PROPHET contract address; the header pill shows first 6 … last 6 and copies the full value |
 | `{{docs_url}}` | $PROPHET; Home; header | External link to documentation site |
 | `{{jupiter_url}}` | $PROPHET; Home; footer; header | $PROPHET on Jupiter (footer token link) |
-| `{{label}}` | Home | `buy_yes` / `buy_no`. The call's label, in the card badge and the thesis block head; Buy YES green, Buy NO red. Never inside the thesis text |
+| `{{label}}` | Home | `buy_yes` / `buy_no`, carried on the card as `data-label`; the card prints it as the big Buy YES / Buy NO. Never inside the thesis text |
 | `{{linkedin_url}}` | $PROPHET; Home; footer; header | Link to the project's LinkedIn page |
 | `{{listed_leg_date}}` | Home | Ladder markets only: the leg's date (e.g. `Oct 20`), under the question on the face and in the thesis header. Empty otherwise. When a leg rolls, the card returns to not evaluated with the next date and the old leg goes to History as resolved |
 | `{{logout_url}}` | $PROPHET; Home; header | The Logout link in the header and menu; render the link only when `{{viewer.signed_in}}` is true. While unfilled, the click fires a `prophet:logout` event and shows the Logged out notice |
@@ -340,15 +339,16 @@ Other globals: `window.prophetOnboarding.open()`, `window.prophetBoard.set({beat
 | `{{market.resolved_pct}}` | Home | Closing YES % at settlement, e.g. `97%` |
 | `{{market.resolved_side}}` | Home | `yes` / `no` — the side the market settled on |
 | `{{market.slug}}` | Home | URL-safe identifier for the market (used in `<!-- repeat: market -->`) |
-| `{{market.state}}` | Home | The badge markup, top-right: `<span class="lbl lbl--yes">Buy YES</span> <span class="conviction">[star]N</span>`, plus in History a tag `<span class="prow__outcome prow__outcome--right">right</span>` (right · wrong · void · awaiting) |
+| `{{market.state}}` | Home | After the odds, top-right: empty for a live call; in History the tag `<span class="prow__outcome prow__outcome--right">right</span>` (right · wrong · void · awaiting) |
 | `{{market.thesis}}` | Home | Full thesis text (called) or draft thesis (vote open), set as `data-thesis` on the card; shown in the Thesis block above the takes when the card is selected; empty otherwise |
-| `{{market.thesis_stance}}` | Home | `yes` or `no`: which way the thesis (or draft) calls it; shown bold beside the Thesis label |
+| `{{market.thesis_stance}}` | Home | `yes` / `no` and `YES` / `NO`: the call, printed big on the card as "Buy YES" (green) or "Buy NO" (red) |
+| `{{market.thesis_stance_upper}}` | Home | `yes` / `no` and `YES` / `NO`: the call, printed big on the card as "Buy YES" (green) or "Buy NO" (red) |
 | `{{market.volume}}` | Home | Polymarket volume, short form (e.g. "$4.1M"), shown after a bar-chart icon |
 | `{{market.yes_pct}}` | Home | Current YES percentage (e.g. "72%"); once resolved, the settled 100% / 0% |
-| `{{market_closed}}` | Home | Agree / Disagree under the thesis: the user's side (`agree` / `disagree` / empty) is marked; from three taps the split reads "62% agree · 14 taps", below that only the user's side; `market_closed` `true` disables both buttons. Signed-in only: a signed-out tap fires `prophet:signin` with `{then: 'agree', slug}` |
+| `{{market_closed}}` | Home | Agree / Disagree under the thesis: the user's side (`agree` / `disagree` / empty) is marked; from three trades the split reads "62% agree · 14 trades", below that only the user's side; `market_closed` `true` disables both buttons. Signed-in only: a signed-out tap fires `prophet:signin` with `{then: 'agree', slug}` |
 | `{{number_moved}}` | Home | A call re-run after it was made: the block shows "Revised {ago}", the latest number beside the label with "{estimate} at call" in its own field, and when `number_moved` is `true` the line "His number has moved. The call stands to resolution." The thesis text is the latest. Empty when not revised |
 | `{{pool_last_week}}` | $PROPHET | Last week's reward pool; the line reads "paid to the community" |
-| `{{prophet_probability}}` | Home | The Prophet's number for the market, a whole integer with `%` (e.g. `78%`). Set as `data-estimate` on the card; shown as a plain purple percentage in the thesis block head for open votes, prophecies, history and Hold markets; empty when not evaluated. Always refers to the listed outcome; nothing flips on Buy NO |
+| `{{prophet_probability}}` | Home | The Prophet's number for the market, a whole integer with `%` (e.g. `78%`). Set as `data-estimate` on the card; carried as `data-estimate`; not shown anywhere for now |
 | `{{pumpfun_url}}` | $PROPHET; Home; footer; header | $PROPHET on pump.fun (footer token link) |
 | `{{revised_ago}}` | Home | A call re-run after it was made: the block shows "Revised {ago}", the latest number beside the label with "{estimate} at call" in its own field, and when `number_moved` is `true` the line "His number has moved. The call stands to resolution." The thesis text is the latest. Empty when not revised |
 | `{{revised_number}}` | Home | A call re-run after it was made: the block shows "Revised {ago}", the latest number beside the label with "{estimate} at call" in its own field, and when `number_moved` is `true` the line "His number has moved. The call stands to resolution." The thesis text is the latest. Empty when not revised |
@@ -356,7 +356,6 @@ Other globals: `window.prophetOnboarding.open()`, `window.prophetBoard.set({beat
 | `{{swap_impact}}` | $PROPHET | Swap meta line, left: slip and price impact |
 | `{{swap_slippage}}` | $PROPHET | Swap meta line, left: slip and price impact |
 | `{{swap_sol_balance}}` | $PROPHET | The viewer's SOL balance, right of the swap meta line (e.g. "2.41 SOL") |
-| `{{tap_count}}` | Home | Agree / Disagree under the thesis: the user's side (`agree` / `disagree` / empty) is marked; from three taps the split reads "62% agree · 14 taps", below that only the user's side; `market_closed` `true` disables both buttons. Signed-in only: a signed-out tap fires `prophet:signin` with `{then: 'agree', slug}` |
 | `{{tg_url}}` | $PROPHET; Home; footer; header | Link to the project's Telegram channel |
 | `{{tl_linkedin_url}}` | $PROPHET; Home; footer; header | TradeLeague on LinkedIn (footer) |
 | `{{tl_tg_url}}` | $PROPHET; Home; footer; header | TradeLeague on Telegram (footer) |
@@ -374,8 +373,9 @@ Other globals: `window.prophetOnboarding.open()`, `window.prophetBoard.set({beat
 | `{{token.volume_change}}` | $PROPHET | Volume and its 24h change |
 | `{{trade.amount}}` | $PROPHET | Live-trades strip (`<!-- repeat: trade -->`): `buy` / `sell` and the amount |
 | `{{trade.side}}` | $PROPHET | Live-trades strip (`<!-- repeat: trade -->`): `buy` / `sell` and the amount |
+| `{{trade_count}}` | Home | Agree / Disagree under the thesis: the user's side (`agree` / `disagree` / empty) is marked; from three trades the split reads "62% agree · 14 trades", below that only the user's side; `market_closed` `true` disables both buttons. Signed-in only: a signed-out tap fires `prophet:signin` with `{then: 'agree', slug}` |
 | `{{tradeleague_url}}` | $PROPHET; Home; footer | Link for the "Automated by TradeLeague" footer lockup |
-| `{{user_side}}` | Home | Agree / Disagree under the thesis: the user's side (`agree` / `disagree` / empty) is marked; from three taps the split reads "62% agree · 14 taps", below that only the user's side; `market_closed` `true` disables both buttons. Signed-in only: a signed-out tap fires `prophet:signin` with `{then: 'agree', slug}` |
+| `{{user_side}}` | Home | Agree / Disagree under the thesis: the user's side (`agree` / `disagree` / empty) is marked; from three trades the split reads "62% agree · 14 trades", below that only the user's side; `market_closed` `true` disables both buttons. Signed-in only: a signed-out tap fires `prophet:signin` with `{then: 'agree', slug}` |
 | `{{viewer.signed_in}}` | $PROPHET; Home; header | `true` / `false`, on the thesis block. When false an Agree / Disagree tap fires `prophet:signin` instead |
 | `{{wallet_burn_url}}` | $PROPHET | Explorer links for the three public wallets (Trading Wallet, Rewards Pool, Buy-and-Burn); shown as labels, never as addresses |
 | `{{wallet_burn_value}}` | $PROPHET | Tokens burned, red (e.g. "8.4M"); the "$PROPHET" ticker after it stays gray, then a red flame icon |

@@ -20,14 +20,14 @@
 | `{{market.image_url}}` | Market image, imported from Polymarket (44px square on the card) |
 | `{{market.question}}` | Market question text |
 | `{{market.yes_pct}}` | Current YES percentage (e.g. "72%"); once resolved, the settled 100% / 0% |
-| `{{market.state}}` | The badge markup, top-right: `<span class="lbl lbl--yes">Buy YES</span> <span class="conviction">[star]N</span>`, plus in History a tag `<span class="prow__outcome prow__outcome--right">right</span>` (right · wrong · void · awaiting) |
+| `{{market.state}}` | After the odds, top-right: empty for a live call; in History the tag `<span class="prow__outcome prow__outcome--right">right</span>` (right · wrong · void · awaiting) |
 | `{{market.volume}}` | Polymarket volume, short form (e.g. "$4.1M"), shown after a bar-chart icon |
 | `{{market.ends_in}}` | Relative time until the market ends (e.g. "12d", "3mo"), shown after a clock icon |
-| `{{prophet_probability}}` | The Prophet's number for the market, a whole integer with `%` (e.g. `78%`). Set as `data-estimate` on the card; shown as a plain purple percentage in the thesis block head for open votes, prophecies, history and Hold markets; empty when not evaluated. Always refers to the listed outcome; nothing flips on Buy NO |
-| `{{label}}` | `buy_yes` / `buy_no`. The call's label, in the card badge and the thesis block head; Buy YES green, Buy NO red. Never inside the thesis text |
+| `{{prophet_probability}}` | The Prophet's number for the market, a whole integer with `%` (e.g. `78%`). Set as `data-estimate` on the card; carried as `data-estimate`; not shown anywhere for now |
+| `{{label}}` | `buy_yes` / `buy_no`, carried on the card as `data-label`; the card prints it as the big Buy YES / Buy NO. Never inside the thesis text |
 | `{{market.called_ago}}` | Relative time of the call, in the meta row as "called 3d ago" |
 | `{{revised_ago}}`, `{{revised_number}}`, `{{number_moved}}` | A call re-run after it was made: the block shows "Revised {ago}", the latest number beside the label with "{estimate} at call" in its own field, and when `number_moved` is `true` the line "His number has moved. The call stands to resolution." The thesis text is the latest. Empty when not revised |
-| `{{agree_pct}}`, `{{tap_count}}`, `{{user_side}}`, `{{market_closed}}` | Agree / Disagree under the thesis: the user's side (`agree` / `disagree` / empty) is marked; from three taps the split reads "62% agree · 14 taps", below that only the user's side; `market_closed` `true` disables both buttons. Signed-in only: a signed-out tap fires `prophet:signin` with `{then: 'agree', slug}` |
+| `{{agree_pct}}`, `{{trade_count}}`, `{{user_side}}`, `{{market_closed}}` | Agree / Disagree under the thesis: the user's side (`agree` / `disagree` / empty) is marked; from three trades the split reads "62% agree · 14 trades", below that only the user's side; `market_closed` `true` disables both buttons. Signed-in only: a signed-out tap fires `prophet:signin` with `{then: 'agree', slug}` |
 | `{{market.outcome}}` | History: `right` / `wrong` / `void` / `awaiting` — the tag in the badge and the outcome line |
 | `{{call_state}}` | `live` / `resolved` / `void` / `closed`. Void shows "Market closed by Polymarket before resolution."; closed shows "Awaiting resolution" |
 | `{{listed_leg_date}}` | Ladder markets only: the leg's date (e.g. `Oct 20`), under the question on the face and in the thesis header. Empty otherwise. When a leg rolls, the card returns to not evaluated with the next date and the old leg goes to History as resolved |
@@ -36,7 +36,7 @@
 | `{{market.resolved_pct}}` | Closing YES % at settlement, e.g. `97%` |
 | `{{market.resolved_ago}}` | Relative time since resolution, e.g. `2w ago` |
 | `{{market.called_pct}}` | Odds when the thesis was called, e.g. `84%`; rendered on called cards only |
-| `{{market.thesis_stance}}` | `yes` or `no`: which way the thesis (or draft) calls it; shown bold beside the Thesis label |
+| `{{market.thesis_stance}}`, `{{market.thesis_stance_upper}}` | `yes` / `no` and `YES` / `NO`: the call, printed big on the card as "Buy YES" (green) or "Buy NO" (red) |
 | `{{market.thesis}}` | Full thesis text (called) or draft thesis (vote open), set as `data-thesis` on the card; shown in the Thesis block above the takes when the card is selected; empty otherwise |
 | `{{market.filter_state}}` | `called` (the Calls deck) or `resolved` (History); the two tabs |
 | `{{buy_url}}` | Buy $PROPHET link (pump.fun) |
