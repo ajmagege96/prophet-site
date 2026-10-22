@@ -19,40 +19,28 @@
 | `{{market.slug}}` | URL-safe identifier for the market (used in `<!-- repeat: market -->`) |
 | `{{market.image_url}}` | Market image, imported from Polymarket (44px square on the card) |
 | `{{market.question}}` | Market question text |
-| `{{market.yes_pct}}` | Current YES percentage (e.g. "72%") |
+| `{{market.yes_pct}}` | Current YES percentage (e.g. "72%"); once resolved, the settled 100% / 0% |
+| `{{market.state}}` | The badge markup, top-right: `<span class="lbl lbl--yes">Buy YES</span> <span class="conviction">[star]N</span>`, plus in History a tag `<span class="prow__outcome prow__outcome--right">right</span>` (right · wrong · void · awaiting) |
 | `{{market.volume}}` | Polymarket volume, short form (e.g. "$4.1M"), shown after a bar-chart icon |
 | `{{market.ends_in}}` | Relative time until the market ends (e.g. "12d", "3mo"), shown after a clock icon |
-| `{{market.take_count}}` | Number of takes on this market |
-| `{{market.state}}` | State badge, top-right of the card, rendered only for vote/called: `vote open · <span class="tally tally--yes">62% YES</span>` or `called <span class="tally tally--no">NO</span> <span class="conviction">[star icon]N</span>` (no dot); tally colors green/red by side; empty for open markets with no thesis |
 | `{{prophet_probability}}` | The Prophet's number for the market, a whole integer with `%` (e.g. `78%`). Set as `data-estimate` on the card; shown as a plain purple percentage in the thesis block head for open votes, prophecies, history and Hold markets; empty when not evaluated. Always refers to the listed outcome; nothing flips on Buy NO |
-| `{{label}}` | `buy_yes` / `buy_no` / `hold` / `none`. One component replacing the YES / NO position tag: in the card badge, the thesis block head and the Vote modal header. Buy YES green, Buy NO red, Hold gray and quieter, none renders nothing. Never inside the thesis text |
-| `{{hold_reason}}` | Hold markets only: `no_gap` → "Nothing the price is missing yet." · `under_gap` → "The price is missing something, too early to call." Not-evaluated markets (label `none`, also after a rejected vote) show the static not-evaluated line |
-| `{{call_state}}` | `live` / `resolved` / `void`. Void (History): the badge carries a VOID tag instead of WON / LOST and the block reads "Market closed by Polymarket before resolution." Never hidden |
+| `{{label}}` | `buy_yes` / `buy_no`. The call's label, in the card badge and the thesis block head; Buy YES green, Buy NO red. Never inside the thesis text |
+| `{{market.called_ago}}` | Relative time of the call, in the meta row as "called 3d ago" |
+| `{{revised_ago}}`, `{{revised_number}}`, `{{number_moved}}` | A call re-run after it was made: the block shows "Revised {ago}", the latest number beside the label with "{estimate} at call" in its own field, and when `number_moved` is `true` the line "His number has moved. The call stands to resolution." The thesis text is the latest. Empty when not revised |
+| `{{agree_pct}}`, `{{tap_count}}`, `{{user_side}}`, `{{market_closed}}` | Agree / Disagree under the thesis: the user's side (`agree` / `disagree` / empty) is marked; from three taps the split reads "62% agree · 14 taps", below that only the user's side; `market_closed` `true` disables both buttons. Signed-in only: a signed-out tap fires `prophet:signin` with `{then: 'agree', slug}` |
+| `{{market.outcome}}` | History: `right` / `wrong` / `void` / `awaiting` — the tag in the badge and the outcome line |
+| `{{call_state}}` | `live` / `resolved` / `void` / `closed`. Void shows "Market closed by Polymarket before resolution."; closed shows "Awaiting resolution" |
 | `{{listed_leg_date}}` | Ladder markets only: the leg's date (e.g. `Oct 20`), under the question on the face and in the thesis header. Empty otherwise. When a leg rolls, the card returns to not evaluated with the next date and the old leg goes to History as resolved |
-| `{{window_class}}` | `standard` / `short`. Short-window votes send `{{market.vote_time_left}}` in hours and minutes (e.g. `1h 40m`) |
 | `{{market.conviction}}` | Star conviction, 1–5; shown in the thesis block head and the called badge |
 | `{{market.outcome}}` | `won` / `lost` — resolved markets only, drives the tag in the badge |
 | `{{market.resolved_side}}` | `yes` / `no` — the side the market settled on |
 | `{{market.resolved_pct}}` | Closing YES % at settlement, e.g. `97%` |
 | `{{market.resolved_ago}}` | Relative time since resolution, e.g. `2w ago` |
-| `{{market.vote_yes_pct}}`, `{{market.vote_yes_weight}}`, `{{market.vote_no_weight}}`, `{{market.vote_count}}`, `{{market.vote_time_left}}` | Open-vote tally for the Vote modal: YES share, weight cast on each side (e.g. `94,200`), number of votes, time left (e.g. `2d`) |
 | `{{market.called_pct}}` | Odds when the thesis was called, e.g. `84%`; rendered on called cards only |
-| `{{market.contributors_json}}` | JSON array of `{user, claim, xp}` set as `data-contributors` on the card; listed under the thesis as Contributors |
-| `{{contributor.username}}` | Contributor's username (used in `<!-- repeat: contributor -->` inside the Thesis block) |
-| `{{contributor.claim}}` | The contribution that fed the thesis, one line |
-| `{{contributor.xp}}` | XP earned for that contribution |
 | `{{market.thesis_stance}}` | `yes` or `no`: which way the thesis (or draft) calls it; shown bold beside the Thesis label |
 | `{{market.thesis}}` | Full thesis text (called) or draft thesis (vote open), set as `data-thesis` on the card; shown in the Thesis block above the takes when the card is selected; empty otherwise |
-| `{{market.vote_time_left}}` | Time left on the vote, relative (purple clock in the badge) |
-| `{{market.vote_count}}` | Votes cast so far on an open vote (shown after a vote icon in the badge) |
-| `{{market.filter_state}}` | `none` (no thesis yet), `vote` (vote open), `called`, or `resolved` (History deck); drives the filter tags above the carousel |
-| `{{take.username}}` | Username of the person who posted the take (used in `<!-- repeat: take -->`) |
-| `{{take.stance}}` | Take stance: YES or NO (used in `<!-- repeat: take -->`) |
-| `{{take.xp}}` | XP earned by the take, rendered as "+N XP" under the timestamp |
-| `{{take.claim}}` | One-line claim text |
-| `{{take.ago}}` | Relative timestamp (e.g. "2h ago") |
+| `{{market.filter_state}}` | `called` (the Calls deck) or `resolved` (History); the two tabs |
 | `{{buy_url}}` | Buy $PROPHET link (pump.fun) |
-| `{{empty_no_takes}}` | Line shown in the take slot when the selected market has no takes (generated later; mock: "Nobody's taken this one yet. The first contributor earns the most credit. What do you think?") |
 
 ### Prophecies page
 | Variable | Description |
@@ -123,27 +111,8 @@ MVP and kept only so they come back with the page. `{{explainer_record}}`,
 
 | Variable | Meaning |
 |---|---|
-| `{{viewer.signed_in}}` | `true` / `false`. When false the Vote button fires a `prophet:signin` event on `document` instead of opening the modal |
-| `{{viewer.username}}` | Shown on the viewer's own take card and feed row. Never an address |
-| `{{viewer.balance}}` | $PROPHET balance, formatted (e.g. `12,400`); also the voting weight |
-| `{{viewer.vote_share}}` | The viewer's share of the weight cast so far on the selected market (e.g. `8%`) |
+| `{{viewer.signed_in}}` | `true` / `false`, on the thesis block. When false an Agree / Disagree tap fires `prophet:signin` instead |
 
-### Take result (what the server returns after Send)
 
-| Variable | Meaning |
-|---|---|
-| `{{take_result.summary}}` | One-line summary of the claim. Raw text is never shown. Preview mock: "Your claim, condensed to one line" |
-| `{{take_result.stance}}` | `yes` / `no` |
-| `{{take_result.evidence}}` | `true` when a source was named; shows the "evidence noted" mark |
-| `{{take_result.ago}}` | Relative timestamp (e.g. `just now`) |
-| `{{take_result.xp}}` | XP earned (e.g. `1`) |
-
-### Takes allowance (limits)
-
-| Variable | Meaning |
-|---|---|
-| `{{takes_remaining_today}}` | Takes the viewer has left today. Shown as a small count beside Send when signed in, and as "{n} takes left today." in the Take-sent confirmed state. At zero Send is off and a tap shows the day-limit copy |
-| `{{take_limit_reason}}` | `day` / `market` / `none`. When the server rejects a take, the Take-sent modal shows its Limit state with the matching copy |
-| `{{takes.per_day}}`, `{{takes.per_market}}` | Config values behind the limit copy (today 5 a day, 2 per market per day). The copy reads them: "That's five takes today…" / "Two takes on this market today is the limit…" |
 
 | `{{logout_url}}` | The Logout link in the header and menu; render the link only when `{{viewer.signed_in}}` is true. While unfilled, the click fires a `prophet:logout` event and shows the Logged out notice |

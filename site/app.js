@@ -150,26 +150,19 @@
   if (!track) return;
 
   var cards = Array.prototype.slice.call(track.querySelectorAll('[data-card]'));
-  var promptInput = document.querySelector('[data-prompt-input]');
-  var takesContainer = document.querySelector('[data-takes-list]');
   var thesisBox = document.querySelector('[data-thesis-box]');
   var thesisText = document.querySelector('[data-thesis-text]');
   var thesisState = document.querySelector('[data-thesis-state]');
   var thesisStance = document.querySelector('[data-thesis-stance]');
-  var voteWrap = document.querySelector('[data-vote-wrap]');
-  var voteOpen = document.querySelector('[data-vote-open]');
   var thesisLabel = document.querySelector('[data-thesis-label]');
-  var thesisList = document.querySelector('[data-thesis-contributors]');
   var thesisEst = document.querySelector('[data-thesis-est]');
   var thesisConv = document.querySelector('[data-thesis-conv]');
   var thesisOutcome = document.querySelector('[data-thesis-outcome]');
-  var HOLD_LINES = { no_gap: 'Nothing the price is missing yet.', under_gap: 'The price is missing something, too early to call.' };
-  var NOT_EVALUATED = 'The price is missing something, too early to call.';
+  var thesisAtCall = document.querySelector('[data-thesis-atcall]'), thesisRevised = document.querySelector('[data-thesis-revised]'), thesisMoved = document.querySelector('[data-thesis-moved]'), thesisSplit = document.querySelector('[data-thesis-split]'), adWrap = document.querySelector('[data-ad]');
+  var taps = {};   /* slug -> 'agree' | 'disagree' (mock, in-memory; the server keeps the real side) */
   var VOID_LINE = 'Market closed by Polymarket before resolution.';
   function labelHTML(key) { return key === 'buy_yes' ? '<span class="lbl lbl--yes">Buy YES</span>' : key === 'buy_no' ? '<span class="lbl lbl--no">Buy NO</span>' : key === 'hold' ? '<span class="lbl lbl--hold">Hold</span>' : ''; }
   function cardLabel(card) { var l = card.dataset.label; if (l && l !== 'none') return l; var st = (card.dataset.stance || '').toLowerCase(); return (card.dataset.state !== 'none' && st) ? 'buy_' + st : 'none'; }
-  var votes = {};   /* slug -> 'yes' | 'no': the vote cast in the Vote modal (mock, in-memory) */
-  var stances = {}; /* slug -> 'yes' | 'no': the bar switch, the stance for what you type; never the vote */
   var prevBtn = document.querySelector('[data-carousel-prev]');
   var nextBtn = document.querySelector('[data-carousel-next]');
   var activeIndex = -1;
@@ -178,49 +171,6 @@
   function visibleCards() {
     return cards.filter(function (c) { return !c.classList.contains('is-hidden'); });
   }
-
-  /* Mock takes keyed by card slug */
-  var TAKES = {
-    'btc-100k': [
-      { user: 'marrow',   xp: 14, stance: 'YES', claim: 'On-chain accumulation hasn\'t slowed — whales are still loading', ago: '2h ago' },
-      { user: 'quietfox', xp: 6,  stance: 'NO',  claim: 'Macro headwinds are underpriced here', ago: '5h ago' },
-      { user: 'tessellate', xp: 11, stance: 'YES', claim: 'ETF inflows have been net positive for 9 straight weeks', ago: '7h ago' },
-      { user: 'bram_o',   xp: 2,  stance: 'NO',  claim: 'Funding rates are stretched; a flush comes before six figures', ago: '9h ago' },
-      { user: 'lunaire',  xp: 8,  stance: 'YES', claim: 'Miner selling has dried up post-halving', ago: '12h ago' },
-      { user: 'kesh',     xp: 5,  stance: 'YES', claim: 'Dollar weakness is doing half the work here', ago: '1d ago' },
-      { user: 'oddlot',   xp: 3,  stance: 'NO',  claim: 'Options skew says the market is already leaning too hard on this', ago: '1d ago' }
-    ],
-    'fed-rate-cut': [
-      { user: 'delta_k', xp: 9, stance: 'NO', claim: 'Labor market still too strong for a cut', ago: '1h ago' }
-    ],
-    'sp500-6000': [
-      { user: 'ines', xp: 3, stance: 'YES', claim: 'Breadth is improving — not just mega-caps anymore', ago: '3h ago' }
-    ],
-    'sec-exchange': [
-      { user: 'halden', xp: 4, stance: 'NO',  claim: 'The comment period closing quietly isn\'t the same as staff sign-off', ago: '40m ago' },
-      { user: 'ines',   xp: 2, stance: 'YES', claim: 'Two commissioners have already said the custody model is fine', ago: '2h ago' },
-      { user: 'oddlot', xp: 1, stance: 'YES', claim: 'Timing risk is real but the question doesn\'t ask about timing', ago: '6h ago' }
-    ],
-    'eth-etf': [
-      { user: 'marrow',   xp: 6, stance: 'YES', claim: 'Day-one volume was the second biggest ETF debut ever', ago: '2w ago' },
-      { user: 'halden',   xp: 2, stance: 'NO',  claim: 'Grayscale outflows will swamp the new money', ago: '2w ago' }
-    ],
-    'fed-hold': [
-      { user: 'oddlot',   xp: 3, stance: 'YES', claim: 'Core PCE is still a full point above target', ago: '3w ago' },
-      { user: 'delta_k',  xp: 5, stance: 'NO',  claim: 'Powell said the labor market is "in balance" twice', ago: '3w ago' }
-    ],
-    'gold-2500': [
-      { user: 'kesh',     xp: 4, stance: 'YES', claim: 'Central bank demand is price-insensitive', ago: '1mo ago' }
-    ],
-    'nvda-earnings': [
-      { user: 'tessellate', xp: 7, stance: 'YES', claim: 'Blackwell ramp is ahead of the guide', ago: '2mo ago' },
-      { user: 'bram_o',   xp: 2, stance: 'NO',  claim: 'Expectations are so high a beat may not move it', ago: '2mo ago' }
-    ],
-    'mstr-btc': [
-      { user: 'quietfox', xp: 5, stance: 'YES', claim: 'Latest 8-K shows the ATM program still has room', ago: '3h ago' },
-      { user: 'bram_o',   xp: 2, stance: 'NO',  claim: 'Premium to NAV has compressed; issuing here is less attractive', ago: '8h ago' }
-    ]
-  };
 
   function cardGap() {
     var v = visibleCards();
@@ -236,9 +186,7 @@
       if (i === index) cards[i].classList.add('carousel__card--active');
       else cards[i].classList.remove('carousel__card--active');
     }
-    startTypewriter(index);
     renderThesis(cards[index]);
-    renderTakes(cards[index].dataset.slug || '');
   }
 
   function select(index) {
@@ -363,7 +311,7 @@
     /* Tab cycles the four tags: No thesis → Open votes → Prophecies → History → …; Shift+Tab goes back */
     if (e.key === 'Tab') {
       e.preventDefault();
-      var order = ['none', 'vote', 'called'];
+      var order = ['called', 'resolved'];
       var at = order.indexOf(activeFilter);
       applyFilter(order[(at + (e.shiftKey ? -1 : 1) + order.length) % order.length]);
       return;
@@ -390,81 +338,16 @@
     }
     track.scrollTo({ left: 0 });
     var v = visibleCards();
+    var empty = document.querySelector('[data-deck-empty]');
+    if (empty) empty.hidden = v.length > 0;
+    if (thesisBox) thesisBox.hidden = v.length === 0;
     if (v.length) setActiveCard(cards.indexOf(v[0]));
   }
   if (filterBar) {
     filterBar.addEventListener('click', function (e) {
       var btn = e.target.closest('[data-filter]');
       if (!btn) return;
-      applyFilter(btn.dataset.filter === activeFilter ? null : btn.dataset.filter);
-    });
-  }
-
-  /* ── Typewriter ───────────────────────────────────────── */
-  /* Types the selected market's question as placeholder, holds, erases,
-     then moves on to the next market's question, looping through all of
-     them. Restarts from the selected card whenever the carousel moves. */
-  var TYPE_MS = 30, ERASE_MS = 15, HOLD_MS = 2200, PAUSE_MS = 400, BLINK_MS = 530;
-  var CURSOR = '▌';
-  var twTimer = null;
-
-  function clearTypewriter() {
-    clearTimeout(twTimer);
-    twTimer = null;
-  }
-
-  function questionOf(index) {
-    var q = cards[index].querySelector('.carousel__question');
-    return q ? q.textContent.trim() : '';
-  }
-
-  function startTypewriter(startIndex) {
-    clearTypewriter();
-    if (!promptInput) return;
-    if (promptInput.value.length > 0) return;
-
-    var idx = startIndex;
-    var text = questionOf(idx);
-    var i = 0;
-    var held = 0;
-    var show = true;
-    promptInput.placeholder = CURSOR;
-
-    function typeStep() {
-      i++;
-      promptInput.placeholder = text.substring(0, i) + CURSOR;
-      if (i < text.length) twTimer = setTimeout(typeStep, TYPE_MS);
-      else { held = 0; twTimer = setTimeout(blinkStep, BLINK_MS); }
-    }
-    function blinkStep() {
-      show = !show;
-      held += BLINK_MS;
-      promptInput.placeholder = text + (show ? CURSOR : '');
-      if (held < HOLD_MS) twTimer = setTimeout(blinkStep, BLINK_MS);
-      else { show = true; twTimer = setTimeout(eraseStep, ERASE_MS); }
-    }
-    function eraseStep() {
-      i--;
-      promptInput.placeholder = text.substring(0, i) + CURSOR;
-      if (i > 0) twTimer = setTimeout(eraseStep, ERASE_MS);
-      else {
-        do { idx = (idx + 1) % cards.length; }
-        while (cards[idx].classList.contains('is-hidden') && idx !== startIndex);
-        text = questionOf(idx);
-        twTimer = setTimeout(typeStep, PAUSE_MS);
-      }
-    }
-    twTimer = setTimeout(typeStep, TYPE_MS);
-  }
-
-  if (promptInput) {
-    promptInput.addEventListener('input', function () {
-      clearTypewriter();
-      if (promptInput.value.length === 0) {
-        startTypewriter(activeIndex);
-      } else {
-        promptInput.placeholder = '';
-      }
+      applyFilter(btn.dataset.filter);   /* two tabs, one always on */
     });
   }
 
@@ -472,127 +355,66 @@
   var STAR_SVG = '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"/></svg>';
   function renderThesis(card) {
     if (!thesisBox) return;
-    var text = card.dataset.thesis || '';
-    var state = card.dataset.state || 'none';
-    paintBarStance(card);
-    var hasThesis = !!text && state !== 'none';
+    var state = card.dataset.state || 'called';
+    var history = state === 'resolved';
     var label = cardLabel(card);
-    /* No thesis: the box stays — "Draft", the label, the number when evaluated, and one line from hold_reason */
+    var revised = !!card.dataset.revisedAgo;
     thesisBox.hidden = false;
-    thesisBox.classList.toggle('thesis--none', !hasThesis);
-    if (!hasThesis) {
-      thesisLabel.textContent = 'Draft';
-      thesisStance.innerHTML = labelHTML(label); thesisStance.className = 'thesis__stance heading';
-      if (thesisEst) thesisEst.textContent = label === 'hold' ? (card.dataset.estimate || '') : '';
-      if (thesisConv) thesisConv.innerHTML = '';
-      thesisText.textContent = label === 'hold' ? (HOLD_LINES[card.dataset.holdReason] || '') : NOT_EVALUATED;
-      thesisState.innerHTML = ''; thesisState.className = 'thesis__state';
-      thesisList.innerHTML = ''; if (thesisOutcome) thesisOutcome.hidden = true;
-      thesisBox.classList.remove('thesis--vote'); voteWrap.hidden = true;
-      return;
-    }
-    thesisLabel.textContent = state === 'vote' ? 'Draft' : 'Thesis';
-    thesisBox.classList.toggle('thesis--vote', state === 'vote');
-    var stance = (card.dataset.stance || '').toLowerCase();
-    thesisStance.innerHTML = labelHTML(label);   /* the label, never the bare position */
+    thesisLabel.textContent = 'Thesis';
+    thesisStance.innerHTML = labelHTML(label);
     thesisStance.className = 'thesis__stance heading';
-    thesisText.textContent = text;
-    /* position · estimated probability · conviction */
-    var est = card.dataset.estimate || '', conv = card.dataset.conviction || '';
-    if (thesisEst) thesisEst.textContent = est;   /* the number alone */
-    if (thesisConv) thesisConv.innerHTML = conv ? STAR_SVG + conv : '';
-    /* resolved: how it played out */
+    /* the latest number; when revised, the number at the call keeps its own field */
+    if (thesisEst) thesisEst.textContent = revised && card.dataset.revisedNumber ? card.dataset.revisedNumber : (card.dataset.estimate || '');
+    if (thesisAtCall) thesisAtCall.textContent = revised && card.dataset.revisedNumber ? (card.dataset.estimate || '') + ' at call' : '';
+    if (thesisConv) thesisConv.innerHTML = card.dataset.conviction ? STAR_SVG + card.dataset.conviction : '';
+    if (thesisRevised) thesisRevised.textContent = revised ? 'Revised ' + card.dataset.revisedAgo : '';
+    thesisText.textContent = card.dataset.thesis || '';
+    if (thesisMoved) thesisMoved.hidden = !(revised && card.dataset.numberMoved === 'true');
+    /* History: how it played out */
     if (thesisOutcome) {
-      var rs = (card.dataset.resolvedSide || '').toLowerCase();
-      var isVoid = card.dataset.callState === 'void';
-      thesisOutcome.hidden = state !== 'resolved' || (!rs && !isVoid);
-      if (isVoid) { thesisOutcome.textContent = VOID_LINE; }
-      else if (!thesisOutcome.hidden) {
-        thesisOutcome.innerHTML = 'Resolved <span class="tally tally--' + rs + '">' + rs.toUpperCase() + '</span>' +
-          ' · market closed at ' + (card.dataset.resolvedPct || '') +
-          (card.dataset.resolvedAgo ? ' · ' + card.dataset.resolvedAgo : '');
+      var cs = card.dataset.callState || '', rs = (card.dataset.resolvedSide || '').toLowerCase();
+      thesisOutcome.hidden = !history;
+      if (history) {
+        if (cs === 'void') thesisOutcome.textContent = VOID_LINE;
+        else if (cs === 'closed' || card.dataset.outcome === 'awaiting') thesisOutcome.textContent = 'Awaiting resolution';
+        else thesisOutcome.innerHTML = 'Resolved <span class="tally tally--' + rs + '">' + rs.toUpperCase() + '</span> · ' + (card.dataset.outcome === 'right' ? '<span class="lbl lbl--yes">right</span>' : '<span class="lbl lbl--no">wrong</span>') + (card.dataset.resolvedAgo ? ' · ' + card.dataset.resolvedAgo : '');
       }
     }
     var badge = card.querySelector('.carousel__state');
     thesisState.innerHTML = badge ? badge.innerHTML : '';
-    thesisState.className = 'thesis__state' + (state === 'vote' ? ' thesis__state--vote' : '');
-
-    var contrib = [];
-    try { contrib = JSON.parse(card.dataset.contributors || '[]'); } catch (e) {}
-    var html = '';
-    for (var i = 0; i < contrib.length; i++) {
-      html += '<li class="thesis__row">' +
-        '<span class="thesis__user">' + contrib[i].user + '</span>' +
-        '<span class="thesis__claim">' + contrib[i].claim + '</span>' +
-        '<span class="thesis__xp">+' + contrib[i].xp + ' XP</span>' +
-        '</li>';
-    }
-    thesisList.innerHTML = html;
-
-    voteWrap.hidden = state !== 'vote';
-    if (state === 'vote') {
-      var chosen = votes[card.dataset.slug];
-      voteOpen.innerHTML = chosen ? 'Voted <span class="tally tally--' + chosen + '">' + chosen.toUpperCase() + '</span>' : 'Vote';
-      voteOpen.disabled = !!chosen;
+    thesisState.className = 'thesis__state';
+    paintAgree(card);
+  }
+  /* ── Agree / Disagree ── */
+  function paintAgree(card) {
+    if (!adWrap) return;
+    var live = (card.dataset.state || '') === 'called';
+    adWrap.hidden = !live; if (thesisSplit) thesisSplit.hidden = true;
+    if (!live) return;
+    var slug = card.dataset.slug, side = taps[slug] || card.dataset.userSide || '';
+    var closed = card.dataset.marketClosed === 'true';
+    var btns = adWrap.querySelectorAll('[data-ad-btn]');
+    for (var i = 0; i < btns.length; i++) { btns[i].classList.toggle('ad__btn--on', btns[i].dataset.adBtn === side); btns[i].disabled = closed; }
+    var n = parseInt(card.dataset.tapCount || '0', 10) || 0, pct = card.dataset.agreePct || '';
+    if (thesisSplit) {
+      if (n >= 3 && pct) { thesisSplit.textContent = pct + '% agree · ' + n + ' tap' + (n === 1 ? '' : 's'); thesisSplit.hidden = false; }
+      else if (side) { thesisSplit.textContent = 'You ' + side; thesisSplit.hidden = false; }
     }
   }
-  if (voteWrap) {
-    voteOpen.addEventListener('click', function () { if (activeIndex >= 0) openVote(cards[activeIndex]); });
-  }
-
-  /* ── Takes renderer ───────────────────────────────────── */
-  /* Empty-state line: {{empty_no_takes}} on the container; while the server
-     hasn't filled it, fall back to the approved mock copy. */
-  var EMPTY_MOCK = 'Nobody\'s taken this one yet. The first contributor earns the most credit. What do you think?';
-  function emptyLine() {
-    var v = takesContainer.getAttribute('data-empty-none') || '';
-    return (/^\{\{/).test(v) || !v ? EMPTY_MOCK : v;
-  }
-
-  function renderTakes(slug) {
-    if (!takesContainer) return;
-    var takes = TAKES[slug] || [];
-    if (takes.length === 0) {
-      takesContainer.innerHTML = '<div class="takes__empty">' + emptyLine() + '</div>';
-      return;
-    }
-    var html = '';
-    for (var i = 0; i < takes.length; i++) {
-      var t = takes[i];
-      html += '<div class="takes__item">' +
-        '<div class="takes__main">' +
-          '<div class="takes__head">' +
-            '<span class="takes__user">' + t.user + '</span>' +
-            '<span class="takes__stance takes__stance--' + t.stance.toLowerCase() + '">' + t.stance + '</span>' +
-          '</div>' +
-          '<p class="takes__claim">' + t.claim + '</p>' +
-        '</div>' +
-        '<div class="takes__side">' +
-          '<span class="takes__ago">' + t.ago + '</span>' +
-          '<span class="takes__xp">+' + t.xp + ' XP</span>' +
-        '</div>' +
-        '</div>';
-    }
-    takesContainer.innerHTML = html;
-  }
-
-  /* Init first card */
-
-  /* ── Bar stance switch ── */
-  var barStance = document.querySelector('[data-bar-stance]');
-  function paintBarStance(card) {
-    if (!barStance) return;
-    var chosen = stances[card.dataset.slug];
-    var btns = barStance.querySelectorAll('[data-bar-stance-btn]');
-    for (var i = 0; i < btns.length; i++) btns[i].classList.toggle('seg__opt--on', btns[i].dataset.barStanceBtn === chosen);
-  }
-  if (barStance) {
-    barStance.addEventListener('click', function (e) {
-      var b = e.target.closest('[data-bar-stance-btn]');
-      if (!b || activeIndex < 0) return;
-      var slug = cards[activeIndex].dataset.slug;
-      stances[slug] = stances[slug] === b.dataset.barStanceBtn ? undefined : b.dataset.barStanceBtn;   /* tap again to clear */
-      paintBarStance(cards[activeIndex]);
+  if (adWrap) {
+    adWrap.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-ad-btn]'); if (!b || activeIndex < 0 || b.disabled) return;
+      var card = cards[activeIndex];
+      var signedIn = (thesisBox.getAttribute('data-signed-in') || '');
+      if (signedIn === 'false') { document.dispatchEvent(new CustomEvent('prophet:signin', { detail: { then: 'agree', slug: card.dataset.slug } })); return; }
+      var slug = card.dataset.slug, prev = taps[slug] || card.dataset.userSide || '';
+      taps[slug] = b.dataset.adBtn;
+      /* mock tally: a new tap counts, a switch moves one */
+      var n = parseInt(card.dataset.tapCount || '0', 10) || 0, a = Math.round(n * (parseInt(card.dataset.agreePct || '50', 10) || 50) / 100);
+      if (!prev) { n += 1; if (taps[slug] === 'agree') a += 1; }
+      else if (prev !== taps[slug]) { a += taps[slug] === 'agree' ? 1 : -1; }
+      card.dataset.tapCount = n; card.dataset.agreePct = n ? Math.round(100 * a / n) : '';
+      paintAgree(card);
     });
   }
 
@@ -617,121 +439,7 @@
   function fmt(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
   function q(root, sel) { return root.querySelector(sel); }
 
-  /* Market head shared by both modals: image, question, stats, probability */
-  function fillMarketHead(root, card) {
-    q(root, '[data-mh-img]').src = q(card, '.carousel__img').src;
-    q(root, '[data-mh-q]').textContent = q(card, '.carousel__question').textContent;
-    q(root, '[data-mh-meta]').innerHTML = q(card, '.carousel__meta').innerHTML;
-    q(root, '[data-mh-pct]').innerHTML = q(card, '.carousel__yes').innerHTML;
-  }
-
-  /* ── Vote modal ── */
-  var vm = document.querySelector('[data-vote-modal]');
-  var vmCard = null, vmSide = 'yes';
-  function tally(card, addSide, addW) {
-    var y = num(val(card, 'vote-yes-weight', '94,200')), n = num(val(card, 'vote-no-weight', '57,700'));
-    if (addSide === 'yes') y += addW; else if (addSide === 'no') n += addW;
-    return { y: y, n: n, pct: (y + n) ? Math.round(100 * y / (y + n)) : 50 };
-  }
-  function paintTally(sfx, t, left) {
-    q(vm, '[data-vm-yes' + sfx + ']').textContent = fmt(t.y) + ' $PROPHET';
-    q(vm, '[data-vm-yespct' + sfx + ']').textContent = t.pct + '%';
-    q(vm, '[data-vm-nopct' + sfx + ']').textContent = (100 - t.pct) + '%';
-    q(vm, '[data-vm-no' + sfx + ']').textContent = fmt(t.n) + ' $PROPHET';
-    q(vm, '[data-vm-left' + sfx + ']').textContent = left + ' left';
-    q(vm, '[data-vm-bar' + sfx + ']').style.width = t.pct + '%';
-  }
-  function openVote(card) {
-    if (!vm || !card || card.dataset.state !== 'vote') return;
-    if (val(vm, 'signed-in', 'true') === 'false') {          /* signed out: the server's sign-in takes over, then reopens this */
-      document.dispatchEvent(new CustomEvent('prophet:signin', { detail: { then: 'vote', slug: card.dataset.slug } }));
-      return;
-    }
-    vmCard = card; vmSide = 'yes';
-    var stance = (card.dataset.stance || '').toLowerCase();
-    fillMarketHead(vm, card);
-    var st = q(vm, '[data-vm-stance]'); st.innerHTML = labelHTML(cardLabel(card)); st.className = 'thesis__stance heading';
-    q(vm, '[data-vm-est]').textContent = card.dataset.estimate || '';
-    q(vm, '[data-vm-conv]').innerHTML = card.dataset.conviction ? STAR_SVG + card.dataset.conviction : '';
-    var tx = q(vm, '[data-vm-text]'); tx.textContent = card.dataset.thesis || ''; tx.classList.remove('vm__text--open'); q(vm, '[data-vm-more]').textContent = 'More';
-    var contrib = []; try { contrib = JSON.parse(card.dataset.contributors || '[]'); } catch (e) {}
-    var ch = '';
-    for (var i = 0; i < contrib.length; i++) ch += '<li class="thesis__row"><span class="thesis__user">' + contrib[i].user + '</span><span class="thesis__claim">' + contrib[i].claim + '</span><span class="thesis__xp">+' + contrib[i].xp + ' XP</span></li>';
-    q(vm, '[data-vm-contrib]').innerHTML = ch;
-    var left = val(card, 'vote-left', '2d');
-    paintTally('', tally(card), left);
-    var bal = val(vm, 'balance', '12,400'), share = val(vm, 'share', '8%');
-    q(vm, '[data-vm-balance]').textContent = bal + ' $PROPHET';
-    q(vm, '[data-vm-weight]').textContent = share + ' of votes so far';
-    paintSide();
-    q(vm, '[data-vm-ballot]').hidden = false; q(vm, '[data-vm-done]').hidden = true;
-    q(vm, '[data-vm-panel]').classList.remove('mdl__panel--glow', 'mdl__panel--glow-no');
-    openModal(vm);
-  }
-  function paintSide() {
-    var btns = vm.querySelectorAll('[data-vm-side-btn]');
-    for (var i = 0; i < btns.length; i++) btns[i].classList.toggle('seg__opt--on', btns[i].dataset.vmSideBtn === vmSide);
-    var cta = q(vm, '[data-vm-cast]'); cta.textContent = 'Vote ' + vmSide.toUpperCase(); cta.classList.toggle('mdl__cta--no', vmSide === 'no');
-  }
-  function nextOpenVote(after) {
-    var v = visibleCards(), start = v.indexOf(after);
-    for (var k = 1; k <= v.length; k++) { var c = v[(start + k) % v.length]; if (c !== after && c.dataset.state === 'vote' && !votes[c.dataset.slug]) return c; }
-    return null;
-  }
-  if (vm) {
-    q(vm, '[data-vm-side]').addEventListener('click', function (e) { var b = e.target.closest('[data-vm-side-btn]'); if (b) { vmSide = b.dataset.vmSideBtn; paintSide(); } });
-    q(vm, '[data-vm-more]').addEventListener('click', function () {
-      var tx = q(vm, '[data-vm-text]'); var open = tx.classList.toggle('vm__text--open'); this.textContent = open ? 'Less' : 'More';
-    });
-    q(vm, '[data-vm-cast]').addEventListener('click', function () {
-      if (!vmCard) return;
-      var slug = vmCard.dataset.slug, bal = val(vm, 'balance', '12,400');
-      votes[slug] = vmSide;
-      if (activeIndex >= 0 && cards[activeIndex] === vmCard) renderThesis(vmCard);
-      q(vm, '[data-vm-voted]').innerHTML = 'Voted <span class="tally tally--' + vmSide + '">' + vmSide.toUpperCase() + '</span>';
-      q(vm, '[data-vm-doneweight]').textContent = bal + ' $PROPHET · ' + val(vm, 'share', '8%') + ' of votes so far';
-      paintTally('2', tally(vmCard, vmSide, num(bal)), val(vmCard, 'vote-left', '2d'));
-      var nxt = nextOpenVote(vmCard);
-      q(vm, '[data-vm-next]').textContent = nxt ? 'Next open vote' : 'Back to the markets';
-      q(vm, '[data-vm-ballot]').hidden = true; q(vm, '[data-vm-done]').hidden = false;
-      var mark = q(vm, '[data-vm-mark]'); mark.classList.toggle('vm__check--no', vmSide === 'no');
-      /* SVG elements have no .hidden property, so the icons swap by class */
-      q(mark, '.vm__ico--check').classList.toggle('is-hidden', vmSide === 'no'); q(mark, '.vm__ico--x').classList.toggle('is-hidden', vmSide !== 'no');
-      var p = q(vm, '[data-vm-panel]'); p.classList.remove('mdl__panel--glow', 'mdl__panel--glow-no'); void p.offsetWidth; p.classList.add(vmSide === 'no' ? 'mdl__panel--glow-no' : 'mdl__panel--glow');
-    });
-    q(vm, '[data-vm-next]').addEventListener('click', function () {
-      var nxt = vmCard ? nextOpenVote(vmCard) : null;
-      closeModal(vm);
-      if (nxt) { select(cards.indexOf(nxt)); openVote(nxt); }
-    });
-  }
-  window.prophetVote = { open: function (slug) { for (var i = 0; i < cards.length; i++) if (cards[i].dataset.slug === slug) return openVote(cards[i]); } };
-
   /* ── Prompt bar notices ── */
-  var takesGiven = {};   /* slug -> takes sent on that market today (mock; the server enforces the real limits) */
-  var tmRoot = document.querySelector('[data-take-modal]');
-  var takesLeft = parseInt(val(tmRoot, 'takes-left', '4'), 10); if (isNaN(takesLeft)) takesLeft = 4;
-  var dayLimit = parseInt(val(tmRoot, 'day-limit', '5'), 10) || 5, marketLimit = parseInt(val(tmRoot, 'market-limit', '2'), 10) || 2;
-  var WORDS = { 1: 'one', 2: 'two', 3: 'three', 4: 'four', 5: 'five', 6: 'six' };
-  var LIMIT_COPY = {
-    day: "That's " + (WORDS[dayLimit] || dayLimit) + " takes today. Each one is read in full and feeds his next run, so fewer, better takes are what he wants. Back tomorrow.",
-    market: ((WORDS[marketLimit] || String(marketLimit)).replace(/^./, function (ch) { return ch.toUpperCase(); })) + " take" + (marketLimit === 1 ? '' : 's') + " on this market today is the limit. Give one on another market, or come back tomorrow."
-  };
-  var barCount = document.querySelector('[data-takes-left-count]'), sendBtnEl = document.querySelector('[data-prompt-send]');
-  function paintTakesLeft() {
-    var signedIn = val(document.querySelector('[data-vote-modal]'), 'signed-in', 'true') !== 'false';
-    if (barCount) { barCount.textContent = takesLeft; barCount.hidden = !signedIn; }
-    if (sendBtnEl) { sendBtnEl.classList.toggle('is-off', takesLeft <= 0); sendBtnEl.setAttribute('aria-disabled', takesLeft <= 0 ? 'true' : 'false'); }
-  }
-  function showLimit(reason) {
-    if (!tmRoot) return;
-    clearTimeout(tmTimer);   /* a previous send's reveal must not land on top of the limit */
-    q(tmRoot, '[data-tm-loading]').hidden = true; q(tmRoot, '[data-tm-done]').hidden = true;
-    q(tmRoot, '[data-tm-limit-line]').textContent = LIMIT_COPY[reason] || LIMIT_COPY.day;
-    q(tmRoot, '[data-tm-limit]').hidden = false;
-    openModal(tmRoot);
-  }
-  paintTakesLeft();
   function notice(name) { return document.querySelector('[data-notice="' + name + '"]'); }
   window.prophetNotices = { open: function (name) { openNotice(name); } };
   /* Log out: the real link is {{logout_url}}; while it is unfilled, the click fires prophet:logout and shows the notice */
@@ -751,58 +459,7 @@
     openModal(n);
   }
 
-  /* ── Take sent modal ── */
-  var tm = document.querySelector('[data-take-modal]');
-  var sendBtn = document.querySelector('[data-prompt-send]');
-  var tmTimer = null;
-  function sendTake() {
-    if (!tm || !promptInput || activeIndex < 0) return;
-    var text = promptInput.value.trim();
-    var card = cards[activeIndex], slug = card.dataset.slug;
-    /* the bar's notices: nothing typed, no side picked, out of takes — the text stays in the field */
-    if (!text) { openNotice('no-text'); return; }
-    if (!stances[slug]) { openNotice('no-stance'); return; }
-    /* Limits: the server answers with take_limit_reason (day | market); the preview counts for itself */
-    var reason = val(tm, 'limit-reason', '');
-    if (reason !== 'day' && reason !== 'market') {
-      if (takesLeft <= 0) reason = 'day';
-      else if ((takesGiven[slug] || 0) >= marketLimit) reason = 'market';
-    }
-    if (reason === 'day' || reason === 'market') { showLimit(reason); return; }
-    takesGiven[slug] = (takesGiven[slug] || 0) + 1; takesLeft -= 1; paintTakesLeft();   /* a take is spent when it is sent */
-    promptInput.value = '';
-    fillMarketHead(tm, card);
-    q(tm, '[data-tm-limit]').hidden = true; q(tm, '[data-tm-loading]').hidden = false; q(tm, '[data-tm-done]').hidden = true;
-    openModal(tm);
-    /* The confirmed card is filled now (the result is known here) so the box already has its final
-       height while the spinner shows; it is revealed, and the feed updated, on confirmation. */
-      /* what the server returns for the take; the mock fallbacks are used only while the variables are unfilled */
-      var summary = val(tm, 'summary', 'Custody objections were withdrawn in the latest docket filing, so the timing risk on approval is smaller than the market is pricing');
-      var stance = val(tm, 'stance', stances[slug]).toLowerCase();   /* the bar switch, required */
-      var evidence = val(tm, 'evidence', (/https?:\/\/|\bsource\b|\bper\b|\breport\b/i).test(text) ? 'true' : 'false') === 'true';
-      var ago = val(tm, 'ago', 'just now'), xp = val(tm, 'xp', '1'), user = val(vm, 'username', 'you');
-      var sb = q(tm, '[data-tm-stance]'); sb.textContent = stance.toUpperCase(); sb.className = 'takes__stance takes__stance--' + stance;
-      q(tm, '[data-tm-ev]').hidden = !evidence;
-      q(tm, '[data-tm-claim]').textContent = summary;
-      q(tm, '[data-tm-ago]').textContent = ago;
-      q(tm, '[data-tm-user]').textContent = user;
-      q(tm, '[data-tm-xpcard]').textContent = '+' + xp + ' XP';
-      q(tm, '[data-tm-xp]').innerHTML = 'You earned <span class="takes__xp">+' + xp + ' XP</span> for this contribution.';
-      q(tm, '[data-tm-left]').textContent = takesLeft + ' take' + (takesLeft === 1 ? '' : 's') + ' left today.';
-    clearTimeout(tmTimer);
-    tmTimer = setTimeout(function () {
-      /* the summarised take lands at the top of the feed behind the modal; raw text never does */
-      if (!TAKES[slug]) TAKES[slug] = [];
-      TAKES[slug].unshift({ user: user, xp: parseInt(xp, 10) || 1, stance: stance.toUpperCase(), claim: summary, ago: ago });
-      renderTakes(slug);
-      q(tm, '[data-tm-loading]').hidden = true; q(tm, '[data-tm-done]').hidden = false;
-    }, 1200);
-  }
-  if (sendBtn) sendBtn.addEventListener('click', sendTake);
-  if (promptInput) promptInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); sendTake(); } });
-  if (tm) q(tm, '[data-tm-again]').addEventListener('click', function () { closeModal(tm); if (promptInput) promptInput.focus(); });
-
-  if (cards.length > 0) applyFilter(null);   /* hides the History deck, selects the first card */
+  applyFilter('called');   /* Calls by default; History is the other tab */
 })();
 
 /* ── Roadmap timeline light ───────────────────────────── */
@@ -998,7 +655,7 @@
   });
 })();
 
-/* ── Circuit board behind the prompt bar ──────────────── */
+/* ── Circuit board around the thesis block ────────────── */
 /* Desktop only (1024px+), home page only, decorative.
  * The rules this must satisfy are written down in BOARD-SPEC.md.
  *
@@ -1009,7 +666,7 @@
  */
 (function () {
   var canvas = document.querySelector('[data-board]');
-  var bar = document.querySelector('.prompt-bar');
+  var bar = document.querySelector('[data-thesis-box]');   /* the board now sits around the thesis block, where the buttons live */
   if (!canvas || !bar || !canvas.getContext) return;
   var ctx = canvas.getContext('2d');
 
@@ -1076,7 +733,7 @@
       var pad = el.classList && el.classList.contains('carousel__card') ? CARD_CLEAR : CLEAR;
       if (r && r.r > r.l && r.b > r.t) out.push(grow(r, pad));
     }
-    var blocks = document.querySelectorAll('.feed, .takes, .thesis, .carousel__card, .carousel__arrow, .filters, .below, .site-header, .site-footer');
+    var blocks = document.querySelectorAll('.feed, .thesis, .carousel__card, .carousel__arrow, .filters, .below, .site-header, .site-footer');
     for (i = 0; i < blocks.length; i++) add(blocks[i]);
     var all = document.body.querySelectorAll('*');
     for (i = 0; i < all.length; i++) {
@@ -1346,8 +1003,8 @@
     for (var i = 0; i < 40 && !route; i++) route = makeRoute();
     if (!route) return;
     runs.push({ t: route, start: performance.now() });
-    bar.classList.add('prompt-bar--pulse');
-    setTimeout(function () { bar.classList.remove('prompt-bar--pulse'); }, 900);
+    bar.classList.add('thesis--pulse');
+    setTimeout(function () { bar.classList.remove('thesis--pulse'); }, 900);
   }
 
   function profile(r, d) {                              /* transparent → green → transparent */
