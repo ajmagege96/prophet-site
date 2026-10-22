@@ -383,7 +383,7 @@
     var cl = adWrap.querySelector('[data-ad-closed]'); if (cl) cl.hidden = !closed;
     var n = parseInt(card.dataset.tradeCount || '0', 10) || 0, pct = card.dataset.agreePct || '';
     if (thesisSplit) {
-      if (n >= 3 && pct) { thesisSplit.textContent = pct + '% agree with him · ' + n + ' tap' + (n === 1 ? '' : 's'); thesisSplit.hidden = false; }
+      if (n >= 3 && pct) { thesisSplit.textContent = pct + '% agree with ' + n + ' tap' + (n === 1 ? '' : 's'); thesisSplit.hidden = false; }
       else if (side) { thesisSplit.textContent = 'You ' + side; thesisSplit.hidden = false; }
     }
   }
@@ -418,12 +418,12 @@
     var st = (card.dataset.stance || 'yes').toLowerCase();
     var at = card.dataset.calledPct || ''; if (!at) { var sp = card.querySelector('[title="odds at call"]'); at = sp ? sp.textContent.replace(/ at call.*/, '') : ''; }
     var label = '<span class="lbl lbl--' + st + ' tc__word">Buy ' + st.toUpperCase() + '</span>';
-    var verdict = side === 'agree' ? '<span class="tc__right">right</span>' : '<span class="tc__wrong">wrong</span>';
+    var verdict = side === 'agree' ? 'right' : 'wrong';   /* plain, not coloured */
     return esc(line).replace(/\{label\}/g, label).replace(/\{verdict\}/g, verdict).replace(/\{price\}/g, esc(at.replace('%', '')));
   }
   function crowdLine(card) {
     var n = parseInt(card.dataset.tradeCount || '0', 10) || 0, pct = card.dataset.agreePct || '';
-    return (n >= 3 && pct) ? pct + '% agree with him · ' + n + ' tap' + (n === 1 ? '' : 's') : '';
+    return (n >= 3 && pct) ? pct + '% agree with ' + n + ' tap' + (n === 1 ? '' : 's') : '';
   }
   function confirmTap(card, side) {
     if (!tapModal) return;

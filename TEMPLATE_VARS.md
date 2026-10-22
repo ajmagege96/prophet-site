@@ -27,7 +27,7 @@
 | `{{label}}` | `buy_yes` / `buy_no`, carried on the card as `data-label`; the card prints it as the big Buy YES / Buy NO. Never inside the thesis text |
 | `{{market.called_ago}}` | Relative time of the call, in the meta row as "called 3d ago" |
 | `{{revised_ago}}`, `{{revised_number}}` | A call re-run after it was made: the block shows "Revised {ago}" and the latest thesis; `revised_number` is carried on the card, not shown. Empty when not revised |
-| `{{agree_pct}}`, `{{trade_count}}`, `{{user_side}}`, `{{market_closed}}` | Agree / Disagree under the thesis: the user's side (`agree` / `disagree` / empty) is marked; from three taps the split reads "58% agree with him · 14 taps" — the server's figure, unchanged by the user's own tap — below that only the user's side; `market_closed` `true` disables both buttons. Signed-in only: a signed-out tap fires `prophet:signin` with `{then: 'agree', slug}` |
+| `{{agree_pct}}`, `{{trade_count}}`, `{{user_side}}`, `{{market_closed}}` | Agree / Disagree under the thesis: the user's side (`agree` / `disagree` / empty) is marked; from three taps the split reads "58% agree with 14 taps" — the server's figure, unchanged by the user's own tap — below that only the user's side; `market_closed` `true` disables both buttons. Signed-in only: a signed-out tap fires `prophet:signin` with `{then: 'agree', slug}` |
 | `{{market.outcome}}` | History: `right` / `wrong` / `void` / `awaiting` — the tag in the badge and the outcome line |
 | `{{call_state}}` | `live` / `resolved` / `void` / `closed`. Void shows "Market closed by Polymarket before resolution."; closed shows "Awaiting resolution" |
 | `{{listed_leg_date}}` | Ladder markets only: the leg's date (e.g. `Oct 20`), small and gray beside the question on the card face. Empty otherwise. When a leg rolls, the card returns to not evaluated with the next date and the old leg goes to History as resolved |
@@ -120,6 +120,6 @@ MVP and kept only so they come back with the page. `{{explainer_record}}`,
 
 | Variable | Meaning |
 |---|---|
-| `{{tap_modal.confirm_agree}}`, `{{tap_modal.confirm_disagree}}` | The confirmation line; `{label}` (Buy YES green / Buy NO red), `{verdict}` (right green / wrong red) and `{price}` are filled from the card and the side. Approved copy while unfilled: "You're calling him {verdict}. {label} at {price}. Let's see if you're both right." / "You're calling him {verdict}. {label} at {price}, you say that's {verdict}." |
+| `{{tap_modal.confirm_agree}}`, `{{tap_modal.confirm_disagree}}` | The confirmation line; `{label}` (Buy YES green / Buy NO red), `{verdict}` (right / wrong, plain) and `{price}` are filled from the card and the side. Approved copy while unfilled: "You're calling him {verdict}. {label} at {price}. Let's see if you're both right." / "You're calling him {verdict}. {label} at {price}, you say that's {verdict}." |
 | `{{tap_modal.scoring_line}}` | Approved copy while unfilled: "Scored when the market resolves. Right or wrong, it's on your record and you'll earn XP." |
 | `{{tap_modal.first_in_line}}` | The crowd line under three taps. Approved copy while unfilled: "First tap on this one. You set the tone." |
