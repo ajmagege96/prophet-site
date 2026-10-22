@@ -29,7 +29,7 @@
   <meta name="twitter:description" content="An agent that reads prediction markets, publishes a thesis before the outcome, and keeps a public record of every call.">
   <meta name="twitter:image" content="https://ajmagege96.github.io/prophet-site/site/assets/prophet-og-1200x630.png">
 
-  <link rel="stylesheet" href="styles.css?v=91d1abe9">
+  <link rel="stylesheet" href="styles.css?v=54eba582">
 </head>
 <body>
 
@@ -124,7 +124,7 @@
              Ladder markets print listed_leg_date under the question. Thesis, numbers and the Agree / Disagree state fill the
              block under the carousel from the data-* attributes. His number and the label live in the block, never on the face. -->
         <template>
-        <div class="carousel__card outline" data-card data-state="{{market.filter_state}}" data-slug="{{market.slug}}" data-label="{{label}}" data-stance="{{market.thesis_stance}}" data-estimate="{{prophet_probability}}" data-called-pct="{{market.called_pct}}" data-called-ago="{{market.called_ago}}" data-call-state="{{call_state}}" data-outcome="{{market.outcome}}" data-resolved-side="{{market.resolved_side}}" data-resolved-pct="{{market.resolved_pct}}" data-resolved-ago="{{market.resolved_ago}}" data-leg-date="{{listed_leg_date}}" data-revised-ago="{{revised_ago}}" data-revised-number="{{revised_number}}" data-agree-pct="{{agree_pct}}" data-trade-count="{{trade_count}}" data-user-side="{{user_side}}" data-market-closed="{{market_closed}}" data-thesis="{{market.thesis}}">
+        <div class="carousel__card outline" data-card data-state="{{market.filter_state}}" data-slug="{{market.slug}}" data-label="{{label}}" data-stance="{{market.thesis_stance}}" data-estimate="{{prophet_probability}}" data-called-pct="{{market.called_pct}}" data-called-ago="{{market.called_ago}}" data-call-state="{{call_state}}" data-outcome="{{market.outcome}}" data-resolved-side="{{market.resolved_side}}" data-resolved-pct="{{market.resolved_pct}}" data-resolved-ago="{{market.resolved_ago}}" data-leg-date="{{listed_leg_date}}" data-revised-ago="{{revised_ago}}" data-revised-number="{{revised_number}}" data-agree-pct="{{agree_pct}}" data-trade-count="{{trade_count}}" data-user-side="{{user_side}}" data-market-closed="{{market_closed}}" data-tap-confirmed="{{tap_confirmed}}" data-thesis="{{market.thesis}}">
           <div class="carousel__top">
             <img class="carousel__img" src="{{market.image_url}}" alt="" loading="lazy">
             <!-- the market's odds, small, top-right; in History the right · wrong · void · awaiting tag follows them -->
@@ -307,11 +307,33 @@
       <button class="ad__btn ad__btn--agree" data-ad-btn="agree">Agree</button>
       <button class="ad__btn ad__btn--disagree" data-ad-btn="disagree">Disagree</button>
       <span class="thesis__split" data-thesis-split hidden></span>
+      <span class="ad__closed" data-ad-closed hidden>Trades closed</span>
     </div>
   </div>
 </main>
 
 
+
+<!-- modal:tap — Tap Confirmed. Opens on a signed-in user's first Agree / Disagree on a card (not on a switch),
+     once per card per user (remembered on the device and, via tap_confirmed on the card, by the server).
+     Bottom sheet on phones, centred dialog on desktop; X, swipe down or the backdrop dismiss it.
+     Every line is a config string on this root; the mocks are [COPY] until the founder writes them. -->
+<div class="mdl mdl--sheet" data-modal data-tap-modal hidden role="dialog" aria-modal="true" aria-label="Confirmed"
+     data-confirm-agree="{{tap_modal.confirm_agree}}" data-confirm-disagree="{{tap_modal.confirm_disagree}}"
+     data-scoring-line="{{tap_modal.scoring_line}}" data-first-in-line="{{tap_modal.first_in_line}}">
+  <div class="mdl__backdrop" data-modal-close></div>
+  <div class="mdl__panel outline" data-tap-panel>
+    <button class="mdl__close" data-modal-close aria-label="Close">&times;</button>
+    <div class="tc">
+      <span class="ad__btn tc__chip" data-tc-chip></span>
+      <p class="tc__line" data-tc-confirm></p>
+      <p class="tc__sub" data-tc-scoring></p>
+      <p class="tc__crowd" data-tc-crowd></p>
+      <button class="mdl__cta" data-tc-next>Next call</button>
+    </div>
+  </div>
+</div>
+<!-- /modal:tap -->
 
 <!-- modal:notices — the Logged out notice. Closes on the X, Escape, the backdrop or the button. -->
 <!-- after Log out: the server signs the viewer out and shows this on the way back -->
@@ -498,6 +520,6 @@
 </footer>
 <!-- /partial:footer -->
 
-<script src="app.js?v=de256dd7"></script>
+<script src="app.js?v=aed11e89"></script>
 </body>
 </html>

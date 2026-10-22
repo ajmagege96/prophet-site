@@ -122,6 +122,15 @@ separator; 16px between the takes and the bar.
 - Open question for the logic doc: which leg of a ladder the card shows is
   not specified. "Current leg" is the default built here; the leg he has a
   view on may be the better rule.
+- **Tap Confirmed modal** (`<!-- modal:tap -->`): opens on a signed-in user's
+  first tap on a card, once per card per user — the device remembers under
+  `prophet.tapped.<slug>` and you send `{{tap_confirmed}}` on the card.
+  Switching side shows nothing. Signed out: the tap fires `prophet:signin`;
+  after sign-in call `window.prophetTap.land(slug, side)` and the tap lands
+  and the modal shows. Lines are config strings on the modal root
+  (`tap_modal.*`), `[COPY]` until written. Next call selects the next live
+  call; Back to top on the last. Bottom sheet on phones (swipe down closes),
+  dialog on desktop. Closed markets: buttons disabled, "Trades closed".
 - The home hero is as tall as its content now; How it Works follows the
   Agree / Disagree row directly.
 
@@ -313,7 +322,7 @@ Other globals: `window.prophetOnboarding.open()`, `window.prophetBoard.set({beat
 
 ## 10. Variable reference
 
-65 variables actually present in the files right now, with where each appears.
+70 variables actually present in the files right now, with where each appears.
 
 | Variable | Where | Holds |
 |---|---|---|
@@ -354,6 +363,11 @@ Other globals: `window.prophetOnboarding.open()`, `window.prophetBoard.set({beat
 | `{{swap_impact}}` | $PROPHET | Swap meta line, left: slip and price impact |
 | `{{swap_slippage}}` | $PROPHET | Swap meta line, left: slip and price impact |
 | `{{swap_sol_balance}}` | $PROPHET | The viewer's SOL balance, right of the swap meta line (e.g. "2.41 SOL") |
+| `{{tap_confirmed}}` | Home | On each card: `true` when this user has already seen the confirmation for it, so it does not show again (the device remembers too) |
+| `{{tap_modal.confirm_agree}}` | Home | The confirmation line in his voice: the call restated with the user's side. Config strings on the modal root; `[COPY]` until written |
+| `{{tap_modal.confirm_disagree}}` | Home | The confirmation line in his voice: the call restated with the user's side. Config strings on the modal root; `[COPY]` until written |
+| `{{tap_modal.first_in_line}}` | Home | The crowd line when the card has fewer than three trades. Config string |
+| `{{tap_modal.scoring_line}}` | Home | One sentence: scored on resolution. Config string |
 | `{{tg_url}}` | $PROPHET; Home; footer; header | Link to the project's Telegram channel |
 | `{{tl_linkedin_url}}` | $PROPHET; Home; footer; header | TradeLeague on LinkedIn (footer) |
 | `{{tl_tg_url}}` | $PROPHET; Home; footer; header | TradeLeague on Telegram (footer) |

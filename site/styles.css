@@ -611,6 +611,16 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
   50%      { opacity: 1;    box-shadow: 0 0 7px 3px rgba(16, 240, 95, 0.55); }
 }
 
+/* Tap Confirmed */
+.tc { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 14px; padding-top: 4px; }
+.tc__chip { pointer-events: none; }
+.tc__line { font-size: 15px; line-height: 1.45; }
+.tc__sub { font-size: 13px; opacity: 0.7; line-height: 1.45; }
+.tc__crowd { font-size: 13px; opacity: 0.85; }
+.tc .mdl__cta { min-width: 200px; margin-top: 4px; }
+.ad__closed { font-size: 12px; opacity: 0.5; margin-left: 8px; }
+.ad__closed[hidden] { display: none; }
+
 /* Hero on home: height from its content, so How it Works sits right under the Agree / Disagree row */
 .hero--home { height: auto; min-height: 0; overflow: visible; }
 .hero--home .home-panel { height: auto; }
@@ -1069,6 +1079,10 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
   .home-panel { height: calc(100svh - 56px); padding: 16px 20px 14px; }
   .hero--home .home-panel { height: auto; }
   .ad__btn { min-height: 44px; padding: 0 18px; }
+  /* Tap Confirmed is a bottom sheet on phones */
+  .mdl--sheet { align-items: flex-end; padding: 0; }
+  .mdl--sheet .mdl__panel { max-width: none; border-radius: 4px 4px 0 0; border-bottom: 0; padding: 44px 20px 28px; }
+  .mdl--sheet .mdl__panel.is-dragging { transition: none; }
   .panel { height: auto; overflow: visible; padding: 16px 20px 28px; }
   .panel--token { overflow: visible; padding-bottom: 44px; }
   .feed { flex: 1 1 auto; min-height: 0; overflow-y: auto; margin: 14px 0 16px; }   /* 16px of air between the takes and the bar */

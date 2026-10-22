@@ -115,3 +115,12 @@ MVP and kept only so they come back with the page. `{{explainer_record}}`,
 
 
 | `{{logout_url}}` | The Logout link in the header and menu; render the link only when `{{viewer.signed_in}}` is true. While unfilled, the click fires a `prophet:logout` event and shows the Logged out notice |
+
+### Tap Confirmed modal
+
+| Variable | Meaning |
+|---|---|
+| `{{tap_modal.confirm_agree}}`, `{{tap_modal.confirm_disagree}}` | The confirmation line in his voice: the call restated with the user's side. Config strings on the modal root; `[COPY]` until written |
+| `{{tap_modal.scoring_line}}` | One sentence: scored on resolution. Config string |
+| `{{tap_modal.first_in_line}}` | The crowd line when the card has fewer than three trades. Config string |
+| `{{tap_confirmed}}` | On each card: `true` when this user has already seen the confirmation for it, so it does not show again (the device remembers too) |

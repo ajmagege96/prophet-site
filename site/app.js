@@ -380,6 +380,7 @@
     var closed = card.dataset.marketClosed === 'true';
     var btns = adWrap.querySelectorAll('[data-ad-btn]');
     for (var i = 0; i < btns.length; i++) { btns[i].classList.toggle('ad__btn--on', btns[i].dataset.adBtn === side); btns[i].disabled = closed; }
+    var cl = adWrap.querySelector('[data-ad-closed]'); if (cl) cl.hidden = !closed;
     var n = parseInt(card.dataset.tradeCount || '0', 10) || 0, pct = card.dataset.agreePct || '';
     if (thesisSplit) {
       if (n >= 3 && pct) { thesisSplit.textContent = pct + '% agree · ' + n + ' trade' + (n === 1 ? '' : 's'); thesisSplit.hidden = false; }
@@ -396,8 +397,53 @@
       var next = prev === b.dataset.adBtn ? '' : b.dataset.adBtn;   /* tap the chosen side again to deselect */
       taps[slug] = next;   /* the split is the server's figure and does not move on a tap */
       paintAgree(card);
+      if (!prev && next) { confirmTap(card, next); }                      /* first tap on this card: the Tap Confirmed modal, once */
+      else if (prev && next) { if (navigator.vibrate) navigator.vibrate(10); }   /* switching side: no modal */
+      return;
+      paintAgree(card);
     });
   }
+
+
+  /* ── Tap Confirmed modal ── */
+  var tapModal = document.querySelector('[data-tap-modal]');
+  function tapSeen(slug) { try { return localStorage.getItem('prophet.tapped.' + slug) === '1'; } catch (e) { return false; } }
+  function markTapSeen(slug) { try { localStorage.setItem('prophet.tapped.' + slug, '1'); } catch (e) {} }
+  function confirmTap(card, side) {
+    if (!tapModal) return;
+    var slug = card.dataset.slug;
+    if (tapSeen(slug) || val(card, 'tap-confirmed', 'false') === 'true') return;   /* once per card per user */
+    markTapSeen(slug);
+    var chip = q(tapModal, '[data-tc-chip]');
+    chip.textContent = side === 'agree' ? 'Agree' : 'Disagree';
+    chip.className = 'ad__btn tc__chip ad__btn--' + side + ' ad__btn--on';
+    q(tapModal, '[data-tc-confirm]').textContent = val(tapModal, side === 'agree' ? 'confirm-agree' : 'confirm-disagree', '[COPY]');
+    q(tapModal, '[data-tc-scoring]').textContent = val(tapModal, 'scoring-line', '[COPY]');
+    var n = parseInt(card.dataset.tradeCount || '0', 10) || 0, pct = card.dataset.agreePct || '';
+    q(tapModal, '[data-tc-crowd]').textContent = (n >= 3 && pct) ? pct + '% agree · ' + n + ' trade' + (n === 1 ? '' : 's') : val(tapModal, 'first-in-line', '[COPY]');
+    var v = visibleCards(), last = v.length && v[v.length - 1] === card;
+    q(tapModal, '[data-tc-next]').textContent = last ? 'Back to top' : 'Next call';
+    openModal(tapModal);
+  }
+  if (tapModal) {
+    q(tapModal, '[data-tc-next]').addEventListener('click', function () {
+      closeModal(tapModal);
+      var v = visibleCards(); if (!v.length || activeIndex < 0) return;
+      var at = v.indexOf(cards[activeIndex]);
+      var nxt = v[(at + 1) % v.length];
+      select(cards.indexOf(nxt));
+    });
+    /* swipe down to dismiss (phones) */
+    var panel = q(tapModal, '[data-tap-panel]'), y0 = null;
+    panel.addEventListener('touchstart', function (e) { y0 = e.touches[0].clientY; panel.classList.add('is-dragging'); }, { passive: true });
+    panel.addEventListener('touchmove', function (e) { if (y0 === null) return; var dy = e.touches[0].clientY - y0; if (dy > 0) panel.style.transform = 'translateY(' + dy + 'px)'; }, { passive: true });
+    panel.addEventListener('touchend', function (e) {
+      var dy = e.changedTouches[0].clientY - (y0 || 0); y0 = null; panel.classList.remove('is-dragging'); panel.style.transform = '';
+      if (dy > 80) closeModal(tapModal);
+    });
+  }
+  /* After sign-in the server lands the tap and shows the confirmation: window.prophetTap.land(slug, 'agree' | 'disagree') */
+  window.prophetTap = { land: function (slug, side) { for (var i = 0; i < cards.length; i++) if (cards[i].dataset.slug === slug) { taps[slug] = side; paintAgree(cards[i]); confirmTap(cards[i], side); return; } } };
 
   /* ── Modals: Vote, Take sent ──────────────────────────── */
   /* Shared: close on X, Escape or the backdrop; body scroll locked while open. */
