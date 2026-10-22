@@ -383,7 +383,7 @@
     var cl = adWrap.querySelector('[data-ad-closed]'); if (cl) cl.hidden = !closed;
     var n = parseInt(card.dataset.tradeCount || '0', 10) || 0, pct = card.dataset.agreePct || '';
     if (thesisSplit) {
-      if (n >= 3 && pct) { thesisSplit.textContent = pct + '% agree · ' + n + ' trade' + (n === 1 ? '' : 's'); thesisSplit.hidden = false; }
+      if (n >= 3 && pct) { thesisSplit.textContent = pct + '% agree with him · ' + n + ' tap' + (n === 1 ? '' : 's'); thesisSplit.hidden = false; }
       else if (side) { thesisSplit.textContent = 'You ' + side; thesisSplit.hidden = false; }
     }
   }
@@ -397,8 +397,7 @@
       var next = prev === b.dataset.adBtn ? '' : b.dataset.adBtn;   /* tap the chosen side again to deselect */
       taps[slug] = next;   /* the split is the server's figure and does not move on a tap */
       paintAgree(card);
-      if (!prev && next) { confirmTap(card, next); }                      /* first tap on this card: the Tap Confirmed modal, once */
-      else if (prev && next) { if (navigator.vibrate) navigator.vibrate(10); }   /* switching side: no modal */
+      if (next) confirmTap(card, next);   /* every tap that sets a side: the Tap Confirmed modal */
       return;
       paintAgree(card);
     });
@@ -407,20 +406,28 @@
 
   /* ── Tap Confirmed modal ── */
   var tapModal = document.querySelector('[data-tap-modal]');
-  function tapSeen(slug) { try { return localStorage.getItem('prophet.tapped.' + slug) === '1'; } catch (e) { return false; } }
-  function markTapSeen(slug) { try { localStorage.setItem('prophet.tapped.' + slug, '1'); } catch (e) {} }
+  var COPY = {
+    agree: "You're with him. {label} at {price}. Let's see if you're both right.",
+    disagree: "You're calling him wrong. {label} at {price}, you say no.",
+    scoring: "Scored when the market resolves. Right or wrong, it's on your record from today.",
+    first: "First tap on this one. You set the tone."
+  };
+  function fillLine(line, card) {
+    var st = (card.dataset.stance || 'yes').toLowerCase();
+    return line.replace(/\{label\}/g, 'Buy ' + st.toUpperCase()).replace(/\{price\}/g, String(card.dataset.calledPct || '').replace('%', ''));
+  }
+  function crowdLine(card) {
+    var n = parseInt(card.dataset.tradeCount || '0', 10) || 0, pct = card.dataset.agreePct || '';
+    return (n >= 3 && pct) ? pct + '% agree with him · ' + n + ' tap' + (n === 1 ? '' : 's') : '';
+  }
   function confirmTap(card, side) {
     if (!tapModal) return;
-    var slug = card.dataset.slug;
-    if (tapSeen(slug) || val(card, 'tap-confirmed', 'false') === 'true') return;   /* once per card per user */
-    markTapSeen(slug);
     var chip = q(tapModal, '[data-tc-chip]');
     chip.textContent = side === 'agree' ? 'Agree' : 'Disagree';
     chip.className = 'ad__btn tc__chip ad__btn--' + side + ' ad__btn--on';
-    q(tapModal, '[data-tc-confirm]').textContent = val(tapModal, side === 'agree' ? 'confirm-agree' : 'confirm-disagree', '[COPY]');
-    q(tapModal, '[data-tc-scoring]').textContent = val(tapModal, 'scoring-line', '[COPY]');
-    var n = parseInt(card.dataset.tradeCount || '0', 10) || 0, pct = card.dataset.agreePct || '';
-    q(tapModal, '[data-tc-crowd]').textContent = (n >= 3 && pct) ? pct + '% agree · ' + n + ' trade' + (n === 1 ? '' : 's') : val(tapModal, 'first-in-line', '[COPY]');
+    q(tapModal, '[data-tc-confirm]').textContent = fillLine(val(tapModal, side === 'agree' ? 'confirm-agree' : 'confirm-disagree', COPY[side]), card);
+    q(tapModal, '[data-tc-scoring]').textContent = val(tapModal, 'scoring-line', COPY.scoring);
+    q(tapModal, '[data-tc-crowd]').textContent = crowdLine(card) || val(tapModal, 'first-in-line', COPY.first);
     var v = visibleCards(), last = v.length && v[v.length - 1] === card;
     q(tapModal, '[data-tc-next]').textContent = last ? 'Back to top' : 'Next call';
     openModal(tapModal);

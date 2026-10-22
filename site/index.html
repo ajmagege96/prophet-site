@@ -124,7 +124,7 @@
              Ladder markets print listed_leg_date under the question. Thesis, numbers and the Agree / Disagree state fill the
              block under the carousel from the data-* attributes. His number and the label live in the block, never on the face. -->
         <template>
-        <div class="carousel__card outline" data-card data-state="{{market.filter_state}}" data-slug="{{market.slug}}" data-label="{{label}}" data-stance="{{market.thesis_stance}}" data-estimate="{{prophet_probability}}" data-called-pct="{{market.called_pct}}" data-called-ago="{{market.called_ago}}" data-call-state="{{call_state}}" data-outcome="{{market.outcome}}" data-resolved-side="{{market.resolved_side}}" data-resolved-pct="{{market.resolved_pct}}" data-resolved-ago="{{market.resolved_ago}}" data-leg-date="{{listed_leg_date}}" data-revised-ago="{{revised_ago}}" data-revised-number="{{revised_number}}" data-agree-pct="{{agree_pct}}" data-trade-count="{{trade_count}}" data-user-side="{{user_side}}" data-market-closed="{{market_closed}}" data-tap-confirmed="{{tap_confirmed}}" data-thesis="{{market.thesis}}">
+        <div class="carousel__card outline" data-card data-state="{{market.filter_state}}" data-slug="{{market.slug}}" data-label="{{label}}" data-stance="{{market.thesis_stance}}" data-estimate="{{prophet_probability}}" data-called-pct="{{market.called_pct}}" data-called-ago="{{market.called_ago}}" data-call-state="{{call_state}}" data-outcome="{{market.outcome}}" data-resolved-side="{{market.resolved_side}}" data-resolved-pct="{{market.resolved_pct}}" data-resolved-ago="{{market.resolved_ago}}" data-leg-date="{{listed_leg_date}}" data-revised-ago="{{revised_ago}}" data-revised-number="{{revised_number}}" data-agree-pct="{{agree_pct}}" data-trade-count="{{trade_count}}" data-user-side="{{user_side}}" data-market-closed="{{market_closed}}" data-thesis="{{market.thesis}}">
           <div class="carousel__top">
             <img class="carousel__img" src="{{market.image_url}}" alt="" loading="lazy">
             <!-- the market's odds, small, top-right; in History the right · wrong · void · awaiting tag follows them -->
@@ -280,7 +280,7 @@
         </div>
       </div>
       <!-- Shown when the deck has no cards for the open tab; the line is the product's voice -->
-      <p class="deck__empty" data-deck-empty hidden>[COPY]</p>
+      <p class="deck__empty" data-deck-empty hidden>No live calls right now. He's reading.</p>
       <button class="carousel__arrow carousel__arrow--next" data-carousel-next aria-label="Next market"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg></button>
     </div>
 
@@ -307,17 +307,17 @@
       <button class="ad__btn ad__btn--agree" data-ad-btn="agree">Agree</button>
       <button class="ad__btn ad__btn--disagree" data-ad-btn="disagree">Disagree</button>
       <span class="thesis__split" data-thesis-split hidden></span>
-      <span class="ad__closed" data-ad-closed hidden>Trades closed</span>
+      <span class="ad__closed" data-ad-closed hidden>Taps closed. Resolution next.</span>
     </div>
   </div>
 </main>
 
 
 
-<!-- modal:tap — Tap Confirmed. Opens on a signed-in user's first Agree / Disagree on a card (not on a switch),
-     once per card per user (remembered on the device and, via tap_confirmed on the card, by the server).
+<!-- modal:tap — Tap Confirmed. Opens on every Agree / Disagree tap that sets a side (a deselect shows nothing).
      Bottom sheet on phones, centred dialog on desktop; X, swipe down or the backdrop dismiss it.
-     Every line is a config string on this root; the mocks are [COPY] until the founder writes them. -->
+     Every line is a config string on this root. {label} and {price} in a line are filled from the card
+     ("Buy YES", the odds at the call without the % sign). -->
 <div class="mdl mdl--sheet" data-modal data-tap-modal hidden role="dialog" aria-modal="true" aria-label="Confirmed"
      data-confirm-agree="{{tap_modal.confirm_agree}}" data-confirm-disagree="{{tap_modal.confirm_disagree}}"
      data-scoring-line="{{tap_modal.scoring_line}}" data-first-in-line="{{tap_modal.first_in_line}}">
@@ -520,6 +520,6 @@
 </footer>
 <!-- /partial:footer -->
 
-<script src="app.js?v=aed11e89"></script>
+<script src="app.js?v=b71ceece"></script>
 </body>
 </html>
