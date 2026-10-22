@@ -571,9 +571,7 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
 .thesis__stance--no  { color: #e53935; }
 /* Position · estimated probability · conviction, in a row after the label */
 .thesis__est { font-size: 11px; color: var(--purple-text); white-space: nowrap; }   /* The Prophet's number: a plain purple percentage, no label, no box */
-.thesis__est:empty, .thesis__conv:empty { display: none; }
-.thesis__conv { font-size: 11px; }
-.thesis__outcome { font-size: 12px; opacity: 0.8; }
+.thesis__est:empty, .thesis__outcome { font-size: 12px; opacity: 0.8; }
 .thesis__outcome[hidden] { display: none; }
 .carousel__state .prow__outcome { padding: 1px 5px; font-size: 9px; margin-left: 2px; }
 .thesis__state { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: rgba(242, 240, 230, 0.85); }   /* same: no opacity, so VOTE OPEN and the star match the cards */
@@ -606,15 +604,20 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
   50%      { opacity: 1;    box-shadow: 0 0 7px 3px rgba(16, 240, 95, 0.55); }
 }
 
-/* Agree / Disagree: two equal buttons in the slot the vote control had; the user's side marked */
-.ad { display: inline-flex; gap: 6px; }
+/* Hero on home: height from its content, so How it Works sits right under the Agree / Disagree row */
+.hero--home { height: auto; min-height: 0; overflow: visible; }
+.hero--home .home-panel { height: auto; }
+
+/* Agree / Disagree: a row under the thesis. Agree green, Disagree red, on hover and when chosen */
+.ad { display: flex; align-items: center; gap: 8px; margin: 4px 0 8px; flex: 0 0 auto; }
 .ad[hidden] { display: none; }
 .ad__btn { min-height: 28px; padding: 0 12px; border: 1px solid var(--outline); border-radius: 4px; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--offwhite); opacity: 0.7; transition: opacity 0.15s, border-color 0.15s; }
 .ad__btn:hover { opacity: 1; }
-.ad__btn--on { opacity: 1; color: var(--green); border-color: var(--green); }
-.ad__btn[disabled] { opacity: 0.35; cursor: default; }
+.ad__btn--agree:hover, .ad__btn--agree.ad__btn--on { opacity: 1; color: var(--green); border-color: var(--green); }
+.ad__btn--disagree:hover, .ad__btn--disagree.ad__btn--on { opacity: 1; color: #e53935; border-color: #e53935; }
+.ad__btn[disabled] { opacity: 0.35; cursor: default; color: var(--offwhite); border-color: var(--outline); }
 .thesis__stateline { flex-direction: column; align-items: flex-end; gap: 6px; }
-.thesis__split { font-size: 11px; opacity: 0.55; white-space: nowrap; }
+.thesis__split { font-size: 11px; opacity: 0.55; white-space: nowrap; margin-left: 4px; }
 .thesis__split[hidden] { display: none; }
 .thesis__revised { font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--purple-text); opacity: 0.85; white-space: nowrap; }
 .thesis__revised:empty { display: none; }
@@ -1056,6 +1059,8 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
   /* ── Page scrolls normally; a little more gutter than desktop ── */
   .hero { height: auto; min-height: 0; overflow: visible; }
   .home-panel { height: calc(100svh - 56px); padding: 16px 20px 14px; }
+  .hero--home .home-panel { height: auto; }
+  .ad__btn { min-height: 44px; padding: 0 16px; }
   .panel { height: auto; overflow: visible; padding: 16px 20px 28px; }
   .panel--token { overflow: visible; padding-bottom: 44px; }
   .feed { flex: 1 1 auto; min-height: 0; overflow-y: auto; margin: 14px 0 16px; }   /* 16px of air between the takes and the bar */

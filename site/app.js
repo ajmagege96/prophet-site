@@ -156,7 +156,6 @@
   var thesisStance = document.querySelector('[data-thesis-stance]');
   var thesisLabel = document.querySelector('[data-thesis-label]');
   var thesisEst = document.querySelector('[data-thesis-est]');
-  var thesisConv = document.querySelector('[data-thesis-conv]');
   var thesisOutcome = document.querySelector('[data-thesis-outcome]');
   var thesisAtCall = document.querySelector('[data-thesis-atcall]'), thesisRevised = document.querySelector('[data-thesis-revised]'), thesisMoved = document.querySelector('[data-thesis-moved]'), thesisSplit = document.querySelector('[data-thesis-split]'), adWrap = document.querySelector('[data-ad]');
   var taps = {};   /* slug -> 'agree' | 'disagree' (mock, in-memory; the server keeps the real side) */
@@ -366,7 +365,6 @@
     /* the latest number; when revised, the number at the call keeps its own field */
     if (thesisEst) thesisEst.textContent = revised && card.dataset.revisedNumber ? card.dataset.revisedNumber : (card.dataset.estimate || '');
     if (thesisAtCall) thesisAtCall.textContent = revised && card.dataset.revisedNumber ? (card.dataset.estimate || '') + ' at call' : '';
-    if (thesisConv) thesisConv.innerHTML = card.dataset.conviction ? STAR_SVG + card.dataset.conviction : '';
     if (thesisRevised) thesisRevised.textContent = revised ? 'Revised ' + card.dataset.revisedAgo : '';
     thesisText.textContent = card.dataset.thesis || '';
     if (thesisMoved) thesisMoved.hidden = !(revised && card.dataset.numberMoved === 'true');
@@ -391,7 +389,7 @@
     var live = (card.dataset.state || '') === 'called';
     adWrap.hidden = !live; if (thesisSplit) thesisSplit.hidden = true;
     if (!live) return;
-    var slug = card.dataset.slug, side = taps[slug] || card.dataset.userSide || '';
+    var slug = card.dataset.slug, side = taps.hasOwnProperty(slug) ? taps[slug] : (card.dataset.userSide || '');
     var closed = card.dataset.marketClosed === 'true';
     var btns = adWrap.querySelectorAll('[data-ad-btn]');
     for (var i = 0; i < btns.length; i++) { btns[i].classList.toggle('ad__btn--on', btns[i].dataset.adBtn === side); btns[i].disabled = closed; }
@@ -407,12 +405,14 @@
       var card = cards[activeIndex];
       var signedIn = (thesisBox.getAttribute('data-signed-in') || '');
       if (signedIn === 'false') { document.dispatchEvent(new CustomEvent('prophet:signin', { detail: { then: 'agree', slug: card.dataset.slug } })); return; }
-      var slug = card.dataset.slug, prev = taps[slug] || card.dataset.userSide || '';
-      taps[slug] = b.dataset.adBtn;
-      /* mock tally: a new tap counts, a switch moves one */
+      var slug = card.dataset.slug, prev = taps.hasOwnProperty(slug) ? taps[slug] : (card.dataset.userSide || '');
+      var next = prev === b.dataset.adBtn ? '' : b.dataset.adBtn;   /* tap the chosen side again to deselect */
+      taps[slug] = next;
+      /* mock tally: a new tap counts, a switch moves one, a deselect removes one */
       var n = parseInt(card.dataset.tapCount || '0', 10) || 0, a = Math.round(n * (parseInt(card.dataset.agreePct || '50', 10) || 50) / 100);
-      if (!prev) { n += 1; if (taps[slug] === 'agree') a += 1; }
-      else if (prev !== taps[slug]) { a += taps[slug] === 'agree' ? 1 : -1; }
+      if (!prev && next) { n += 1; if (next === 'agree') a += 1; }
+      else if (prev && !next) { n = Math.max(0, n - 1); if (prev === 'agree') a = Math.max(0, a - 1); }
+      else if (prev !== next) { a += next === 'agree' ? 1 : -1; }
       card.dataset.tapCount = n; card.dataset.agreePct = n ? Math.round(100 * a / n) : '';
       paintAgree(card);
     });

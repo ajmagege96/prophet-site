@@ -31,7 +31,6 @@
 | `{{market.outcome}}` | History: `right` / `wrong` / `void` / `awaiting` — the tag in the badge and the outcome line |
 | `{{call_state}}` | `live` / `resolved` / `void` / `closed`. Void shows "Market closed by Polymarket before resolution."; closed shows "Awaiting resolution" |
 | `{{listed_leg_date}}` | Ladder markets only: the leg's date (e.g. `Oct 20`), under the question on the face and in the thesis header. Empty otherwise. When a leg rolls, the card returns to not evaluated with the next date and the old leg goes to History as resolved |
-| `{{market.conviction}}` | Star conviction, 1–5; shown in the thesis block head and the called badge |
 | `{{market.outcome}}` | `won` / `lost` — resolved markets only, drives the tag in the badge |
 | `{{market.resolved_side}}` | `yes` / `no` — the side the market settled on |
 | `{{market.resolved_pct}}` | Closing YES % at settlement, e.g. `97%` |

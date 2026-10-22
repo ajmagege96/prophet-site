@@ -17,16 +17,15 @@ sections 5–7 are the contracts your side has to honour.
 product; the two verbs are Agree and Disagree.
 - **Deck** = live calls only, ordered by you, most interesting first. Two tabs,
   Calls · History, one always on. An empty tab shows one `[COPY]` line.
-- **Card face**: label (Buy YES / Buy NO) + conviction in the badge; the live
+- **Card face**: label (Buy YES / Buy NO) in the badge — conviction is gone, he just calls it; the live
   price; the meta row reads "{{market.called_pct}} at call · called
   {{market.called_ago}} · volume · ends-in". No take count, no Buy link.
-- **Thesis block** (one, under the carousel): label, his number, conviction,
-  the thesis. Revised calls add "Revised {{revised_ago}}", show
+- **Thesis block** (one, under the carousel): label, his number, the thesis. Revised calls add "Revised {{revised_ago}}", show
   `{{revised_number}}` as the number with `{{prophet_probability}} at call`
   in its own field, and — when `{{number_moved}}` is true — "His number has
   moved. The call stands to resolution." The block carries
   `data-signed-in="{{viewer.signed_in}}"`.
-- **Agree / Disagree** in the slot the vote control had. `{{user_side}}` marks
+- **Agree / Disagree** in its own row under the thesis block. Agree green, Disagree red on hover and when chosen; tapping the chosen one deselects. `{{user_side}}` marks
   the user's button; tapping the other switches it; `{{market_closed}}` true
   disables both. From three taps the split "{{agree_pct}}% agree ·
   {{tap_count}} taps" shows; below that only the user's side. A signed-out
@@ -125,6 +124,8 @@ separator; 16px between the takes and the bar.
 - Open question for the logic doc: which leg of a ladder the card shows is
   not specified. "Current leg" is the default built here; the leg he has a
   view on may be the better rule.
+- The home hero is as tall as its content now; How it Works follows the
+  Agree / Disagree row directly.
 
 **Copy, pre-launch (Sept 13).** How it Works: "credited by wallet", "If
 rejected, he goes back to the drawing board.", "Every call lives on the record."
@@ -218,7 +219,7 @@ or modal root is the whole contract.
 | `data-state` | `market.filter_state` | `none` · `vote` · `called` (`resolved` returns with History) |
 | `data-slug` | `market.slug` | row key |
 | `data-label` | `label` | buy_yes · buy_no · hold · none; drives the badge, the thesis head and the Vote modal header |
-| `data-stance`, `data-estimate`, `data-conviction` | `market.thesis_stance`, `prophet_probability`, `market.conviction` | thesis head; `data-estimate` is The Prophet's number, a whole integer with `%`, shown in purple. Leave it empty on a market not yet evaluated |
+| `data-stance`, `data-estimate` | `market.thesis_stance`, `prophet_probability` | thesis head; `data-estimate` is The Prophet's number, a whole integer with `%`, shown in purple |
 | `data-thesis`, `data-contributors` | `market.thesis`, `market.contributors_json` | reasoning and `[{user, claim, xp}]`; an empty array shows nothing |
 | `data-hold-reason` | `hold_reason` | Hold markets: no_gap / under_gap selects the hold line |
 | `data-call-state` | `call_state` | live / resolved / void |
@@ -314,7 +315,7 @@ Other globals: `window.prophetOnboarding.open()`, `window.prophetBoard.set({beat
 
 ## 10. Variable reference
 
-66 variables actually present in the files right now, with where each appears.
+65 variables actually present in the files right now, with where each appears.
 
 | Variable | Where | Holds |
 |---|---|---|
@@ -330,7 +331,6 @@ Other globals: `window.prophetOnboarding.open()`, `window.prophetBoard.set({beat
 | `{{logout_url}}` | $PROPHET; Home; header | The Logout link in the header and menu; render the link only when `{{viewer.signed_in}}` is true. While unfilled, the click fires a `prophet:logout` event and shows the Logged out notice |
 | `{{market.called_ago}}` | Home | Relative time of the call, in the meta row as "called 3d ago" |
 | `{{market.called_pct}}` | Home | Odds when the thesis was called, e.g. `84%`; rendered on called cards only |
-| `{{market.conviction}}` | Home | Star conviction, 1–5; shown in the thesis block head and the called badge |
 | `{{market.ends_in}}` | Home | Relative time until the market ends (e.g. "12d", "3mo"), shown after a clock icon |
 | `{{market.filter_state}}` | Home | `called` (the Calls deck) or `resolved` (History); the two tabs |
 | `{{market.image_url}}` | Home | Market image, imported from Polymarket (44px square on the card) |
@@ -340,11 +340,11 @@ Other globals: `window.prophetOnboarding.open()`, `window.prophetBoard.set({beat
 | `{{market.resolved_pct}}` | Home | Closing YES % at settlement, e.g. `97%` |
 | `{{market.resolved_side}}` | Home | `yes` / `no` — the side the market settled on |
 | `{{market.slug}}` | Home | URL-safe identifier for the market (used in `<!-- repeat: market -->`) |
-| `{{market.state}}` | Home | — |
+| `{{market.state}}` | Home | The badge markup, top-right: `<span class="lbl lbl--yes">Buy YES</span> <span class="conviction">[star]N</span>`, plus in History a tag `<span class="prow__outcome prow__outcome--right">right</span>` (right · wrong · void · awaiting) |
 | `{{market.thesis}}` | Home | Full thesis text (called) or draft thesis (vote open), set as `data-thesis` on the card; shown in the Thesis block above the takes when the card is selected; empty otherwise |
 | `{{market.thesis_stance}}` | Home | `yes` or `no`: which way the thesis (or draft) calls it; shown bold beside the Thesis label |
 | `{{market.volume}}` | Home | Polymarket volume, short form (e.g. "$4.1M"), shown after a bar-chart icon |
-| `{{market.yes_pct}}` | Home | Current YES percentage (e.g. "72%") |
+| `{{market.yes_pct}}` | Home | Current YES percentage (e.g. "72%"); once resolved, the settled 100% / 0% |
 | `{{market_closed}}` | Home | Agree / Disagree under the thesis: the user's side (`agree` / `disagree` / empty) is marked; from three taps the split reads "62% agree · 14 taps", below that only the user's side; `market_closed` `true` disables both buttons. Signed-in only: a signed-out tap fires `prophet:signin` with `{then: 'agree', slug}` |
 | `{{number_moved}}` | Home | A call re-run after it was made: the block shows "Revised {ago}", the latest number beside the label with "{estimate} at call" in its own field, and when `number_moved` is `true` the line "His number has moved. The call stands to resolution." The thesis text is the latest. Empty when not revised |
 | `{{pool_last_week}}` | $PROPHET | Last week's reward pool; the line reads "paid to the community" |
