@@ -70,12 +70,6 @@ ul, ol { list-style: none; }
 }
 @media (min-width: 1024px) { .bg-board { display: block; } }
 
-/* The bar's frame glows for a moment as each pulse leaves it */
-.prompt-bar--pulse {
-  border-color: rgba(16, 240, 95, 0.36);
-  box-shadow: 0 0 12px 0 rgba(16, 240, 95, 0.13);
-  transition: border-color 0.5s ease-in-out, box-shadow 0.5s ease-in-out;
-}
 
 /* ── Header ───────────────────────────────────────────── */
 .site-header {
@@ -458,25 +452,6 @@ ul, ol { list-style: none; }
 
 /* Buy $PROPHET on an open-vote card: floats over the bottom-right corner, centred on
    the meta row's line, so the card's own layout is identical to every other card */
-.carousel__buy {
-  position: absolute;
-  right: 18px;
-  bottom: 14px;
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  padding: 3px 8px;
-  border: 1px solid var(--outline);
-  border-radius: 4px;
-  color: var(--green);
-  text-decoration: none;
-  white-space: nowrap;
-  opacity: 0.85;
-  transition: opacity 0.15s, border-color 0.15s;
-}
-.carousel__buy:hover { opacity: 1; border-color: currentColor; text-decoration: none; }
-
 
 /* Logout: gray like its neighbours, red on hover / press, in the desktop nav and the phone menu alike */
 .site-header__nav .site-header__logout:hover, .site-header__nav .site-header__logout:focus-visible,
@@ -503,15 +478,11 @@ ul, ol { list-style: none; }
 .mdl__actions button { flex: 1 1 0; min-height: 44px; border: 1px solid var(--outline); border-radius: 4px; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.85; }
 .mdl__actions button:hover { opacity: 1; }
 .mdl__actions .is-primary { color: var(--green); border-color: var(--green); }
+/* Ballot and voted state: same width (the panel's), each its own height */      /* the page's thesis block, box and all, unchanged */                                          /* phones only */   /* same red as the NO text */
 
-/* Ballot and voted state: same width (the panel's), each its own height */
-
-/* the reward for voting */
+/* the reward for voting */   /* roomier than the ballot */   /* air between the bar and the button */
 .mdl__panel--glow-no { animation: mdl-glow-no 1.4s ease-out; }
-.mdl__panel--glow { animation: mdl-glow 1.4s ease-out; }
-
-  line-height: 1.4; }   /* the feed's claim rule, mirrored: it is scoped to the feed there */
-.prompt-bar__send.is-off { opacity: 0.3; cursor: default; }   /* the +1 XP in the line is green, the rest plain */
+.mdl__panel--glow { animation: mdl-glow 1.4s ease-out; }   /* as big as the check */   /* the feed's take row, shortened and outlined; padding wins over the row's own */   /* air under "Take received" */   /* the feed's claim rule, mirrored: it is scoped to the feed there */   /* hidden state keeps its height, so the box never resizes */   /* the +1 XP in the line is green, the rest plain */
 
 /* ── Onboarding modal ─────────────────────────────────── */
 .onb { position: fixed; inset: 0; z-index: 1000;   /* above the header and the mobile menu */ display: flex; align-items: center; justify-content: center; padding: 16px; }
@@ -608,77 +579,15 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
 .thesis__state { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: rgba(242, 240, 230, 0.85); }   /* same: no opacity, so VOTE OPEN and the star match the cards */
 .thesis__state--vote { color: var(--purple-text); }
 .thesis__text { font-size: 13px; line-height: 1.45; }
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  padding: 4px 12px;
-  border: 1px solid var(--purple-text);
-  border-radius: 4px;
-  color: var(--purple-text);
-}
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  padding: 4px 12px;
-  border: 1px solid var(--outline);
-  border-radius: 4px;
-  opacity: 0.7;
-  transition: opacity 0.15s, border-color 0.15s;
-}
+/* Vote call to action, top-right of the thesis block; opens a small popup */   /* no credits row in the no-thesis box */   /* no credits yet: nothing shows, not even the hairline */   /* the word alone, coloured; no box */
 
 
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 8px 0;
-  font-size: 13px;
-  border-bottom: 1px solid var(--outline);
-}
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--offwhite);
-  opacity: 0.85;
-}
-  flex: 0 0 auto;
-  font-size: 9px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
- }   /* the word alone, coloured; no box */
-  font-size: 11px;
-  opacity: 0.35;
-  white-space: nowrap;
-}
-  font-size: 11px;
-  color: var(--green);
-  opacity: 0.8;
-  white-space: nowrap;
-}
-  opacity: 0.7;
-  line-height: 1.4;
-}
-  font-size: 13px;
-  opacity: 0.5;
-  padding: 8px 0;
-  line-height: 1.45;
-}
+/* Joint YES | NO switch, far left of the bar: the stance for what you type, never the vote.
+   Chosen YES reads green, chosen NO red. */
+
+/* Row under the bar: status left, future tool buttons right */
 
 /* ── Status dot (live trades on the token page) ───────── */
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12px;
-  letter-spacing: 0.04em;
-  color: var(--offwhite);
-  opacity: 0.8;
-  cursor: default;
-}
 .status-line__dot {
   width: 4px;
   height: 4px;
@@ -697,6 +606,29 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
   50%      { opacity: 1;    box-shadow: 0 0 7px 3px rgba(16, 240, 95, 0.55); }
 }
 
+/* Agree / Disagree: two equal buttons in the slot the vote control had; the user's side marked */
+.ad { display: inline-flex; gap: 6px; }
+.ad[hidden] { display: none; }
+.ad__btn { min-height: 28px; padding: 0 12px; border: 1px solid var(--outline); border-radius: 4px; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--offwhite); opacity: 0.7; transition: opacity 0.15s, border-color 0.15s; }
+.ad__btn:hover { opacity: 1; }
+.ad__btn--on { opacity: 1; color: var(--green); border-color: var(--green); }
+.ad__btn[disabled] { opacity: 0.35; cursor: default; }
+.thesis__stateline { flex-direction: column; align-items: flex-end; gap: 6px; }
+.thesis__split { font-size: 11px; opacity: 0.55; white-space: nowrap; }
+.thesis__split[hidden] { display: none; }
+.thesis__revised { font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--purple-text); opacity: 0.85; white-space: nowrap; }
+.thesis__revised:empty { display: none; }
+.thesis__atcall { font-size: 11px; opacity: 0.5; white-space: nowrap; }
+.thesis__atcall:empty { display: none; }
+.thesis__moved { font-size: 12px; opacity: 0.8; }
+.thesis__moved[hidden] { display: none; }
+/* The thesis block's frame glows for a moment as each pulse of the board leaves it */
+.thesis--pulse { border-color: rgba(16, 240, 95, 0.36); box-shadow: 0 0 12px 0 rgba(16, 240, 95, 0.13); transition: border-color 0.5s ease-in-out, box-shadow 0.5s ease-in-out; }
+.prow__outcome--right { color: var(--green); }
+.prow__outcome--wrong { color: #e53935; }
+.prow__outcome--awaiting { color: rgba(242, 240, 230, 0.55); }
+.deck__empty { font-size: 13px; opacity: 0.6; padding: 24px 0; text-align: center; width: 100%; }
+.deck__empty[hidden] { display: none; }
 
 /* ── Walkthrough ──────────────────────────────────────── */
 
@@ -754,8 +686,6 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
 .prow__state--vote { color: var(--purple-text); }
 .prow__meta { font-size: 11px; opacity: 0.45; white-space: nowrap; }
 .prow__row { display: flex; align-items: center; gap: 10px; }
-.prow__side .vote { margin-left: auto; }
-.prow__side .vote__pop { right: 0; }
 .prow__outcome { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 2px 8px; border: 1px solid currentColor; border-radius: 2px; }
 .prow__outcome--won { color: var(--green); }
 .prow__outcome--lost { color: #e53935; }
@@ -764,7 +694,6 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
 .prow__drop { grid-column: 1 / -1; padding-top: 4px; border-top: 1px solid var(--outline); cursor: default; }
 .prow__drop[hidden] { display: none; }
 .prow__takes { max-height: 180px; overflow-y: auto; scrollbar-width: thin; padding-right: 4px; }
-.prow__takes .takes__item:last-child { border-bottom: none; }
 
 /* ── Record ───────────────────────────────────────────── */
 .pnl { width: 100%; max-width: 1000px; margin: 0 auto 10px; display: flex; flex-direction: column; align-items: center; gap: 14px; }
@@ -1073,7 +1002,6 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
     height: 220px;
     padding: 20px;
   }
-  .carousel__buy { right: 20px; bottom: 16px; }
 
   .feed {
     flex: 1 1 auto;         /* fills the space between cards and bar; feed scrolls */
@@ -1081,19 +1009,10 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
     margin: 24px 52px 0;
   }
 
-  .prompt-bar-wrap {
-    width: 46vw;
-    min-width: 560px;
-    max-width: 760px;
-    margin: 24px auto 0;
-  }
-
   .panel { padding: 24px 48px 24px; gap: 20px; }
   .prow { grid-template-columns: 40px 1fr auto; align-items: start; padding: 14px 16px; }
   .prow__img { width: 40px; height: 40px; }
   .prow__side { grid-column: auto; flex-direction: column-reverse; align-items: flex-end; gap: 6px; min-width: 200px; }
-  .prow__side:has(.vote) { gap: 12px; }
-  .prow__side .vote { margin-left: 0; }
 
   .tstats { grid-template-columns: repeat(6, 1fr); }
   .token__grid { grid-template-columns: 1fr 320px; }
@@ -1117,7 +1036,6 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
   .phases { grid-template-columns: repeat(3, 1fr); gap: 32px; }
   .timeline__dot { left: 0; top: -33px; }   /* centred on the line at top:12px + 0.5px */
 }
-
 
 /* ══ MOBILE PASS ═══════════════════════════════════════════
    Everything below 768px. Desktop is untouched: this block is
@@ -1161,8 +1079,7 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
   .thesis__head { flex-wrap: wrap; row-gap: 6px; }
   .thesis__label { white-space: nowrap; }
   /* Open vote on a phone: the state line (badge + Vote) is too long for the head, so it
-     moves under the reasoning, where a resolved market shows its outcome line. */
-  .thesis--vote .thesis__stateline { order: 3; margin-left: 0; justify-content: flex-start; }   /* Vote sits beside the badge */
+     moves under the reasoning, where a resolved market shows its outcome line. */   /* Vote sits beside the badge */
   /* Onboarding on a phone: a modal, not a sheet. Full width, height from its content,
      centred; the video keeps 16:9; Back / Next are thumb-height and equal width. */
   .onb { padding: 12px; }
@@ -1186,13 +1103,13 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
   .filters { gap: 6px; }
   .filters__tag { font-size: 10px; }
   /* Resolved cards carry four meta items; keep them on one line inside the fixed card */
-  .carousel__meta { gap: 4px 8px; font-size: 10px; }
+  .carousel__meta { gap: 4px 4px; font-size: 10px; }   /* four items (202px of text) on one line in a 216px row */
+  .thesis__top { flex-wrap: wrap; row-gap: 4px; }      /* label · number · at call · conviction · Revised wrap rather than run off */
   .filters::-webkit-scrollbar { display: none; }
   .filters__tag { flex: 0 0 auto; min-height: 34px; padding: 0 8px; display: inline-flex; align-items: center; }   /* 8px so four chips fit 390 */
   /* same height as desktop: padding only, no min-height */
   /* An open-vote card's meta row also carries Buy $PROPHET; at 390px that only fits
-     on one line with a smaller Buy and a tighter gap. */
-  .carousel__buy { padding: 1px 5px; line-height: 1.4; font-size: 8px; letter-spacing: 0.02em; right: 8px; bottom: 16px; }   /* bottom-right on the stats line; small and tucked into the corner so it never touches the stats */
+     on one line with a smaller Buy and a tighter gap. */   /* bottom-right on the stats line; small and tucked into the corner so it never touches the stats */
   .range__tab, .seg__opt { min-height: 32px; display: inline-flex; align-items: center; justify-content: center; }
   .range { gap: 6px; }
   .range__tab { padding: 0 6px; }
@@ -1203,32 +1120,7 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
   .carousel__track { padding: 2px 0; gap: 12px; }
   .carousel__card { flex: 0 0 100%; scroll-snap-align: start; }
 
-
-  
-/* Agree / Disagree: two equal buttons in the slot the vote control had; the user's side marked */
-.ad { display: inline-flex; gap: 6px; }
-.ad[hidden] { display: none; }
-.ad__btn { min-height: 28px; padding: 0 12px; border: 1px solid var(--outline); border-radius: 4px; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--offwhite); opacity: 0.7; transition: opacity 0.15s, border-color 0.15s; }
-.ad__btn:hover { opacity: 1; }
-.ad__btn--on { opacity: 1; color: var(--green); border-color: var(--green); }
-.ad__btn[disabled] { opacity: 0.35; cursor: default; }
-.thesis__stateline { flex-direction: column; align-items: flex-end; gap: 6px; }
-.thesis__split { font-size: 11px; opacity: 0.55; white-space: nowrap; }
-.thesis__split[hidden] { display: none; }
-.thesis__revised { font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--purple-text); opacity: 0.85; white-space: nowrap; }
-.thesis__revised:empty { display: none; }
-.thesis__atcall { font-size: 11px; opacity: 0.5; white-space: nowrap; }
-.thesis__atcall:empty { display: none; }
-.thesis__moved { font-size: 12px; opacity: 0.8; }
-.thesis__moved[hidden] { display: none; }
-.thesis--pulse { border-color: rgba(16, 240, 95, 0.36); box-shadow: 0 0 12px 0 rgba(16, 240, 95, 0.13); transition: border-color 0.5s ease-in-out, box-shadow 0.5s ease-in-out; }
-.prow__outcome--right { color: var(--green); }
-.prow__outcome--wrong { color: #e53935; }
-.prow__outcome--awaiting { color: rgba(242, 240, 230, 0.55); }
-.deck__empty { font-size: 13px; opacity: 0.6; padding: 24px 0; text-align: center; width: 100%; }
-.deck__empty[hidden] { display: none; }
-/* ── Prompt bar ── */
-  .prompt-bar__input { font-size: 16px; }   /* 16px stops iOS zooming on focus */
+  /* ── Prompt bar ── */   /* 16px stops iOS zooming on focus */
 
   /* ── List rows: right column beside the text, meta row on top ── */
   .prow__img { width: 34px; height: 34px; }
@@ -1267,7 +1159,6 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
   .prow__bottom, .prow__side > .prow__meta { justify-content: flex-end; text-align: right; }
   .prow__state, .prow__bottom { font-size: 8.5px; }
   .prow__state { gap: 3px; }
-  .prow__side .vote__btn { font-size: 9px; padding: 4px 10px; }
   .prow__bottom { gap: 3px 8px; }
   .prow__q { font-size: 13px; }
   .prow__thesis { font-size: 11px; }
@@ -1348,8 +1239,4 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
    a row's content grows past one draft line. With one filter tag on there is
    only one group on screen, so the caps come off and it takes the whole hero. */
 @media (min-width: 768px) {
-  .panel--prophecies .pgroup[data-group="votes"],
-
-  .panel--prophecies.is-filtered .pgroup { flex: 1 1 auto; }
-  .panel--prophecies.is-filtered .pgroup__list { max-height: none; }
 }
