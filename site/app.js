@@ -414,7 +414,8 @@
   };
   function fillLine(line, card) {
     var st = (card.dataset.stance || 'yes').toLowerCase();
-    return line.replace(/\{label\}/g, 'Buy ' + st.toUpperCase()).replace(/\{price\}/g, String(card.dataset.calledPct || '').replace('%', ''));
+    var at = card.dataset.calledPct || ''; if (!at) { var sp = card.querySelector('[title="odds at call"]'); at = sp ? sp.textContent.replace(/ at call.*/, '') : ''; }
+    return line.replace(/\{label\}/g, 'Buy ' + st.toUpperCase()).replace(/\{price\}/g, at.replace('%', ''));
   }
   function crowdLine(card) {
     var n = parseInt(card.dataset.tradeCount || '0', 10) || 0, pct = card.dataset.agreePct || '';
