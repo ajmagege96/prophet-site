@@ -986,6 +986,8 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
   .site-header__menu-btn { display: none; }
 
   .hero { height: calc(100vh - 64px); }
+  .hero.hero--home { height: auto; min-height: 0; overflow: visible; }   /* home: as tall as its content */
+  .hero--home .feed { flex: 0 0 auto; overflow: visible; }
 
   .home-panel {
     padding: 24px 48px 24px;
