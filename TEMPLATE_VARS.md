@@ -120,6 +120,6 @@ MVP and kept only so they come back with the page. `{{explainer_record}}`,
 
 | Variable | Meaning |
 |---|---|
-| `{{tap_modal.confirm_agree}}`, `{{tap_modal.confirm_disagree}}` | The confirmation line; `{label}` and `{price}` are filled from the card. Approved copy, used while unfilled: "You're with him. {label} at {price}. Let's see if you're both right." / "You're calling him wrong. {label} at {price}, you say no." |
-| `{{tap_modal.scoring_line}}` | Approved copy while unfilled: "Scored when the market resolves. Right or wrong, it's on your record from today." |
+| `{{tap_modal.confirm_agree}}`, `{{tap_modal.confirm_disagree}}` | The confirmation line; `{label}` (Buy YES green / Buy NO red), `{verdict}` (right green / wrong red) and `{price}` are filled from the card and the side. Approved copy while unfilled: "You're calling him {verdict}. {label} at {price}. Let's see if you're both right." / "You're calling him {verdict}. {label} at {price}, you say that's {verdict}." |
+| `{{tap_modal.scoring_line}}` | Approved copy while unfilled: "Scored when the market resolves. Right or wrong, it's on your record and you'll earn XP." |
 | `{{tap_modal.first_in_line}}` | The crowd line under three taps. Approved copy while unfilled: "First tap on this one. You set the tone." |

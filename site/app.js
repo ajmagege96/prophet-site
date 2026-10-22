@@ -407,15 +407,19 @@
   /* ── Tap Confirmed modal ── */
   var tapModal = document.querySelector('[data-tap-modal]');
   var COPY = {
-    agree: "You're with him. {label} at {price}. Let's see if you're both right.",
-    disagree: "You're calling him wrong. {label} at {price}, you say no.",
-    scoring: "Scored when the market resolves. Right or wrong, it's on your record from today.",
+    agree: "You're calling him {verdict}. {label} at {price}. Let's see if you're both right.",
+    disagree: "You're calling him {verdict}. {label} at {price}, you say that's {verdict}.",
+    scoring: "Scored when the market resolves. Right or wrong, it's on your record and you'll earn XP.",
     first: "First tap on this one. You set the tone."
   };
-  function fillLine(line, card) {
+  function esc(t) { return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  /* {label} → Buy YES / Buy NO in its colour; {verdict} → right (green) / wrong (red); {price} → the odds at the call */
+  function fillLine(line, card, side) {
     var st = (card.dataset.stance || 'yes').toLowerCase();
     var at = card.dataset.calledPct || ''; if (!at) { var sp = card.querySelector('[title="odds at call"]'); at = sp ? sp.textContent.replace(/ at call.*/, '') : ''; }
-    return line.replace(/\{label\}/g, 'Buy ' + st.toUpperCase()).replace(/\{price\}/g, at.replace('%', ''));
+    var label = '<span class="lbl lbl--' + st + ' tc__word">Buy ' + st.toUpperCase() + '</span>';
+    var verdict = side === 'agree' ? '<span class="tc__right">right</span>' : '<span class="tc__wrong">wrong</span>';
+    return esc(line).replace(/\{label\}/g, label).replace(/\{verdict\}/g, verdict).replace(/\{price\}/g, esc(at.replace('%', '')));
   }
   function crowdLine(card) {
     var n = parseInt(card.dataset.tradeCount || '0', 10) || 0, pct = card.dataset.agreePct || '';
@@ -426,7 +430,7 @@
     var chip = q(tapModal, '[data-tc-chip]');
     chip.textContent = side === 'agree' ? 'Agree' : 'Disagree';
     chip.className = 'ad__btn tc__chip ad__btn--' + side + ' ad__btn--on';
-    q(tapModal, '[data-tc-confirm]').textContent = fillLine(val(tapModal, side === 'agree' ? 'confirm-agree' : 'confirm-disagree', COPY[side]), card);
+    q(tapModal, '[data-tc-confirm]').innerHTML = fillLine(val(tapModal, side === 'agree' ? 'confirm-agree' : 'confirm-disagree', COPY[side]), card, side);
     q(tapModal, '[data-tc-scoring]').textContent = val(tapModal, 'scoring-line', COPY.scoring);
     q(tapModal, '[data-tc-crowd]').textContent = crowdLine(card) || val(tapModal, 'first-in-line', COPY.first);
     var v = visibleCards(), last = v.length && v[v.length - 1] === card;

@@ -126,7 +126,7 @@ separator; 16px between the takes and the bar.
   sets a side (a deselect shows nothing). Signed out: the tap fires `prophet:signin`;
   after sign-in call `window.prophetTap.land(slug, side)` and the tap lands
   and the modal shows. Lines are config strings on the modal root
-  (`tap_modal.*`) with `{label}` / `{price}` filled from the card; the
+  (`tap_modal.*`) with `{label}` / `{verdict}` / `{price}` filled from the card and the side; the
   approved copy is the fallback. Next call selects the next live
   call; Back to top on the last. Bottom sheet on phones (swipe down closes),
   dialog on desktop. Closed markets: buttons disabled, "Taps closed. Resolution next." Empty deck: "No live calls right now. He's reading."

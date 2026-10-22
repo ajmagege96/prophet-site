@@ -613,7 +613,10 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
 
 /* Tap Confirmed */
 .tc { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 14px; padding-top: 4px; }
-.tc__chip { pointer-events: none; }
+.tc__chip { pointer-events: none; display: inline-flex; align-items: center; justify-content: center; }
+.tc__right { color: var(--green); }
+.tc__wrong { color: #e53935; }
+.tc__word { font-family: inherit; font-size: inherit; letter-spacing: inherit; text-transform: none; font-weight: 500; }
 .tc__line { font-size: 15px; line-height: 1.45; }
 .tc__sub { font-size: 13px; opacity: 0.7; line-height: 1.45; }
 .tc__crowd { font-size: 13px; opacity: 0.85; }
