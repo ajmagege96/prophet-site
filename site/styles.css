@@ -422,8 +422,8 @@ ul, ol { list-style: none; }
 .prow__outcome--void { color: rgba(242, 240, 230, 0.55); }
 
 /* The market's odds, small, top-right of the card */
-.carousel__odds { margin-left: auto; display: inline-flex; align-items: baseline; gap: 4px; font-size: 14px; line-height: 1; color: var(--green); padding-top: 4px; white-space: nowrap; }
-.carousel__odds small { font-size: 9px; letter-spacing: 0.12em; opacity: 0.7; }
+.carousel__odds { margin-left: auto; display: inline-flex; align-items: baseline; gap: 5px; font-size: 22px; line-height: 1; color: var(--green); padding-top: 2px; white-space: nowrap; }   /* nearly as big as the call */
+.carousel__odds small { font-size: 11px; letter-spacing: 0.12em; opacity: 0.7; }
 .carousel__odds .prow__outcome { margin-left: 6px; align-self: center; }
 /* The call, big, where the figure was */
 .carousel__call { margin-top: auto; font-size: 24px; line-height: 1; letter-spacing: 0.06em; }
@@ -620,14 +620,14 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
 /* Agree / Disagree: a row under the thesis. Agree green, Disagree red, on hover and when chosen */
 .ad { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 6px 0 10px; flex: 0 0 auto; }
 .ad[hidden] { display: none; }
-.ad__btn { min-height: 32px; padding: 0 18px; border: 1px solid; border-radius: 4px; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; transition: color 0.15s, border-color 0.15s; }
+.ad__btn { min-height: 40px; padding: 0 22px; border: 1px solid; border-radius: 4px; font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; transition: color 0.15s, border-color 0.15s; }
 .ad__btn--agree { color: rgba(16, 240, 95, 0.5); border-color: rgba(16, 240, 95, 0.35); }
-.ad__btn--disagree { color: rgba(229, 57, 53, 0.55); border-color: rgba(229, 57, 53, 0.4); }
+.ad__btn--disagree { color: #e53935; border-color: rgba(229, 57, 53, 0.5); }   /* the normal red at rest */
 .ad__btn--agree:hover, .ad__btn--agree.ad__btn--on { color: var(--green); border-color: var(--green); }
 .ad__btn--disagree:hover, .ad__btn--disagree.ad__btn--on { color: #e53935; border-color: #e53935; }
 .ad__btn[disabled] { opacity: 0.35; cursor: default; color: var(--offwhite); border-color: var(--outline); }
 .thesis__stateline { flex-direction: column; align-items: flex-end; gap: 6px; }
-.thesis__split { font-size: 11px; opacity: 0.55; white-space: nowrap; margin-left: 6px; }
+.thesis__split { font-size: 14px; opacity: 0.7; white-space: nowrap; margin-left: 8px; }
 .thesis__split[hidden] { display: none; }
 .thesis__revised { font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--purple-text); opacity: 0.85; white-space: nowrap; }
 .thesis__revised:empty { display: none; }
@@ -1072,7 +1072,7 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
   .hero { height: auto; min-height: 0; overflow: visible; }
   .home-panel { height: calc(100svh - 56px); padding: 16px 20px 14px; }
   .hero--home .home-panel { height: auto; }
-  .ad__btn { min-height: 44px; padding: 0 16px; }
+  .ad__btn { min-height: 44px; padding: 0 18px; }
   .panel { height: auto; overflow: visible; padding: 16px 20px 28px; }
   .panel--token { overflow: visible; padding-bottom: 44px; }
   .feed { flex: 1 1 auto; min-height: 0; overflow-y: auto; margin: 14px 0 16px; }   /* 16px of air between the takes and the bar */
