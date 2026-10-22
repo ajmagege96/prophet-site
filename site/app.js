@@ -154,7 +154,7 @@
   var thesisText = document.querySelector('[data-thesis-text]');
   var thesisLabel = document.querySelector('[data-thesis-label]');
   var thesisOutcome = document.querySelector('[data-thesis-outcome]');
-  var thesisRevised = document.querySelector('[data-thesis-revised]'), thesisMoved = document.querySelector('[data-thesis-moved]'), thesisSplit = document.querySelector('[data-thesis-split]'), adWrap = document.querySelector('[data-ad]');
+  var thesisRevised = document.querySelector('[data-thesis-revised]'), thesisSplit = document.querySelector('[data-thesis-split]'), adWrap = document.querySelector('[data-ad]');
   var taps = {};   /* slug -> 'agree' | 'disagree' (mock, in-memory; the server keeps the real side) */
   var VOID_LINE = 'Market closed by Polymarket before resolution.';
   function labelHTML(key) { return key === 'buy_yes' ? '<span class="lbl lbl--yes">Buy YES</span>' : key === 'buy_no' ? '<span class="lbl lbl--no">Buy NO</span>' : key === 'hold' ? '<span class="lbl lbl--hold">Hold</span>' : ''; }
@@ -358,7 +358,6 @@
     thesisLabel.textContent = 'Thesis';
     if (thesisRevised) thesisRevised.textContent = revised ? 'Revised ' + card.dataset.revisedAgo : '';
     thesisText.textContent = card.dataset.thesis || '';
-    if (thesisMoved) thesisMoved.hidden = !(revised && card.dataset.numberMoved === 'true');
     /* History: how it played out */
     if (thesisOutcome) {
       var cs = card.dataset.callState || '', rs = (card.dataset.resolvedSide || '').toLowerCase();
@@ -395,13 +394,7 @@
       if (signedIn === 'false') { document.dispatchEvent(new CustomEvent('prophet:signin', { detail: { then: 'agree', slug: card.dataset.slug } })); return; }
       var slug = card.dataset.slug, prev = taps.hasOwnProperty(slug) ? taps[slug] : (card.dataset.userSide || '');
       var next = prev === b.dataset.adBtn ? '' : b.dataset.adBtn;   /* tap the chosen side again to deselect */
-      taps[slug] = next;
-      /* mock tally: a new tap counts, a switch moves one, a deselect removes one */
-      var n = parseInt(card.dataset.tradeCount || '0', 10) || 0, a = Math.round(n * (parseInt(card.dataset.agreePct || '50', 10) || 50) / 100);
-      if (!prev && next) { n += 1; if (next === 'agree') a += 1; }
-      else if (prev && !next) { n = Math.max(0, n - 1); if (prev === 'agree') a = Math.max(0, a - 1); }
-      else if (prev !== next) { a += next === 'agree' ? 1 : -1; }
-      card.dataset.tradeCount = n; card.dataset.agreePct = n ? Math.round(100 * a / n) : '';
+      taps[slug] = next;   /* the split is the server's figure and does not move on a tap */
       paintAgree(card);
     });
   }

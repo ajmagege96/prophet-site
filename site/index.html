@@ -29,7 +29,7 @@
   <meta name="twitter:description" content="An agent that reads prediction markets, publishes a thesis before the outcome, and keeps a public record of every call.">
   <meta name="twitter:image" content="https://ajmagege96.github.io/prophet-site/site/assets/prophet-og-1200x630.png">
 
-  <link rel="stylesheet" href="styles.css?v=5a107a98">
+  <link rel="stylesheet" href="styles.css?v=91d1abe9">
 </head>
 <body>
 
@@ -124,14 +124,13 @@
              Ladder markets print listed_leg_date under the question. Thesis, numbers and the Agree / Disagree state fill the
              block under the carousel from the data-* attributes. His number and the label live in the block, never on the face. -->
         <template>
-        <div class="carousel__card outline" data-card data-state="{{market.filter_state}}" data-slug="{{market.slug}}" data-label="{{label}}" data-stance="{{market.thesis_stance}}" data-estimate="{{prophet_probability}}" data-called-pct="{{market.called_pct}}" data-called-ago="{{market.called_ago}}" data-call-state="{{call_state}}" data-outcome="{{market.outcome}}" data-resolved-side="{{market.resolved_side}}" data-resolved-pct="{{market.resolved_pct}}" data-resolved-ago="{{market.resolved_ago}}" data-leg-date="{{listed_leg_date}}" data-revised-ago="{{revised_ago}}" data-revised-number="{{revised_number}}" data-number-moved="{{number_moved}}" data-agree-pct="{{agree_pct}}" data-trade-count="{{trade_count}}" data-user-side="{{user_side}}" data-market-closed="{{market_closed}}" data-thesis="{{market.thesis}}">
+        <div class="carousel__card outline" data-card data-state="{{market.filter_state}}" data-slug="{{market.slug}}" data-label="{{label}}" data-stance="{{market.thesis_stance}}" data-estimate="{{prophet_probability}}" data-called-pct="{{market.called_pct}}" data-called-ago="{{market.called_ago}}" data-call-state="{{call_state}}" data-outcome="{{market.outcome}}" data-resolved-side="{{market.resolved_side}}" data-resolved-pct="{{market.resolved_pct}}" data-resolved-ago="{{market.resolved_ago}}" data-leg-date="{{listed_leg_date}}" data-revised-ago="{{revised_ago}}" data-revised-number="{{revised_number}}" data-agree-pct="{{agree_pct}}" data-trade-count="{{trade_count}}" data-user-side="{{user_side}}" data-market-closed="{{market_closed}}" data-thesis="{{market.thesis}}">
           <div class="carousel__top">
             <img class="carousel__img" src="{{market.image_url}}" alt="" loading="lazy">
             <!-- the market's odds, small, top-right; in History the right · wrong · void · awaiting tag follows them -->
             <span class="carousel__odds heading">{{market.yes_pct}}<small>YES</small>{{market.state}}</span>
           </div>
-          <p class="carousel__question">{{market.question}}</p>
-          <span class="carousel__leg">{{listed_leg_date}}</span>   <!-- ladder markets only: the leg's date, on the face only; omit when empty -->
+          <p class="carousel__question">{{market.question}} <span class="carousel__leg">{{listed_leg_date}}</span></p>   <!-- ladder markets only: the leg's date beside the question; omit the span when empty -->
           <!-- the call, big: carousel__call--yes "Buy YES" or carousel__call--no "Buy NO" -->
           <span class="carousel__call heading carousel__call--{{market.thesis_stance}}">Buy {{market.thesis_stance_upper}}</span>
           <span class="carousel__meta"><span title="odds at call">{{market.called_pct}} at call</span><span title="called">called {{market.called_ago}}</span><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>{{market.volume}}</span><span title="ends in"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>{{market.ends_in}}</span></span>
@@ -139,7 +138,7 @@
         </template>
         <!-- /repeat: market -->
 
-        <div class="carousel__card outline" data-card data-state="called" data-slug="mstr-btc" data-agree-pct="71" data-trade-count="38" data-user-side="agree" data-market-closed="false" data-revised-ago="3h ago" data-revised-number="88%" data-number-moved="true" data-called-ago="3d ago" data-label="buy_yes" data-stance="yes" data-estimate="92%" data-thesis="Saylor&#x27;s playbook hasn&#x27;t changed: every dip is a buying opportunity until the balance sheet says otherwise. The company has raised fresh capital three quarters running and has never let a quarter close without adding. Nothing in the filings suggests this one is different." data-contributors="[{&quot;user&quot;: &quot;marrow&quot;, &quot;claim&quot;: &quot;Filings show new convertible capacity was authorized last week&quot;, &quot;xp&quot;: 14}, {&quot;user&quot;: &quot;lunaire&quot;, &quot;claim&quot;: &quot;Every prior raise was followed by a buy within 10 days&quot;, &quot;xp&quot;: 8}, {&quot;user&quot;: &quot;kesh&quot;, &quot;claim&quot;: &quot;Saylor&#x27;s public cadence hasn&#x27;t slowed&quot;, &quot;xp&quot;: 5}]">
+        <div class="carousel__card outline" data-card data-state="called" data-slug="mstr-btc" data-agree-pct="71" data-trade-count="38" data-user-side="" data-market-closed="false" data-revised-ago="3h ago" data-revised-number="88%" data-called-ago="3d ago" data-label="buy_yes" data-stance="yes" data-estimate="92%" data-thesis="Saylor&#x27;s playbook hasn&#x27;t changed: every dip is a buying opportunity until the balance sheet says otherwise. The company has raised fresh capital three quarters running and has never let a quarter close without adding. Nothing in the filings suggests this one is different." data-contributors="[{&quot;user&quot;: &quot;marrow&quot;, &quot;claim&quot;: &quot;Filings show new convertible capacity was authorized last week&quot;, &quot;xp&quot;: 14}, {&quot;user&quot;: &quot;lunaire&quot;, &quot;claim&quot;: &quot;Every prior raise was followed by a buy within 10 days&quot;, &quot;xp&quot;: 8}, {&quot;user&quot;: &quot;kesh&quot;, &quot;claim&quot;: &quot;Saylor&#x27;s public cadence hasn&#x27;t slowed&quot;, &quot;xp&quot;: 5}]">
           <div class="carousel__top">
             <img class="carousel__img" src="https://polymarket-upload.s3.us-east-2.amazonaws.com/will-microstrategy-purchase-bitcoin-july-1-7-mzoE5TYk_cCI.jpg" alt="" loading="lazy">
             <span class="carousel__odds heading">91%<small>YES</small></span>
@@ -164,8 +163,7 @@
             <img class="carousel__img" src="https://polymarket-upload.s3.us-east-2.amazonaws.com/BTC+fullsize.png" alt="" loading="lazy">
             <span class="carousel__odds heading">72%<small>YES</small></span>
           </div>
-          <p class="carousel__question">Will Bitcoin exceed $100K?</p>
-          <span class="carousel__leg">Oct 20</span>
+          <p class="carousel__question">Will Bitcoin exceed $100K? <span class="carousel__leg">Oct 20</span></p>
           <span class="carousel__call heading carousel__call--yes">Buy YES</span>
           <span class="carousel__meta"><span title="odds at call">68% at call</span><span title="called">called 2d ago</span><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>$4.1M</span><span title="ends in"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>3mo</span></span>
         </div>
@@ -297,7 +295,6 @@
           </div>
         </div>
         <p class="thesis__text" data-thesis-text></p>
-        <p class="thesis__moved" data-thesis-moved hidden>His number has moved. The call stands to resolution.</p>
         <!-- History: how it played out -->
         <p class="thesis__outcome" data-thesis-outcome hidden></p>
       </div>
@@ -501,6 +498,6 @@
 </footer>
 <!-- /partial:footer -->
 
-<script src="app.js?v=f93f7522"></script>
+<script src="app.js?v=de256dd7"></script>
 </body>
 </html>
