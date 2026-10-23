@@ -383,7 +383,7 @@
     var cl = adWrap.querySelector('[data-ad-closed]'); if (cl) cl.hidden = !closed;
     var n = parseInt(card.dataset.tradeCount || '0', 10) || 0, pct = card.dataset.agreePct || '';
     if (thesisSplit) {
-      if (n >= 3 && pct) { thesisSplit.textContent = pct + '% agree with ' + n + ' tap' + (n === 1 ? '' : 's'); thesisSplit.hidden = false; }
+      if (n >= 3 && pct) { thesisSplit.textContent = pct + '% agree with ' + n + ' trade' + (n === 1 ? '' : 's'); thesisSplit.hidden = false; }
       else if (side) { thesisSplit.textContent = 'You ' + side; thesisSplit.hidden = false; }
     }
   }
@@ -409,8 +409,7 @@
   var COPY = {
     agree: "You're calling him {verdict}. {label} at {price}. Let's see if you're both right.",
     disagree: "You're calling him {verdict}. {label} at {price}, you say that's {verdict}.",
-    scoring: "Scored when the market resolves. Right or wrong, it's on your record and you'll earn XP.",
-    first: "First tap on this one. You set the tone."
+    scoring: "Scored when the market resolves. Right or wrong, it's on your record and you'll earn XP."
   };
   function esc(t) { return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
   /* {label} → Buy YES / Buy NO in its colour; {verdict} → right (green) / wrong (red); {price} → the odds at the call */
@@ -423,7 +422,7 @@
   }
   function crowdLine(card) {
     var n = parseInt(card.dataset.tradeCount || '0', 10) || 0, pct = card.dataset.agreePct || '';
-    return (n >= 3 && pct) ? pct + '% agree with ' + n + ' tap' + (n === 1 ? '' : 's') : '';
+    return (n >= 3 && pct) ? pct + '% agree with ' + n + ' trade' + (n === 1 ? '' : 's') : '';
   }
   function confirmTap(card, side) {
     if (!tapModal) return;
@@ -432,7 +431,7 @@
     chip.className = 'ad__btn tc__chip ad__btn--' + side + ' ad__btn--on';
     q(tapModal, '[data-tc-confirm]').innerHTML = fillLine(val(tapModal, side === 'agree' ? 'confirm-agree' : 'confirm-disagree', COPY[side]), card, side);
     q(tapModal, '[data-tc-scoring]').textContent = val(tapModal, 'scoring-line', COPY.scoring);
-    q(tapModal, '[data-tc-crowd]').textContent = crowdLine(card) || val(tapModal, 'first-in-line', COPY.first);
+    var cl = q(tapModal, '[data-tc-crowd]'); cl.textContent = crowdLine(card); cl.hidden = !cl.textContent;
     var v = visibleCards(), last = v.length && v[v.length - 1] === card;
     q(tapModal, '[data-tc-next]').textContent = last ? 'Back to top' : 'Next call';
     openModal(tapModal);

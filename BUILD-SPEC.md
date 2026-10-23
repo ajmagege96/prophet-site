@@ -106,9 +106,9 @@ A centred row under the block, live calls only (hidden on History):
   chosen. Nobody is pre-selected unless `{{user_side}}` says so.
 - A tap marks the side. Tapping the other switches it. Tapping the chosen one
   again deselects it. `{{market_closed}}` `true` disables both and shows
-  `"Taps closed. Resolution next."` beside them.
-- Beside the buttons, from three taps: **`{{agree_pct}}% agree with
-  {{trade_count}} taps`** (e.g. "71% agree with 38 taps"). Below three taps and
+  `"Trades closed. Resolution next."` beside them.
+- Beside the buttons, from three trades: **`{{agree_pct}}% agree with
+  {{trade_count}} trades`** (e.g. "71% agree with 38 trades"). Below three trades and
   with a side chosen: "You agree" / "You disagree". The figure is the server's;
   the client never recomputes it on a tap — re-render it from the endpoint.
 - Signed out (`viewer.signed_in` false): a tap dispatches `prophet:signin` on
@@ -129,8 +129,7 @@ swipe down. Top to bottom:
    plain. The price is `called_pct` without the % sign.
 3. Scoring line: `Scored when the market resolves. Right or wrong, it's on
    your record and you'll earn XP.`
-4. Crowd line: `71% agree with 38 taps` from three taps; otherwise
-   `First tap on this one. You set the tone.`
+4. Crowd line: `71% agree with 38 trades` from three trades; hidden below that.
 5. One button, **Next call** — closes and selects the next live call. On the
    last card it reads **Back to top** and returns to the first.
 
