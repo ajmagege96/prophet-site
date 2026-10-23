@@ -431,7 +431,6 @@
     chip.className = 'ad__btn tc__chip ad__btn--' + side + ' ad__btn--on';
     q(tapModal, '[data-tc-confirm]').innerHTML = fillLine(val(tapModal, side === 'agree' ? 'confirm-agree' : 'confirm-disagree', COPY[side]), card, side);
     q(tapModal, '[data-tc-scoring]').textContent = val(tapModal, 'scoring-line', COPY.scoring);
-    var cl = q(tapModal, '[data-tc-crowd]'); cl.textContent = crowdLine(card); cl.hidden = !cl.textContent;
     var v = visibleCards(), last = v.length && v[v.length - 1] === card;
     q(tapModal, '[data-tc-next]').textContent = last ? 'Back to top' : 'Next call';
     openModal(tapModal);

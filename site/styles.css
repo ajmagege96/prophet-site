@@ -617,8 +617,6 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
 .tc__word { font-family: inherit; font-size: inherit; letter-spacing: inherit; text-transform: none; font-weight: 500; }
 .tc__line { font-size: 15px; line-height: 1.45; }
 .tc__sub { font-size: 13px; opacity: 0.7; line-height: 1.45; }
-.tc__crowd { font-size: 13px; opacity: 0.85; }
-.tc__crowd[hidden] { display: none; }
 .tc .mdl__cta { min-width: 200px; margin-top: 4px; }
 .ad__closed { font-size: 12px; opacity: 0.5; margin-left: 8px; }
 .ad__closed[hidden] { display: none; }

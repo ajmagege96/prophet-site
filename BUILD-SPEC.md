@@ -129,8 +129,7 @@ swipe down. Top to bottom:
    plain. The price is `called_pct` without the % sign.
 3. Scoring line: `Scored when the market resolves. Right or wrong, it's on
    your record and you'll earn XP.`
-4. Crowd line: `71% agree with 38 trades` from three trades; hidden below that.
-5. One button, **Next call** — closes and selects the next live call. On the
+4. One button, **Next call** — closes and selects the next live call. On the
    last card it reads **Back to top** and returns to the first.
 
 No second button, no token, no share, no XP figure. Every line is a config
