@@ -135,8 +135,7 @@ swipe down. Top to bottom:
 
 No second button, no token, no share, no XP figure. Every line is a config
 string on the modal root — `{{tap_modal.confirm_agree}}`,
-`{{tap_modal.confirm_disagree}}`, `{{tap_modal.scoring_line}}`,
-`{{tap_modal.first_in_line}}` — with `{label}`, `{verdict}` and `{price}` as
+`{{tap_modal.confirm_disagree}}`, `{{tap_modal.scoring_line}}` — with `{label}`, `{verdict}` and `{price}` as
 tokens filled from the card and the side. The approved copy above is the
 fallback while a string is unfilled.
 
@@ -162,8 +161,7 @@ Nothing about the user's taps appears in History.
 `label`, `market.called_ago`, `market.thesis_stance_upper`, `call_state`,
 `listed_leg_date`, `revised_ago`, `revised_number`, `agree_pct`, `trade_count`,
 `user_side`, `market_closed`, `tap_modal.confirm_agree`,
-`tap_modal.confirm_disagree`, `tap_modal.scoring_line`,
-`tap_modal.first_in_line`. `market.outcome` now takes `right` / `wrong` /
+`tap_modal.confirm_disagree`, `tap_modal.scoring_line`. `market.outcome` now takes `right` / `wrong` /
 `void` / `awaiting`; `market.filter_state` takes `called` / `resolved`.
 Descriptions in `TEMPLATE_VARS.md`; the generated table in `HANDOFF.md` §10.
 
