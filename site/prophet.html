@@ -29,7 +29,7 @@
   <meta name="twitter:description" content="An agent that reads prediction markets, publishes a thesis before the outcome, and keeps a public record of every call.">
   <meta name="twitter:image" content="https://ajmagege96.github.io/prophet-site/site/assets/prophet-og-1200x630.png">
 
-  <link rel="stylesheet" href="styles.css?v=f3944f2e">
+  <link rel="stylesheet" href="styles.css?v=2f3b369e">
 </head>
 <body>
 
@@ -40,14 +40,14 @@
       <img src="assets/prophet-logo-transparent.svg" alt="" class="site-header__mark" width="48" height="48">
       <img src="assets/wordmark_offwhite.svg" alt="The Prophet" class="site-header__wordmark">
     </a>
+    <!-- desktop only; opens the How it Works click-through, every time -->
+    <a href="#how-it-works" class="site-header__hiw heading" data-hiw-open>How it Works</a>
   </div>
 
   <!-- Desktop nav -->
   <nav class="site-header__nav">
     <a href="prophet.html">$Prophet</a>
     <a href="{{docs_url}}" target="_blank" rel="noopener">Docs</a>
-    <!-- opens the How it works click-through, every time -->
-    <a href="#how-it-works" data-hiw-open>How it works</a>
     <!-- only when the viewer is signed in ({{viewer.signed_in}}); hover reads red -->
     <a href="{{logout_url}}" class="site-header__logout" data-logout>Logout</a>
     <button class="site-header__ca" data-ca="{{contract_address}}" data-ca-copy title="Copy contract address" aria-label="Copy contract address">
@@ -67,7 +67,7 @@
 
   <!-- Mobile panel -->
   <nav class="site-header__mobile-panel" data-menu-panel>
-    <a href="#how-it-works" data-hiw-open>How it works</a>
+    <a href="#how-it-works" data-hiw-open>How it Works</a>
     <a href="prophet.html">$Prophet</a>
     <a href="{{docs_url}}" target="_blank" rel="noopener">Docs</a>
     <!-- only when the viewer is signed in ({{viewer.signed_in}}); gray, red on hover like the header -->
@@ -456,6 +456,6 @@
 </footer>
 <!-- /partial:footer -->
 
-<script src="app.js?v=8aab4b57"></script>
+<script src="app.js?v=4380484e"></script>
 </body>
 </html>

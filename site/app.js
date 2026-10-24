@@ -1049,12 +1049,16 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
 
   /* ── the beat: one tick, one flash, one run ── */
   function beat() {
+    /* the frame swells and the selected card flashes with it, at every width; a trace leaves only on the wide board */
+    bar.classList.add('thesis--pulse');
+    var card = document.querySelector('[data-card].carousel__card--active');
+    if (card) card.classList.add('carousel__card--pulse');
+    setTimeout(function () { bar.classList.remove('thesis--pulse'); if (card) card.classList.remove('carousel__card--pulse'); }, 900);
+    if (!drawing) return;
     var route = null;
     for (var i = 0; i < 40 && !route; i++) route = makeRoute();
     if (!route) return;
     runs.push({ t: route, start: performance.now() });
-    bar.classList.add('thesis--pulse');
-    setTimeout(function () { bar.classList.remove('thesis--pulse'); }, 900);
   }
 
   function profile(r, d) {                              /* transparent → green → transparent */
@@ -1133,11 +1137,13 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
     runs = [];
   }
 
+  var drawing = false;
   function startUp() {
     stop();
-    if (!wide.matches || reduced.matches) { canvas.style.width = '0px'; canvas.style.height = '0px'; return; }
-    measure();
+    drawing = wide.matches && !reduced.matches;
     beatTimer = setInterval(beat, BEAT);   /* only the timer fires beats */
+    if (!drawing) { canvas.style.width = '0px'; canvas.style.height = '0px'; return; }
+    measure();
     raf = requestAnimationFrame(draw);
   }
 

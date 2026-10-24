@@ -161,14 +161,17 @@ Nothing about the user's taps appears in History.
 
 - The home hero is as tall as its content; How it Works follows the Agree /
   Disagree row directly. The $PROPHET panel is unchanged.
+- The selected card no longer carries a brighter outline; it flashes green on
+  the same 3s beat as the thesis block, at every width, so the thesis reads as
+  that market's. Decorative.
 - The decorative circuit board now runs around the thesis block (it used to run
   around the prompt bar). Desktop only. Nothing to wire; safe to delete with
   its `<canvas data-board>`.
 
 ## 10. Header: How it works
 
-A **How it works** link sits in the desktop nav next to Docs ($PROPHET · Docs ·
-How it works · Logout) and first in the mobile menu. It opens a click-through
+A **How it Works** link sits beside the logo on desktop (as before) and first
+in the mobile menu. It opens a click-through
 modal on the onboarding shell — `partials/how-it-works.html`, four slides with
 placeholder titles (What he does · Agree or Disagree · He can change his mind ·
 Election night keeps score) and `[COPY]` lines — every time it is clicked. The
@@ -198,7 +201,7 @@ Descriptions in `TEMPLATE_VARS.md`; the generated table in `HANDOFF.md` §10.
 - All shows every listed market with a call; History shows resolved; the empty
   line appears on an empty tab.
 - Every card: odds top-right, the big Buy YES / Buy NO in the right colour, the
-  stars bottom-left in that colour, no at-call stat, three meta items on one
+  stars bottom-left in that colour (faint on the unfilled ones), no at-call stat, three meta items on one
   line, no overflow at 390px.
 - The purple marker beside Thesis reads Called / Revised / Changed by state; a
   changed call also shows the change note.
