@@ -46,16 +46,16 @@ Variables that go with them: `market.take_count`, `market.vote_*`, `take.*`,
 
 ## 3. Deck and tabs
 
-- Two tabs above the carousel: **All** · **History**. One is always on
-  (All by default); the Tab key switches. One gray highlight style, no colour.
-- **All** = every listed market with a call, `filter_state` `called`, in the order the server
+- Two tabs above the carousel: **Calls** · **History**. One is always on
+  (Calls by default); the Tab key switches. One gray highlight style, no colour.
+- **Calls** = every listed market with a call, `filter_state` `called`, in the order the server
   sends (most interesting first). **History** = `filter_state` `resolved`.
   Both decks are sent in the same `<!-- repeat: market -->` loop; the client
   shows one at a time.
 - Empty tab: one centred line, `"No live calls right now. He's reading."` —
   the `<p class="deck__empty">` after the track. Not padded.
 - Three cards across on desktop, one on phones with the next peeking. Cards are
-  a fixed height: 220px desktop, 214px phone. Nothing shifts on tab change.
+  a fixed height: 196px desktop, 184px phone. Nothing shifts on tab change.
 
 ## 4. The card face
 
@@ -68,25 +68,17 @@ Top to bottom, for every card:
    live calls.
 2. **Question**, two lines max. A ladder market prints `{{listed_leg_date}}`
    small and gray on the same line as the question (omit the span when empty).
-3. **His call, big** (24px display face): a small gray caption `His call`, then
-   `YES` in green or `NO` in red — `{{market.side}}` / `{{market.side_upper}}`.
-4. **Under the call**, one row of tags, empty on most cards: an outlined
-   `Against the market` when `{{market.against_market}}` is `true`; on History,
-   `changed 1 time` / `changed n times` when `{{market.change_count}}` > 0; and
-   five stars (`{{market.conviction}}` filled, green) only when the carousel root
-   carries `data-show-conviction="true"` (`{{show_conviction}}`, off at launch).
-5. **Meta row**, live: `{{market.time_line}}` (`called 2d ago` / `revised 2h ago`
-   / `changed 2h ago`, by `{{market.state}}`) · bar icon + `{{market.volume}}` ·
-   clock icon + `{{market.ends_in}}`. History: `called {{market.called_date}} ·
-   odds {{market.called_pct}} · his number {{market.called_number}}`. The odds
-   at the call are not printed on a live face; they stay on the card as data for
-   the Tap Confirmed line. The template carries every span; the client shows the
-   right ones per card.
+3. **The call, big** (24px display face), where a figure would be:
+   `Buy YES` in green or `Buy NO` in red — `{{market.side}}` /
+   `{{market.side_upper}}` — with five small stars beside it, the first
+   `{{market.conviction}}` filled green. The stars hide only when the carousel
+   root carries `data-show-conviction="false"` (`{{show_conviction}}`).
+4. **Meta row**: `{{market.called_pct}} at call` · bar icon + `{{market.volume}}`
+   · clock icon + `{{market.ends_in}}`. Three items, one line.
 
 Card attributes the client reads: `data-state`, `data-slug`, `data-label`,
 `data-side`, `data-call-kind`, `data-time-line`, `data-called-pct`,
-`data-called-date`, `data-called-number`, `data-change-count`,
-`data-change-note`, `data-against-market`, `data-conviction`, `data-call-state`,
+`data-change-note`, `data-conviction`, `data-call-state`,
 `data-outcome`, `data-resolved-side`, `data-resolved-pct`, `data-resolved-ago`,
 `data-leg-date`, `data-agree-pct`, `data-tap-count`, `data-user-side`,
 `data-market-closed`, `data-thesis`.
@@ -96,11 +88,12 @@ Card attributes the client reads: `data-state`, `data-slug`, `data-label`,
 One block under the carousel for the selected card, outlined like the selected
 card. Contents, and nothing else:
 
-- Label **THESIS**.
+- Label **THESIS**, and beside it the small purple time marker
+  `{{market.time_line}}` — "Called 3d ago" / "Revised 3h ago" / "Changed 2h
+  ago" by `{{market.state}}` (the client capitalises the first letter). No tap
+  behaviour.
 - When `{{market.state}}` is `changed`: one purple line above the text,
   `{{market.change_note}}` — "Changed his mind on Oct 23. He had called NO."
-  There is no Revised marker any more; the time line on the card carries
-  revised / changed.
 - The thesis text, the latest revision (`{{market.thesis}}`).
 - History only: one line under the text — `Resolved YES · right · 2w ago`
   (right green / wrong red), or `"Market closed by Polymarket before
@@ -113,14 +106,14 @@ The block carries `data-signed-in="{{viewer.signed_in}}"`.
 
 A centred row under the block, live calls only (hidden on History):
 
-- Two buttons, **Agree** and **Disagree**, 40px tall (44px on phones). Bright
-  green and bright red from the start; no hover change, no soft resting state.
-  The chosen one carries a thin outline (`.ad__btn--on`). Nobody is pre-selected
-  unless `{{user_side}}` says so.
+- Two buttons, **Agree** and **Disagree**, 40px tall (44px on phones). Soft
+  green and soft red at rest; bright green / bright red on hover and when
+  chosen (`.ad__btn--on`), no outline. Nobody is pre-selected unless
+  `{{user_side}}` says so.
 - A tap marks the side. Tapping the other switches it. Tapping the chosen one
   again deselects it. `{{market_closed}}` `true` disables both and shows
-  `"Taps closed. Resolution next."` under them.
-- Under the buttons, centred, from three taps: **`{{agree_pct}}% agree ·
+  `"Taps closed. Resolution next."` beside them.
+- Beside the buttons, from three taps: **`{{agree_pct}}% agree ·
   {{tap_count}} taps`** (e.g. "71% agree · 38 taps"). Below three taps and
   with a side chosen: "You agree" / "You disagree". The figure is the server's;
   the client never recomputes it on a tap — re-render it from the endpoint.
@@ -155,9 +148,8 @@ fallback while a string is unfilled.
 ## 8. History
 
 The History tab shows resolved calls as cards in the same structure: odds
-(settled 100% / 0%) with the outcome tag, His call YES / NO, the `changed n
-times` tag when he changed his mind, and the meta row `called {date} · odds
-{called_pct} · his number {called_number}`. Selecting one shows the thesis as last revised
+(settled 100% / 0%) with the outcome tag, the big Buy YES / Buy NO, the meta
+row with the odds at the call. Selecting one shows the thesis as last revised
 and the outcome line (section 5). Void calls carry the void tag and line and sit
 apart from any count. Closed-but-unresolved calls read Awaiting resolution.
 Nothing about the user's taps appears in History.
@@ -184,10 +176,10 @@ its own only once per device. Globals: `window.prophetHowItWorks.open()`,
 ## 11. Variables added in this drop
 
 Oct 23 evening: `market.side`, `market.side_upper`, `market.time_line`,
-`market.state` (called / revised / changed), `market.against_market`,
-`market.conviction`, `show_conviction`, `market.change_note`,
-`market.called_date`, `market.called_number`, `market.change_count`,
-`tap_count`. The History tag after the odds is now `market.outcome_tag` (it was
+`market.state` (called / revised / changed), `market.conviction`,
+`show_conviction`, `market.change_note`, `tap_count`. Not built, by the
+founder's call: `market.against_market`, `market.called_date`,
+`market.called_number`, `market.change_count`. The History tag after the odds is now `market.outcome_tag` (it was
 `market.state`). Retired: `market.thesis_stance`, `market.thesis_stance_upper`,
 `market.called_ago`, `revised_ago`, `revised_number`, `trade_count`,
 `prophet_probability` (nothing rendered it).
@@ -202,16 +194,13 @@ Descriptions in `TEMPLATE_VARS.md`; the generated table in `HANDOFF.md` §10.
 
 - All shows every listed market with a call; History shows resolved; the empty
   line appears on an empty tab.
-- Every card: odds top-right, "His call" then YES / NO in the right colour, the
-  time line reads called / revised / changed by state, no at-call price on a
-  live face, no overflow at 390px.
-- "Against the market" shows only when `against_market` is true; the star row
-  only when `show_conviction` is true.
-- A changed call shows the change note in the block; nothing says Revised.
-- History faces read called date · odds · his number, plus the changed tag.
-- Agree / Disagree: bright at rest, no hover change, the chosen one outlined,
-  deselect works, closed markets disable with "Taps closed. Resolution next.",
-  the split sits under the buttons and never moves on a tap, the word is taps.
+- Every card: odds top-right, the big Buy YES / Buy NO in the right colour with
+  the stars beside it, three meta items on one line, no overflow at 390px.
+- The purple marker beside Thesis reads Called / Revised / Changed by state; a
+  changed call also shows the change note.
+- Agree / Disagree: soft at rest, bright on hover / chosen, no outline, deselect
+  works, closed markets disable with "Taps closed. Resolution next.", the split
+  beside the buttons never moves on a tap, the word is taps.
 - How it works opens from the header and the menu every time; onboarding only
   on a first visit.
 - Signed out: a tap fires `prophet:signin` and nothing else; `prophetTap.land`

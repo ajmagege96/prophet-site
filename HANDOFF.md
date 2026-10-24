@@ -13,14 +13,12 @@ sections 5–7 are the contracts your side has to honour.
 
 ## 1. What changed since the last drop
 
-**UI Revisions (Oct 23 evening spec, built Oct 23).**
-- **Card face**: the call slot reads a small gray "His call" caption then **YES** green / **NO** red (`{{market.side}}`, `{{market.side_upper}}`). The meta row is one time line (`{{market.time_line}}`: "called 2d ago" / "revised 2h ago" / "changed 2h ago", by `{{market.state}}` called / revised / changed) + volume + time to close; the at-call price is off the face (it stays as `data-called-pct` for the Tap Confirmed line). Under the call, a tag row: outlined **Against the market** when `{{market.against_market}}` is `true`; five stars from `{{market.conviction}}` only when the carousel root's `data-show-conviction="{{show_conviction}}"` is `true` (off at launch). Cards are 220px desktop / 214px phone.
-- **Deck** = every listed market with a call (`filter_state` `called`); tabs read **All · History**.
-- **Thesis block**: the Revised marker is gone. When `{{market.state}}` is `changed` a purple line above the text reads `{{market.change_note}}` ("Changed his mind on Oct 23. He had called NO.").
-- **Agree / Disagree**: bright from the start, no hover change; the chosen one gets a thin outline. The split moved under the buttons, centred: "`{{agree_pct}}% agree · {{tap_count}} taps`", "You agree" / "You disagree" below three taps. The word is **taps** everywhere ("Taps closed. Resolution next."); `trade_count` is now `tap_count`.
-- **History faces**: meta reads "called `{{market.called_date}}` · odds `{{market.called_pct}}` · his number `{{market.called_number}}`"; `{{market.change_count}}` > 0 adds a "changed n time(s)" tag under the call.
+**UI Revisions (Oct 23 evening spec, built Oct 23–24; only the additions, the settled layout stays).**
+- **Card face**: the big call is still **Buy YES** green / **Buy NO** red, now from `{{market.side}}` / `{{market.side_upper}}`, with five conviction stars beside it (`{{market.conviction}}` filled green; hidden only when the carousel root's `data-show-conviction="{{show_conviction}}"` is `false`). The meta row is "{{market.called_pct}} at call · volume · time to close". Cards stay 196px desktop / 184px phone.
+- **Thesis block**: the purple marker beside the label is now the time line, `{{market.time_line}}` ("called 2d ago" / "revised 2h ago" / "changed 2h ago" by `{{market.state}}` called / revised / changed; the block capitalises it). When the state is `changed` a purple line above the text reads `{{market.change_note}}` ("Changed his mind on Oct 23. He had called NO.").
+- **Agree / Disagree**: unchanged (soft at rest, bright on hover / chosen, split beside the buttons). The split reads "`{{agree_pct}}% agree · {{tap_count}} taps`"; the word is **taps** everywhere ("Taps closed. Resolution next."); `trade_count` is now `tap_count`.
 - **How it works**: a link in the desktop nav next to Docs and first in the menu opens a four-slide click-through on the onboarding shell (`partials/how-it-works.html`, placeholder titles, `[COPY]` lines) every time. Onboarding itself now opens only on a first visit.
-- **Variable renames**: the History tag after the odds is `{{market.outcome_tag}}` (was `market.state`). Retired: `market.thesis_stance`, `market.thesis_stance_upper`, `market.called_ago`, `revised_ago`, `revised_number`, `trade_count`, `prophet_probability`.
+- **Variable renames**: the History tag after the odds is `{{market.outcome_tag}}` (was `market.state`). Retired: `market.thesis_stance`, `market.thesis_stance_upper`, `market.called_ago`, `revised_ago`, `revised_number`, `trade_count`, `prophet_probability`. Not built: `market.against_market`, `market.called_date`, `market.called_number`, `market.change_count` — the Against the market tag and the History number line were dropped by the founder.
 
 **UI Revisions (Oct 22 spec, built Oct 22).** Votes and takes are gone from the
 product; the two verbs are Agree and Disagree.
@@ -234,13 +232,11 @@ or modal root is the whole contract.
 | `data-state` | `market.filter_state` | `called` (All) · `resolved` (History) |
 | `data-slug` | `market.slug` | row key |
 | `data-label` | `label` | buy_yes · buy_no |
-| `data-side` | `market.side` | yes / no; the face prints `market.side_upper` |
-| `data-call-kind`, `data-time-line` | `market.state`, `market.time_line` | called / revised / changed and the meta row's first line |
-| `data-called-pct` | `market.called_pct` | odds at the call; the Tap Confirmed price and the History face |
-| `data-called-date`, `data-called-number`, `data-change-count` | `market.called_date`, `market.called_number`, `market.change_count` | History face: "called Sep 12 · odds 74% · his number 31%" and the "changed n times" tag |
+| `data-side` | `market.side` | yes / no; the face prints Buy `market.side_upper` |
+| `data-call-kind`, `data-time-line` | `market.state`, `market.time_line` | called / revised / changed and the purple marker beside the Thesis label |
+| `data-called-pct` | `market.called_pct` | odds at the call: the meta row's "84% at call" and the Tap Confirmed price |
 | `data-change-note` | `market.change_note` | shown in the block when `data-call-kind` is changed |
-| `data-against-market` | `market.against_market` | `true` shows the Against the market tag |
-| `data-conviction` | `market.conviction` | 1–5; renders only when the carousel root has `data-show-conviction="true"` (`show_conviction`) |
+| `data-conviction` | `market.conviction` | 1–5 stars beside the call; hidden only when the carousel root has `data-show-conviction="false"` (`show_conviction`) |
 | `data-thesis` | `market.thesis` | the thesis, latest revision |
 | `data-call-state` | `call_state` | live / resolved / void / closed |
 | `data-leg-date` | `listed_leg_date` | ladder markets: the leg's date; also printed on the face |
@@ -334,11 +330,11 @@ Other globals: `window.prophetOnboarding.open()`, `window.prophetHowItWorks.open
 
 ## 10. Variable reference
 
-74 variables actually present in the files right now, with where each appears.
+70 variables actually present in the files right now, with where each appears.
 
 | Variable | Where | Holds |
 |---|---|---|
-| `{{agree_pct}}` | Home | Agree / Disagree under the thesis: the user's side (`agree` / `disagree` / empty) is marked with a thin outline; from three taps the split under the buttons reads "71% agree · 38 taps" — the server's figure, unchanged by the user's own tap — below that only "You agree" / "You disagree"; `market_closed` `true` disables both buttons and shows "Taps closed. Resolution next." Signed-in only: a signed-out tap fires `prophet:signin` with `{then: 'agree', slug}` |
+| `{{agree_pct}}` | Home | Agree / Disagree under the thesis: the user's side (`agree` / `disagree` / empty) is marked; from three taps the split beside the buttons reads "71% agree · 38 taps" — the server's figure, unchanged by the user's own tap — below that only "You agree" / "You disagree"; `market_closed` `true` disables both buttons and shows "Taps closed. Resolution next." Signed-in only: a signed-out tap fires `prophet:signin` with `{then: 'agree', slug}` |
 | `{{buy_url}}` | $PROPHET; Home; below-fold | Buy $PROPHET link (pump.fun) |
 | `{{call_state}}` | Home | `live` / `resolved` / `void` / `closed`. Void shows "Market closed by Polymarket before resolution."; closed shows "Awaiting resolution" |
 | `{{contract_address}}` | $PROPHET; Home; header | $PROPHET contract address; the header pill shows first 6 … last 6 and copies the full value |
@@ -348,15 +344,11 @@ Other globals: `window.prophetOnboarding.open()`, `window.prophetHowItWorks.open
 | `{{linkedin_url}}` | $PROPHET; Home; footer; header | Link to the project's LinkedIn page |
 | `{{listed_leg_date}}` | Home | Ladder markets only: the leg's date (e.g. `Oct 20`), small and gray beside the question on the card face. Empty otherwise. When a leg rolls, the card returns to not evaluated with the next date and the old leg goes to History as resolved |
 | `{{logout_url}}` | $PROPHET; Home; header | The Logout link in the header and menu; render the link only when `{{viewer.signed_in}}` is true. While unfilled, the click fires a `prophet:logout` event and shows the Logged out notice |
-| `{{market.against_market}}` | Home | `true` when his side is the one the market prices under 50%: the outlined "Against the market" tag under the call. Empty or `false` otherwise |
-| `{{market.called_date}}` | Home | History faces: the meta row reads "called Sep 12 · odds {called_pct} · his number {called_number}"; `change_count` above zero adds a "changed n time(s)" tag under the call. Carried on every card; shown on History only |
-| `{{market.called_number}}` | Home | History faces: the meta row reads "called Sep 12 · odds {called_pct} · his number {called_number}"; `change_count` above zero adds a "changed n time(s)" tag under the call. Carried on every card; shown on History only |
-| `{{market.called_pct}}` | Home | Odds when the call was made, e.g. `84%`. Carried as `data-called-pct` for the Tap Confirmed line ("Buy YES at 84") and printed on History faces as "odds 84%"; not printed on a live face |
-| `{{market.change_count}}` | Home | History faces: the meta row reads "called Sep 12 · odds {called_pct} · his number {called_number}"; `change_count` above zero adds a "changed n time(s)" tag under the call. Carried on every card; shown on History only |
+| `{{market.called_pct}}` | Home | Odds when the call was made, e.g. `84%`. First item of the meta row, "84% at call"; also the Tap Confirmed price ("Buy YES at 84") |
 | `{{market.change_note}}` | Home | `market.state` changed: one line above the thesis in the block, "Changed his mind on Oct 23. He had called NO." (the call's own date prints as a date). Empty otherwise |
-| `{{market.conviction}}` | Home | Conviction 1–5, carried as `data-conviction`; a star row under the call renders only when `show_conviction` (on the carousel root) is `true`. Off at launch |
+| `{{market.conviction}}` | Home | Conviction 1–5, carried as `data-conviction`; five stars beside the call, the first n filled green. `show_conviction` on the carousel root hides them when it is `false`; anything else shows them |
 | `{{market.ends_in}}` | Home | Relative time until the market ends (e.g. "12d", "3mo"), shown after a clock icon |
-| `{{market.filter_state}}` | Home | `called` (All: every listed market with a call) or `resolved` (History); the two tabs |
+| `{{market.filter_state}}` | Home | `called` (the Calls deck) or `resolved` (History); the two tabs |
 | `{{market.image_url}}` | Home | Market image, imported from Polymarket (44px square on the card) |
 | `{{market.outcome}}` | Home | History: `right` / `wrong` / `void` / `awaiting` — the tag in the badge and the outcome line |
 | `{{market.outcome_tag}}` | Home | After the odds, top-right: empty for a live call; in History the tag `<span class="prow__outcome prow__outcome--right">right</span>` (right · wrong · void · awaiting). Was `market.state` before Oct 23 |
@@ -364,23 +356,23 @@ Other globals: `window.prophetOnboarding.open()`, `window.prophetHowItWorks.open
 | `{{market.resolved_ago}}` | Home | Relative time since resolution, e.g. `2w ago` |
 | `{{market.resolved_pct}}` | Home | Closing YES % at settlement, e.g. `97%` |
 | `{{market.resolved_side}}` | Home | `yes` / `no` — the side the market settled on |
-| `{{market.side}}` | Home | `yes` / `no` and `YES` / `NO`: his call, printed big on the card as YES (green) or NO (red) under the small "His call" caption. Replace `thesis_stance` / `thesis_stance_upper` |
-| `{{market.side_upper}}` | Home | `yes` / `no` and `YES` / `NO`: his call, printed big on the card as YES (green) or NO (red) under the small "His call" caption. Replace `thesis_stance` / `thesis_stance_upper` |
+| `{{market.side}}` | Home | `yes` / `no` and `YES` / `NO`: the call, printed big on the card as "Buy YES" (green) or "Buy NO" (red). Replace `thesis_stance` / `thesis_stance_upper` |
+| `{{market.side_upper}}` | Home | `yes` / `no` and `YES` / `NO`: the call, printed big on the card as "Buy YES" (green) or "Buy NO" (red). Replace `thesis_stance` / `thesis_stance_upper` |
 | `{{market.slug}}` | Home | URL-safe identifier for the market (used in `<!-- repeat: market -->`) |
 | `{{market.state}}` | Home | `called` / `revised` / `changed` — the call's state, carried as `data-call-kind`. `changed` shows the change note in the block |
 | `{{market.thesis}}` | Home | Full thesis text (called) or draft thesis (vote open), set as `data-thesis` on the card; shown in the Thesis block above the takes when the card is selected; empty otherwise |
-| `{{market.time_line}}` | Home | First item of the meta row, one line by state: "called 2d ago" / "revised 2h ago" / "changed 2h ago" (relative). Replaces `called_ago` and the Revised marker |
+| `{{market.time_line}}` | Home | The purple marker beside the Thesis label, one line by state: "called 2d ago" / "revised 2h ago" / "changed 2h ago" (relative; the block capitalises it). Replaces `called_ago` and `revised_ago` |
 | `{{market.volume}}` | Home | Polymarket volume, short form (e.g. "$4.1M"), shown after a bar-chart icon |
 | `{{market.yes_pct}}` | Home | Current YES percentage (e.g. "72%"); once resolved, the settled 100% / 0% |
-| `{{market_closed}}` | Home | Agree / Disagree under the thesis: the user's side (`agree` / `disagree` / empty) is marked with a thin outline; from three taps the split under the buttons reads "71% agree · 38 taps" — the server's figure, unchanged by the user's own tap — below that only "You agree" / "You disagree"; `market_closed` `true` disables both buttons and shows "Taps closed. Resolution next." Signed-in only: a signed-out tap fires `prophet:signin` with `{then: 'agree', slug}` |
+| `{{market_closed}}` | Home | Agree / Disagree under the thesis: the user's side (`agree` / `disagree` / empty) is marked; from three taps the split beside the buttons reads "71% agree · 38 taps" — the server's figure, unchanged by the user's own tap — below that only "You agree" / "You disagree"; `market_closed` `true` disables both buttons and shows "Taps closed. Resolution next." Signed-in only: a signed-out tap fires `prophet:signin` with `{then: 'agree', slug}` |
 | `{{pool_last_week}}` | $PROPHET | Last week's reward pool; the line reads "paid to the community" |
 | `{{pumpfun_url}}` | $PROPHET; Home; footer; header | $PROPHET on pump.fun (footer token link) |
-| `{{show_conviction}}` | Home | Conviction 1–5, carried as `data-conviction`; a star row under the call renders only when `show_conviction` (on the carousel root) is `true`. Off at launch |
+| `{{show_conviction}}` | Home | Conviction 1–5, carried as `data-conviction`; five stars beside the call, the first n filled green. `show_conviction` on the carousel root hides them when it is `false`; anything else shows them |
 | `{{solscan_url}}` | $PROPHET; Home; footer; header | $PROPHET on Solscan (footer token link) |
 | `{{swap_impact}}` | $PROPHET | Swap meta line, left: slip and price impact |
 | `{{swap_slippage}}` | $PROPHET | Swap meta line, left: slip and price impact |
 | `{{swap_sol_balance}}` | $PROPHET | The viewer's SOL balance, right of the swap meta line (e.g. "2.41 SOL") |
-| `{{tap_count}}` | Home | Agree / Disagree under the thesis: the user's side (`agree` / `disagree` / empty) is marked with a thin outline; from three taps the split under the buttons reads "71% agree · 38 taps" — the server's figure, unchanged by the user's own tap — below that only "You agree" / "You disagree"; `market_closed` `true` disables both buttons and shows "Taps closed. Resolution next." Signed-in only: a signed-out tap fires `prophet:signin` with `{then: 'agree', slug}` |
+| `{{tap_count}}` | Home | Agree / Disagree under the thesis: the user's side (`agree` / `disagree` / empty) is marked; from three taps the split beside the buttons reads "71% agree · 38 taps" — the server's figure, unchanged by the user's own tap — below that only "You agree" / "You disagree"; `market_closed` `true` disables both buttons and shows "Taps closed. Resolution next." Signed-in only: a signed-out tap fires `prophet:signin` with `{then: 'agree', slug}` |
 | `{{tap_modal.confirm_agree}}` | Home | The confirmation line; `{label}` (Buy YES green / Buy NO red), `{verdict}` (right / wrong, plain) and `{price}` are filled from the card and the side. Approved copy while unfilled: "You're calling him {verdict}. {label} at {price}. Let's see if you're both right." / "You're calling him {verdict}. {label} at {price}, you say that's {verdict}." |
 | `{{tap_modal.confirm_disagree}}` | Home | The confirmation line; `{label}` (Buy YES green / Buy NO red), `{verdict}` (right / wrong, plain) and `{price}` are filled from the card and the side. Approved copy while unfilled: "You're calling him {verdict}. {label} at {price}. Let's see if you're both right." / "You're calling him {verdict}. {label} at {price}, you say that's {verdict}." |
 | `{{tap_modal.scoring_line}}` | Home | Approved copy while unfilled: "Scored when the market resolves. Right or wrong, it's on your record and you'll earn XP." |
@@ -403,7 +395,7 @@ Other globals: `window.prophetOnboarding.open()`, `window.prophetHowItWorks.open
 | `{{trade.amount}}` | $PROPHET | Live-trades strip (`<!-- repeat: trade -->`): `buy` / `sell` and the amount |
 | `{{trade.side}}` | $PROPHET | Live-trades strip (`<!-- repeat: trade -->`): `buy` / `sell` and the amount |
 | `{{tradeleague_url}}` | $PROPHET; Home; footer | Link for the "Automated by TradeLeague" footer lockup |
-| `{{user_side}}` | Home | Agree / Disagree under the thesis: the user's side (`agree` / `disagree` / empty) is marked with a thin outline; from three taps the split under the buttons reads "71% agree · 38 taps" — the server's figure, unchanged by the user's own tap — below that only "You agree" / "You disagree"; `market_closed` `true` disables both buttons and shows "Taps closed. Resolution next." Signed-in only: a signed-out tap fires `prophet:signin` with `{then: 'agree', slug}` |
+| `{{user_side}}` | Home | Agree / Disagree under the thesis: the user's side (`agree` / `disagree` / empty) is marked; from three taps the split beside the buttons reads "71% agree · 38 taps" — the server's figure, unchanged by the user's own tap — below that only "You agree" / "You disagree"; `market_closed` `true` disables both buttons and shows "Taps closed. Resolution next." Signed-in only: a signed-out tap fires `prophet:signin` with `{then: 'agree', slug}` |
 | `{{viewer.signed_in}}` | $PROPHET; Home; header | `true` / `false`, on the thesis block. When false an Agree / Disagree tap fires `prophet:signin` instead |
 | `{{wallet_burn_url}}` | $PROPHET | Explorer links for the three public wallets (Trading Wallet, Rewards Pool, Buy-and-Burn); shown as labels, never as addresses |
 | `{{wallet_burn_value}}` | $PROPHET | Tokens burned, red (e.g. "8.4M"); the "$PROPHET" ticker after it stays gray, then a red flame icon |

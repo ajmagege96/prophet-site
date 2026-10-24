@@ -158,7 +158,7 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
   var thesisText = document.querySelector('[data-thesis-text]');
   var thesisLabel = document.querySelector('[data-thesis-label]');
   var thesisOutcome = document.querySelector('[data-thesis-outcome]');
-  var thesisChange = document.querySelector('[data-thesis-change]'), thesisSplit = document.querySelector('[data-thesis-split]'), adWrap = document.querySelector('[data-ad]');
+  var thesisRevised = document.querySelector('[data-thesis-revised]'), thesisChange = document.querySelector('[data-thesis-change]'), thesisSplit = document.querySelector('[data-thesis-split]'), adWrap = document.querySelector('[data-ad]');
   var taps = {};   /* slug -> 'agree' | 'disagree' (mock, in-memory; the server keeps the real side) */
   var VOID_LINE = 'Market closed by Polymarket before resolution.';
   function labelHTML(key) { return key === 'buy_yes' ? '<span class="lbl lbl--yes">Buy YES</span>' : key === 'buy_no' ? '<span class="lbl lbl--no">Buy NO</span>' : key === 'hold' ? '<span class="lbl lbl--hold">Hold</span>' : ''; }
@@ -351,26 +351,15 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
     });
   }
 
-  /* ── Card faces ── painted once: which meta spans show, the Against the market tag, the conviction row */
+  /* ── Card faces ── painted once: the conviction stars beside the call (hidden only when show_conviction is "false") */
   var deckRoot = track.closest('[data-carousel]');
-  var showConviction = !!deckRoot && deckRoot.getAttribute('data-show-conviction') === 'true';
+  var showConviction = !deckRoot || deckRoot.getAttribute('data-show-conviction') !== 'false';
   function paintFace(card) {
-    var history = (card.dataset.state || '') === 'resolved';
-    var n = parseInt(card.dataset.changeCount || '0', 10) || 0;
-    var m = { time: !history, called: history, changed: history && n > 0, volume: !history, ends: !history };
-    var spans = card.querySelectorAll('[data-m]');
-    for (var i = 0; i < spans.length; i++) {
-      var k = spans[i].getAttribute('data-m');
-      spans[i].hidden = !m[k];
-      if (k === 'changed') spans[i].textContent = 'changed ' + n + ' time' + (n === 1 ? '' : 's');
-    }
-    var ag = card.querySelector('[data-against]'); if (ag) ag.hidden = card.dataset.againstMarket !== 'true';
     var cv = card.querySelector('[data-conviction-row]');
-    if (cv) {
-      var c = parseInt(card.dataset.conviction || '0', 10) || 0;
-      cv.hidden = !(showConviction && c > 0);
-      if (!cv.hidden) { var h = ''; for (var s = 1; s <= 5; s++) h += '<span class="carousel__star' + (s <= c ? ' carousel__star--on' : '') + '">' + STAR_SVG + '</span>'; cv.innerHTML = h; }
-    }
+    if (!cv) return;
+    var c = parseInt(card.dataset.conviction || '0', 10) || 0;
+    cv.hidden = !(showConviction && c > 0);
+    if (!cv.hidden) { var h = ''; for (var s = 1; s <= 5; s++) h += '<span class="carousel__star' + (s <= c ? ' carousel__star--on' : '') + '">' + STAR_SVG + '</span>'; cv.innerHTML = h; }
   }
 
   /* ── Thesis block (live / resolved markets) ── */
@@ -382,7 +371,9 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
     var history = state === 'resolved';
     thesisBox.hidden = false;
     thesisLabel.textContent = 'Thesis';
-    /* market.state "changed": the change note sits above the thesis; the time line on the card carries revised / changed */
+    /* the time line in purple beside the label: Called 3d ago / Revised 3h ago / Changed 2h ago; a changed call adds the note */
+    var tl = history ? '' : (card.dataset.timeLine || '');
+    if (thesisRevised) thesisRevised.textContent = tl ? tl.charAt(0).toUpperCase() + tl.slice(1) : '';
     if (thesisChange) thesisChange.textContent = (card.dataset.callKind === 'changed' && !history) ? (card.dataset.changeNote || '') : '';
     thesisText.textContent = card.dataset.thesis || '';
     /* History: how it played out */

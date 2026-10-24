@@ -25,12 +25,10 @@
 | `{{market.ends_in}}` | Relative time until the market ends (e.g. "12d", "3mo"), shown after a clock icon |
 | `{{label}}` | `buy_yes` / `buy_no`, carried on the card as `data-label`. Never inside the thesis text |
 | `{{market.state}}` | `called` / `revised` / `changed` — the call's state, carried as `data-call-kind`. `changed` shows the change note in the block |
-| `{{market.time_line}}` | First item of the meta row, one line by state: "called 2d ago" / "revised 2h ago" / "changed 2h ago" (relative). Replaces `called_ago` and the Revised marker |
-| `{{market.against_market}}` | `true` when his side is the one the market prices under 50%: the outlined "Against the market" tag under the call. Empty or `false` otherwise |
-| `{{market.conviction}}`, `{{show_conviction}}` | Conviction 1–5, carried as `data-conviction`; a star row under the call renders only when `show_conviction` (on the carousel root) is `true`. Off at launch |
+| `{{market.time_line}}` | The purple marker beside the Thesis label, one line by state: "called 2d ago" / "revised 2h ago" / "changed 2h ago" (relative; the block capitalises it). Replaces `called_ago` and `revised_ago` |
+| `{{market.conviction}}`, `{{show_conviction}}` | Conviction 1–5, carried as `data-conviction`; five stars beside the call, the first n filled green. `show_conviction` on the carousel root hides them when it is `false`; anything else shows them |
 | `{{market.change_note}}` | `market.state` changed: one line above the thesis in the block, "Changed his mind on Oct 23. He had called NO." (the call's own date prints as a date). Empty otherwise |
-| `{{market.called_date}}`, `{{market.called_number}}`, `{{market.change_count}}` | History faces: the meta row reads "called Sep 12 · odds {called_pct} · his number {called_number}"; `change_count` above zero adds a "changed n time(s)" tag under the call. Carried on every card; shown on History only |
-| `{{agree_pct}}`, `{{tap_count}}`, `{{user_side}}`, `{{market_closed}}` | Agree / Disagree under the thesis: the user's side (`agree` / `disagree` / empty) is marked with a thin outline; from three taps the split under the buttons reads "71% agree · 38 taps" — the server's figure, unchanged by the user's own tap — below that only "You agree" / "You disagree"; `market_closed` `true` disables both buttons and shows "Taps closed. Resolution next." Signed-in only: a signed-out tap fires `prophet:signin` with `{then: 'agree', slug}` |
+| `{{agree_pct}}`, `{{tap_count}}`, `{{user_side}}`, `{{market_closed}}` | Agree / Disagree under the thesis: the user's side (`agree` / `disagree` / empty) is marked; from three taps the split beside the buttons reads "71% agree · 38 taps" — the server's figure, unchanged by the user's own tap — below that only "You agree" / "You disagree"; `market_closed` `true` disables both buttons and shows "Taps closed. Resolution next." Signed-in only: a signed-out tap fires `prophet:signin` with `{then: 'agree', slug}` |
 | `{{market.outcome}}` | History: `right` / `wrong` / `void` / `awaiting` — the tag in the badge and the outcome line |
 | `{{call_state}}` | `live` / `resolved` / `void` / `closed`. Void shows "Market closed by Polymarket before resolution."; closed shows "Awaiting resolution" |
 | `{{listed_leg_date}}` | Ladder markets only: the leg's date (e.g. `Oct 20`), small and gray beside the question on the card face. Empty otherwise. When a leg rolls, the card returns to not evaluated with the next date and the old leg goes to History as resolved |
@@ -38,10 +36,10 @@
 | `{{market.resolved_side}}` | `yes` / `no` — the side the market settled on |
 | `{{market.resolved_pct}}` | Closing YES % at settlement, e.g. `97%` |
 | `{{market.resolved_ago}}` | Relative time since resolution, e.g. `2w ago` |
-| `{{market.called_pct}}` | Odds when the call was made, e.g. `84%`. Carried as `data-called-pct` for the Tap Confirmed line ("Buy YES at 84") and printed on History faces as "odds 84%"; not printed on a live face |
-| `{{market.side}}`, `{{market.side_upper}}` | `yes` / `no` and `YES` / `NO`: his call, printed big on the card as YES (green) or NO (red) under the small "His call" caption. Replace `thesis_stance` / `thesis_stance_upper` |
+| `{{market.called_pct}}` | Odds when the call was made, e.g. `84%`. First item of the meta row, "84% at call"; also the Tap Confirmed price ("Buy YES at 84") |
+| `{{market.side}}`, `{{market.side_upper}}` | `yes` / `no` and `YES` / `NO`: the call, printed big on the card as "Buy YES" (green) or "Buy NO" (red). Replace `thesis_stance` / `thesis_stance_upper` |
 | `{{market.thesis}}` | Full thesis text (called) or draft thesis (vote open), set as `data-thesis` on the card; shown in the Thesis block above the takes when the card is selected; empty otherwise |
-| `{{market.filter_state}}` | `called` (All: every listed market with a call) or `resolved` (History); the two tabs |
+| `{{market.filter_state}}` | `called` (the Calls deck) or `resolved` (History); the two tabs |
 | `{{buy_url}}` | Buy $PROPHET link (pump.fun) |
 
 ### Prophecies page
