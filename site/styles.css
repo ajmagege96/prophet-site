@@ -341,8 +341,12 @@ ul, ol { list-style: none; }
   transition: border-color 0.15s;
 }
 .carousel__card:hover { border-color: rgba(242, 240, 230, 0.3); }
-/* The selected card is not outlined brighter; it flashes green on the same beat as the thesis block */
-.carousel__card--pulse, .carousel__card--pulse:hover { border-color: rgba(16, 240, 95, 0.36); box-shadow: 0 0 12px 0 rgba(16, 240, 95, 0.13); transition: border-color 0.5s ease-in-out, box-shadow 0.5s ease-in-out; }
+.carousel__card--active,
+.carousel__card--active:hover {
+  border-color: rgba(242, 240, 230, 0.7);
+}
+/* The selected card keeps its brighter outline and flashes green on the same beat as the thesis block */
+.carousel__card--active.carousel__card--pulse, .carousel__card--active.carousel__card--pulse:hover { border-color: rgba(16, 240, 95, 0.36); box-shadow: 0 0 12px 0 rgba(16, 240, 95, 0.13); transition: border-color 0.5s ease-in-out, box-shadow 0.5s ease-in-out; }
 
 .carousel__top {
   display: flex;

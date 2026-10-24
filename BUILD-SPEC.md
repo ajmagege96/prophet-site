@@ -161,7 +161,7 @@ Nothing about the user's taps appears in History.
 
 - The home hero is as tall as its content; How it Works follows the Agree /
   Disagree row directly. The $PROPHET panel is unchanged.
-- The selected card no longer carries a brighter outline; it flashes green on
+- The selected card keeps its brighter outline and also flashes green on
   the same 3s beat as the thesis block, at every width, so the thesis reads as
   that market's. Decorative.
 - The decorative circuit board now runs around the thesis block (it used to run
