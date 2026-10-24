@@ -1053,7 +1053,7 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
     bar.classList.add('thesis--pulse');
     var card = document.querySelector('[data-card].carousel__card--active');
     if (card) card.classList.add('carousel__card--pulse');
-    setTimeout(function () { bar.classList.remove('thesis--pulse'); if (card) card.classList.remove('carousel__card--pulse'); }, 900);
+    setTimeout(function () { bar.classList.remove('thesis--pulse'); if (card) card.classList.remove('carousel__card--pulse'); }, 1000);
     if (!drawing) return;
     var route = null;
     for (var i = 0; i < 40 && !route; i++) route = makeRoute();

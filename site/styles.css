@@ -344,9 +344,10 @@ ul, ol { list-style: none; }
 .carousel__card--active,
 .carousel__card--active:hover {
   border-color: rgba(242, 240, 230, 0.7);
+  transition: border-color 0.9s ease-in-out, box-shadow 0.9s ease-in-out;   /* the flash builds and releases slowly */
 }
 /* The selected card keeps its brighter outline and flashes green on the same beat as the thesis block */
-.carousel__card--active.carousel__card--pulse, .carousel__card--active.carousel__card--pulse:hover { border-color: rgba(16, 240, 95, 0.36); box-shadow: 0 0 12px 0 rgba(16, 240, 95, 0.13); transition: border-color 0.5s ease-in-out, box-shadow 0.5s ease-in-out; }
+.carousel__card--active.carousel__card--pulse, .carousel__card--active.carousel__card--pulse:hover { border-color: rgba(16, 240, 95, 0.5); box-shadow: 0 0 12px 0 rgba(16, 240, 95, 0.13); }
 
 .carousel__top {
   display: flex;
@@ -575,6 +576,7 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
   padding: 12px 14px;
   margin-bottom: 8px;
   border-color: rgba(242, 240, 230, 0.7);   /* same highlight as a selected card */
+  transition: border-color 0.9s ease-in-out, box-shadow 0.9s ease-in-out;   /* the flash builds and releases slowly */
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -655,7 +657,7 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
 .thesis__atcall { font-size: 11px; opacity: 0.5; white-space: nowrap; }
 .thesis__atcall:empty { display: none; }
 /* The thesis block's frame glows for a moment as each pulse of the board leaves it */
-.thesis--pulse { border-color: rgba(16, 240, 95, 0.36); box-shadow: 0 0 12px 0 rgba(16, 240, 95, 0.13); transition: border-color 0.5s ease-in-out, box-shadow 0.5s ease-in-out; }
+.thesis--pulse { border-color: rgba(16, 240, 95, 0.5); box-shadow: 0 0 12px 0 rgba(16, 240, 95, 0.13); }
 .prow__outcome--right { color: var(--green); }
 .prow__outcome--wrong { color: #e53935; }
 .prow__outcome--awaiting { color: rgba(242, 240, 230, 0.55); }
