@@ -112,8 +112,8 @@ A centred row under the block, live calls only (hidden on History):
   `{{user_side}}` says so.
 - A tap marks the side. Tapping the other switches it. Tapping the chosen one
   again deselects it. `{{market_closed}}` `true` disables both and shows
-  `"Taps closed. Resolution next."` beside them.
-- Beside the buttons, from three taps: **`{{agree_pct}}% agree ·
+  `"Taps closed. Resolution next."` under them.
+- Under the buttons, centred, from three taps: **`{{agree_pct}}% agree ·
   {{tap_count}} taps`** (e.g. "71% agree · 38 taps"). Below three taps and
   with a side chosen: "You agree" / "You disagree". The figure is the server's;
   the client never recomputes it on a tap — re-render it from the endpoint.
@@ -200,7 +200,7 @@ Descriptions in `TEMPLATE_VARS.md`; the generated table in `HANDOFF.md` §10.
   changed call also shows the change note.
 - Agree / Disagree: soft at rest, bright on hover / chosen, no outline, deselect
   works, closed markets disable with "Taps closed. Resolution next.", the split
-  beside the buttons never moves on a tap, the word is taps.
+  under the buttons never moves on a tap, the word is taps.
 - How it works opens from the header and the menu every time; onboarding only
   on a first visit.
 - Signed out: a tap fires `prophet:signin` and nothing else; `prophetTap.land`
