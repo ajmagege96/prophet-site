@@ -24,10 +24,9 @@
 | `{{market.volume}}` | Polymarket volume, short form (e.g. "$4.1M"), shown after a bar-chart icon |
 | `{{market.ends_in}}` | Relative time until the market ends (e.g. "12d", "3mo"), shown after a clock icon |
 | `{{label}}` | `buy_yes` / `buy_no`, carried on the card as `data-label`. Never inside the thesis text |
-| `{{market.state}}` | `called` / `revised` / `changed` — the call's state, carried as `data-call-kind`. `changed` shows the change note in the block |
+| `{{market.state}}` | `called` / `revised` / `changed` — the call's state, carried as `data-call-kind` |
 | `{{market.time_line}}` | The purple marker beside the Thesis label, one line by state: "called 2d ago" / "revised 2h ago" / "changed 2h ago" (relative; the block capitalises it). Replaces `called_ago` and `revised_ago` |
 | `{{market.conviction}}`, `{{show_conviction}}` | Conviction 1–5, carried as `data-conviction`; five stars first in the meta row (bottom-left), the first n filled in the call's colour (green for Buy YES, red for Buy NO), the rest faint in the same colour. `show_conviction` on the carousel root hides them when it is `false`; anything else shows them |
-| `{{market.change_note}}` | `market.state` changed: one line above the thesis in the block, "Changed his mind on Oct 23. He had called NO." (the call's own date prints as a date). Empty otherwise |
 | `{{agree_pct}}`, `{{tap_count}}`, `{{user_side}}`, `{{market_closed}}` | Agree / Disagree under the thesis: the user's side (`agree` / `disagree` / empty) is kept; from three taps the split under the buttons reads "71% agree · 38 taps" — the server's figure, unchanged by the user's own tap — below that only "You agree" / "You disagree"; `market_closed` `true` disables both buttons and shows "Taps closed. Resolution next." Signed-in only: a signed-out tap fires `prophet:signin` with `{then: 'agree', slug}` |
 | `{{market.outcome}}` | History: `right` / `wrong` / `void` / `awaiting` — the tag in the badge and the outcome line |
 | `{{call_state}}` | `live` / `resolved` / `void` / `closed`. Void shows "Market closed by Polymarket before resolution."; closed shows "Awaiting resolution" |

@@ -81,7 +81,7 @@ Top to bottom, for every card:
 
 Card attributes the client reads: `data-state`, `data-slug`, `data-label`,
 `data-side`, `data-call-kind`, `data-time-line`, `data-called-pct`,
-`data-change-note`, `data-conviction`, `data-call-state`,
+`data-conviction`, `data-call-state`,
 `data-outcome`, `data-resolved-side`, `data-resolved-pct`, `data-resolved-ago`,
 `data-leg-date`, `data-agree-pct`, `data-tap-count`, `data-user-side`,
 `data-market-closed`, `data-thesis`.
@@ -95,8 +95,6 @@ card. Contents, and nothing else:
   `{{market.time_line}}` — "Called 3d ago" / "Revised 3h ago" / "Changed 2h
   ago" by `{{market.state}}` (the client capitalises the first letter). No tap
   behaviour.
-- When `{{market.state}}` is `changed`: one purple line above the text,
-  `{{market.change_note}}` — "Changed his mind on Oct 23. He had called NO."
 - The thesis text, the latest revision (`{{market.thesis}}`).
 - History only: one line under the text — `Resolved YES · right · 2w ago`
   (right green / wrong red), or `"Market closed by Polymarket before
@@ -183,9 +181,9 @@ its own only once per device. Globals: `window.prophetHowItWorks.open()`,
 
 Oct 23 evening: `market.side`, `market.side_upper`, `market.time_line`,
 `market.state` (called / revised / changed), `market.conviction`,
-`show_conviction`, `market.change_note`, `tap_count`. Not built, by the
-founder's call: `market.against_market`, `market.called_date`,
-`market.called_number`, `market.change_count`. The History tag after the odds is now `market.outcome_tag` (it was
+`show_conviction`, `tap_count`. Not built, by the founder's call:
+`market.against_market`, `market.called_date`, `market.called_number`,
+`market.change_count`, `market.change_note`. The History tag after the odds is now `market.outcome_tag` (it was
 `market.state`). Retired: `market.thesis_stance`, `market.thesis_stance_upper`,
 `market.called_ago`, `revised_ago`, `revised_number`, `trade_count`,
 `prophet_probability` (nothing rendered it).
@@ -203,8 +201,7 @@ Descriptions in `TEMPLATE_VARS.md`; the generated table in `HANDOFF.md` §10.
 - Every card: odds top-right, the big Buy YES / Buy NO in the right colour, the
   stars bottom-left in that colour (faint on the unfilled ones), no at-call stat, three meta items on one
   line, no overflow at 390px.
-- The purple marker beside Thesis reads Called / Revised / Changed by state; a
-  changed call also shows the change note.
+- The purple marker beside Thesis reads Called / Revised / Changed by state.
 - Agree / Disagree: bright from the start, no hover change, no outline, deselect
   works, closed markets disable with "Taps closed. Resolution next.", the split
   under the buttons never moves on a tap, the word is taps.

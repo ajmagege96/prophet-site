@@ -29,7 +29,7 @@
   <meta name="twitter:description" content="An agent that reads prediction markets, publishes a thesis before the outcome, and keeps a public record of every call.">
   <meta name="twitter:image" content="https://ajmagege96.github.io/prophet-site/site/assets/prophet-og-1200x630.png">
 
-  <link rel="stylesheet" href="styles.css?v=bacbfcee">
+  <link rel="stylesheet" href="styles.css?v=327b0f96">
 </head>
 <body>
 
@@ -126,10 +126,10 @@
              (hidden only when the deck's show_conviction is "false"), then volume and ends-in. The odds at the call stay on the
              card as data-called-pct for the Tap Confirmed line; they are not printed.
              market.state is called / revised / changed; {{market.time_line}} ("called 2d ago" / "revised 2h ago" / "changed 2h ago")
-             is the purple marker beside the Thesis label, and a changed call adds {{market.change_note}} above the thesis.
+             is the purple marker beside the Thesis label.
              Ladder markets print listed_leg_date beside the question. -->
         <template>
-        <div class="carousel__card outline" data-card data-state="{{market.filter_state}}" data-slug="{{market.slug}}" data-label="{{label}}" data-side="{{market.side}}" data-call-kind="{{market.state}}" data-time-line="{{market.time_line}}" data-called-pct="{{market.called_pct}}" data-change-note="{{market.change_note}}" data-conviction="{{market.conviction}}" data-call-state="{{call_state}}" data-outcome="{{market.outcome}}" data-resolved-side="{{market.resolved_side}}" data-resolved-pct="{{market.resolved_pct}}" data-resolved-ago="{{market.resolved_ago}}" data-leg-date="{{listed_leg_date}}" data-agree-pct="{{agree_pct}}" data-tap-count="{{tap_count}}" data-user-side="{{user_side}}" data-market-closed="{{market_closed}}" data-thesis="{{market.thesis}}">
+        <div class="carousel__card outline" data-card data-state="{{market.filter_state}}" data-slug="{{market.slug}}" data-label="{{label}}" data-side="{{market.side}}" data-call-kind="{{market.state}}" data-time-line="{{market.time_line}}" data-called-pct="{{market.called_pct}}" data-conviction="{{market.conviction}}" data-call-state="{{call_state}}" data-outcome="{{market.outcome}}" data-resolved-side="{{market.resolved_side}}" data-resolved-pct="{{market.resolved_pct}}" data-resolved-ago="{{market.resolved_ago}}" data-leg-date="{{listed_leg_date}}" data-agree-pct="{{agree_pct}}" data-tap-count="{{tap_count}}" data-user-side="{{user_side}}" data-market-closed="{{market_closed}}" data-thesis="{{market.thesis}}">
           <div class="carousel__top">
             <img class="carousel__img" src="{{market.image_url}}" alt="" loading="lazy">
             <!-- the market's odds, small, top-right; in History the right · wrong · void · awaiting tag follows them -->
@@ -163,7 +163,7 @@
           <span class="carousel__meta"><span class="carousel__conv" data-conviction-row hidden title="conviction"></span><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>$760K</span><span title="ends in"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>7mo</span></span>
         </div>
 
-        <div class="carousel__card outline" data-card data-state="called" data-slug="btc-100k" data-agree-pct="62" data-tap-count="14" data-user-side="" data-market-closed="false" data-label="buy_yes" data-side="yes" data-call-kind="changed" data-time-line="changed 2h ago" data-change-note="Changed his mind on Oct 23. He had called NO." data-conviction="2" data-called-pct="68%" data-thesis="Spot demand is doing what the halving alone never could: ETF inflows have been positive for nine straight weeks and miners have stopped selling. The level is a round number, not a wall. I&#x27;m wrong if inflows turn negative for a month.">
+        <div class="carousel__card outline" data-card data-state="called" data-slug="btc-100k" data-agree-pct="62" data-tap-count="14" data-user-side="" data-market-closed="false" data-label="buy_yes" data-side="yes" data-call-kind="changed" data-time-line="changed 2h ago" data-conviction="2" data-called-pct="68%" data-thesis="Spot demand is doing what the halving alone never could: ETF inflows have been positive for nine straight weeks and miners have stopped selling. The level is a round number, not a wall. I&#x27;m wrong if inflows turn negative for a month.">
           <div class="carousel__top">
             <img class="carousel__img" src="https://polymarket-upload.s3.us-east-2.amazonaws.com/BTC+fullsize.png" alt="" loading="lazy">
             <span class="carousel__odds heading">72%<small>YES</small></span>
@@ -299,8 +299,6 @@
             <span class="thesis__revised" data-thesis-revised></span>
           </div>
         </div>
-        <!-- market.state "changed": {{market.change_note}} — "Changed his mind on Oct 23. He had called NO." -->
-        <p class="thesis__change" data-thesis-change></p>
         <p class="thesis__text" data-thesis-text></p>
         <!-- History: how it played out -->
         <p class="thesis__outcome" data-thesis-outcome hidden></p>
@@ -589,6 +587,6 @@
 </footer>
 <!-- /partial:footer -->
 
-<script src="app.js?v=cf49f092"></script>
+<script src="app.js?v=7cf7eec3"></script>
 </body>
 </html>

@@ -15,7 +15,7 @@ sections 5–7 are the contracts your side has to honour.
 
 **UI Revisions (Oct 23 evening spec, built Oct 23–24; only the additions, the settled layout stays).**
 - **Card face**: the big call is still **Buy YES** green / **Buy NO** red, now from `{{market.side}}` / `{{market.side_upper}}`, the market odds top-right a step bigger (26px). The meta row starts with five conviction stars, bottom-left (`{{market.conviction}}` filled, green under Buy YES / red under Buy NO; hidden only when the carousel root's `data-show-conviction="{{show_conviction}}"` is `false`), then volume and time to close. The at-call stat is off the face; `{{market.called_pct}}` stays as data for the Tap Confirmed line. Cards stay 196px desktop / 184px phone.
-- **Thesis block**: the purple marker beside the label is now the time line, `{{market.time_line}}` ("called 2d ago" / "revised 2h ago" / "changed 2h ago" by `{{market.state}}` called / revised / changed; the block capitalises it). When the state is `changed` a purple line above the text reads `{{market.change_note}}` ("Changed his mind on Oct 23. He had called NO.").
+- **Thesis block**: the purple marker beside the label is now the time line, `{{market.time_line}}` ("called 2d ago" / "revised 2h ago" / "changed 2h ago" by `{{market.state}}` called / revised / changed; the block capitalises it).
 - **Agree / Disagree**: bright green and red from the start, the same on hover and when chosen; the split moved under the buttons, centred.
 - **Selected card**: keeps its brighter outline and also flashes green on the board's beat together with the thesis block (every 3s, at every width). Decorative, nothing to wire. It reads "`{{agree_pct}}% agree · {{tap_count}} taps`"; the word is **taps** everywhere ("Taps closed. Resolution next."); `trade_count` is now `tap_count`.
 - **How it Works**: the link beside the logo (desktop) and first in the menu opens a four-slide click-through on the onboarding shell (`partials/how-it-works.html`, placeholder titles, `[COPY]` lines) every time. Onboarding itself now opens only on a first visit.
@@ -236,7 +236,6 @@ or modal root is the whole contract.
 | `data-side` | `market.side` | yes / no; the face prints Buy `market.side_upper` |
 | `data-call-kind`, `data-time-line` | `market.state`, `market.time_line` | called / revised / changed and the purple marker beside the Thesis label |
 | `data-called-pct` | `market.called_pct` | odds at the call, data only: the Tap Confirmed price |
-| `data-change-note` | `market.change_note` | shown in the block when `data-call-kind` is changed |
 | `data-conviction` | `market.conviction` | 1–5 stars first in the meta row, in the call's colour; hidden only when the carousel root has `data-show-conviction="false"` (`show_conviction`) |
 | `data-thesis` | `market.thesis` | the thesis, latest revision |
 | `data-call-state` | `call_state` | live / resolved / void / closed |
@@ -331,7 +330,7 @@ Other globals: `window.prophetOnboarding.open()`, `window.prophetHowItWorks.open
 
 ## 10. Variable reference
 
-70 variables actually present in the files right now, with where each appears.
+69 variables actually present in the files right now, with where each appears.
 
 | Variable | Where | Holds |
 |---|---|---|
@@ -345,9 +344,8 @@ Other globals: `window.prophetOnboarding.open()`, `window.prophetHowItWorks.open
 | `{{linkedin_url}}` | $PROPHET; Home; footer; header | Link to the project's LinkedIn page |
 | `{{listed_leg_date}}` | Home | Ladder markets only: the leg's date (e.g. `Oct 20`), small and gray beside the question on the card face. Empty otherwise. When a leg rolls, the card returns to not evaluated with the next date and the old leg goes to History as resolved |
 | `{{logout_url}}` | $PROPHET; Home; header | The Logout link in the header and menu; render the link only when `{{viewer.signed_in}}` is true. While unfilled, the click fires a `prophet:logout` event and shows the Logged out notice |
-| `{{market.called_pct}}` | Home | Odds when the call was made, e.g. `84%`. First item of the meta row, "84% at call"; also the Tap Confirmed price ("Buy YES at 84") |
-| `{{market.change_note}}` | Home | `market.state` changed: one line above the thesis in the block, "Changed his mind on Oct 23. He had called NO." (the call's own date prints as a date). Empty otherwise |
-| `{{market.conviction}}` | Home | Conviction 1–5, carried as `data-conviction`; five stars beside the call, the first n filled green. `show_conviction` on the carousel root hides them when it is `false`; anything else shows them |
+| `{{market.called_pct}}` | Home | Odds when the call was made, e.g. `84%`. Odds at the call, carried as `data-called-pct` for the Tap Confirmed price ("Buy YES at 84"); not printed on the card |
+| `{{market.conviction}}` | Home | Conviction 1–5, carried as `data-conviction`; five stars first in the meta row (bottom-left), the first n filled in the call's colour (green for Buy YES, red for Buy NO), the rest faint in the same colour. `show_conviction` on the carousel root hides them when it is `false`; anything else shows them |
 | `{{market.ends_in}}` | Home | Relative time until the market ends (e.g. "12d", "3mo"), shown after a clock icon |
 | `{{market.filter_state}}` | Home | `called` (the Calls deck) or `resolved` (History); the two tabs |
 | `{{market.image_url}}` | Home | Market image, imported from Polymarket (44px square on the card) |
@@ -360,7 +358,7 @@ Other globals: `window.prophetOnboarding.open()`, `window.prophetHowItWorks.open
 | `{{market.side}}` | Home | `yes` / `no` and `YES` / `NO`: the call, printed big on the card as "Buy YES" (green) or "Buy NO" (red). Replace `thesis_stance` / `thesis_stance_upper` |
 | `{{market.side_upper}}` | Home | `yes` / `no` and `YES` / `NO`: the call, printed big on the card as "Buy YES" (green) or "Buy NO" (red). Replace `thesis_stance` / `thesis_stance_upper` |
 | `{{market.slug}}` | Home | URL-safe identifier for the market (used in `<!-- repeat: market -->`) |
-| `{{market.state}}` | Home | `called` / `revised` / `changed` — the call's state, carried as `data-call-kind`. `changed` shows the change note in the block |
+| `{{market.state}}` | Home | `called` / `revised` / `changed` — the call's state, carried as `data-call-kind` |
 | `{{market.thesis}}` | Home | Full thesis text (called) or draft thesis (vote open), set as `data-thesis` on the card; shown in the Thesis block above the takes when the card is selected; empty otherwise |
 | `{{market.time_line}}` | Home | The purple marker beside the Thesis label, one line by state: "called 2d ago" / "revised 2h ago" / "changed 2h ago" (relative; the block capitalises it). Replaces `called_ago` and `revised_ago` |
 | `{{market.volume}}` | Home | Polymarket volume, short form (e.g. "$4.1M"), shown after a bar-chart icon |
@@ -368,7 +366,7 @@ Other globals: `window.prophetOnboarding.open()`, `window.prophetHowItWorks.open
 | `{{market_closed}}` | Home | Agree / Disagree under the thesis: the user's side (`agree` / `disagree` / empty) is kept; from three taps the split under the buttons reads "71% agree · 38 taps" — the server's figure, unchanged by the user's own tap — below that only "You agree" / "You disagree"; `market_closed` `true` disables both buttons and shows "Taps closed. Resolution next." Signed-in only: a signed-out tap fires `prophet:signin` with `{then: 'agree', slug}` |
 | `{{pool_last_week}}` | $PROPHET | Last week's reward pool; the line reads "paid to the community" |
 | `{{pumpfun_url}}` | $PROPHET; Home; footer; header | $PROPHET on pump.fun (footer token link) |
-| `{{show_conviction}}` | Home | Conviction 1–5, carried as `data-conviction`; five stars beside the call, the first n filled green. `show_conviction` on the carousel root hides them when it is `false`; anything else shows them |
+| `{{show_conviction}}` | Home | Conviction 1–5, carried as `data-conviction`; five stars first in the meta row (bottom-left), the first n filled in the call's colour (green for Buy YES, red for Buy NO), the rest faint in the same colour. `show_conviction` on the carousel root hides them when it is `false`; anything else shows them |
 | `{{solscan_url}}` | $PROPHET; Home; footer; header | $PROPHET on Solscan (footer token link) |
 | `{{swap_impact}}` | $PROPHET | Swap meta line, left: slip and price impact |
 | `{{swap_slippage}}` | $PROPHET | Swap meta line, left: slip and price impact |

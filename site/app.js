@@ -158,7 +158,7 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
   var thesisText = document.querySelector('[data-thesis-text]');
   var thesisLabel = document.querySelector('[data-thesis-label]');
   var thesisOutcome = document.querySelector('[data-thesis-outcome]');
-  var thesisRevised = document.querySelector('[data-thesis-revised]'), thesisChange = document.querySelector('[data-thesis-change]'), thesisSplit = document.querySelector('[data-thesis-split]'), adWrap = document.querySelector('[data-ad]');
+  var thesisRevised = document.querySelector('[data-thesis-revised]'), thesisSplit = document.querySelector('[data-thesis-split]'), adWrap = document.querySelector('[data-ad]');
   var taps = {};   /* slug -> 'agree' | 'disagree' (mock, in-memory; the server keeps the real side) */
   var VOID_LINE = 'Market closed by Polymarket before resolution.';
   function labelHTML(key) { return key === 'buy_yes' ? '<span class="lbl lbl--yes">Buy YES</span>' : key === 'buy_no' ? '<span class="lbl lbl--no">Buy NO</span>' : key === 'hold' ? '<span class="lbl lbl--hold">Hold</span>' : ''; }
@@ -372,10 +372,9 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
     var history = state === 'resolved';
     thesisBox.hidden = false;
     thesisLabel.textContent = 'Thesis';
-    /* the time line in purple beside the label: Called 3d ago / Revised 3h ago / Changed 2h ago; a changed call adds the note */
+    /* the time line in purple beside the label: Called 3d ago / Revised 3h ago / Changed 2h ago */
     var tl = history ? '' : (card.dataset.timeLine || '');
     if (thesisRevised) thesisRevised.textContent = tl ? tl.charAt(0).toUpperCase() + tl.slice(1) : '';
-    if (thesisChange) thesisChange.textContent = (card.dataset.callKind === 'changed' && !history) ? (card.dataset.changeNote || '') : '';
     thesisText.textContent = card.dataset.thesis || '';
     /* History: how it played out */
     if (thesisOutcome) {
