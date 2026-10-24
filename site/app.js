@@ -359,6 +359,7 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
     if (!cv) return;
     var c = parseInt(card.dataset.conviction || '0', 10) || 0;
     cv.hidden = !(showConviction && c > 0);
+    cv.className = 'carousel__conv carousel__conv--' + ((card.dataset.side || 'yes').toLowerCase());   /* stars in the call's colour */
     if (!cv.hidden) { var h = ''; for (var s = 1; s <= 5; s++) h += '<span class="carousel__star' + (s <= c ? ' carousel__star--on' : '') + '">' + STAR_SVG + '</span>'; cv.innerHTML = h; }
   }
 

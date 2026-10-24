@@ -407,20 +407,22 @@ ul, ol { list-style: none; }
 .prow__outcome--void { color: rgba(242, 240, 230, 0.55); }
 
 /* The market's odds, small, top-right of the card */
-.carousel__odds { margin-left: auto; display: inline-flex; align-items: baseline; gap: 5px; font-size: 22px; line-height: 1; color: var(--green); align-self: flex-start; white-space: nowrap; }   /* nearly as big as the call, in the corner */
-.carousel__odds small { font-size: 11px; letter-spacing: 0.12em; opacity: 0.7; }
+.carousel__odds { margin-left: auto; display: inline-flex; align-items: baseline; gap: 5px; font-size: 26px; line-height: 1; color: var(--green); align-self: flex-start; white-space: nowrap; }   /* nearly as big as the call, in the corner */
+.carousel__odds small { font-size: 12px; letter-spacing: 0.12em; opacity: 0.7; }
 .carousel__odds .prow__outcome { margin-left: 6px; align-self: center; }
 /* The call, big, where the figure was */
-.carousel__callrow { margin-top: auto; display: flex; align-items: center; gap: 12px; }
+.carousel__callrow { margin-top: auto; display: flex; align-items: center; line-height: 1; }
 .carousel__call { font-size: 24px; line-height: 1; letter-spacing: 0.06em; }
 .carousel__call--yes { color: var(--green); }
 .carousel__call--no { color: #e53935; }
-/* conviction stars beside the call; hidden only when the deck's show_conviction is "false" */
-.carousel__conv { display: inline-flex; gap: 2px; line-height: 1; }
-.carousel__callrow { line-height: 1; }
+/* conviction stars, first in the meta row, in the call's colour; hidden only when the deck's show_conviction is "false" */
+.carousel__conv { display: inline-flex; gap: 2px; line-height: 1; opacity: 1; }
 .carousel__conv[hidden] { display: none; }
 .carousel__star .ico { width: 11px; height: 11px; fill: currentColor; opacity: 0.25; }
-.carousel__star--on .ico { opacity: 1; color: var(--green); }
+.carousel__star--on .ico { opacity: 1; }
+.carousel__conv--yes .carousel__star--on .ico { color: var(--green); }
+.carousel__conv--no .carousel__star--on .ico { color: #e53935; }
+.carousel__meta .carousel__conv .ico { margin: 0; }
 
 /* State badge, top-right of the card; only rendered for vote / called */
 .carousel__state {
@@ -623,11 +625,9 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
 .ad { display: flex; flex-direction: column; align-items: center; gap: 8px; margin: 6px 0 10px; flex: 0 0 auto; }
 .ad[hidden] { display: none; }
 .ad__row { display: flex; align-items: center; justify-content: center; gap: 10px; }
-.ad__btn { min-height: 40px; padding: 0 22px; border: 1px solid; border-radius: 4px; font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; transition: color 0.15s, border-color 0.15s; }
-.ad__btn--agree { color: rgba(16, 240, 95, 0.5); border-color: rgba(16, 240, 95, 0.35); }
-.ad__btn--disagree { color: rgba(229, 57, 53, 0.55); border-color: rgba(229, 57, 53, 0.4); }   /* soft at rest, bright on hover or when chosen */
-.ad__btn--agree:hover, .ad__btn--agree.ad__btn--on { color: var(--green); border-color: var(--green); }
-.ad__btn--disagree:hover, .ad__btn--disagree.ad__btn--on { color: #e53935; border-color: #e53935; }
+.ad__btn { min-height: 40px; padding: 0 22px; border: 1px solid; border-radius: 4px; font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+.ad__btn--agree { color: var(--green); border-color: var(--green); }     /* bright from the start; hover and chosen look the same */
+.ad__btn--disagree { color: #e53935; border-color: #e53935; }
 .ad__btn[disabled] { opacity: 0.35; cursor: default; color: var(--offwhite); border-color: var(--outline); }
 .thesis__stateline { flex-direction: column; align-items: flex-end; gap: 6px; }
 .thesis__split { font-size: 14px; opacity: 0.7; white-space: nowrap; }

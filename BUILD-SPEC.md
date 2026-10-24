@@ -61,7 +61,7 @@ Variables that go with them: `market.take_count`, `market.vote_*`, `take.*`,
 
 Top to bottom, for every card:
 
-1. **Image** (44px) top-left; **market odds** top-right, big (22px display face)
+1. **Image** (44px) top-left; **market odds** top-right, big (26px display face)
    — `{{market.yes_pct}}` + "YES" — the live price, or the settled 100% / 0%
    once resolved. In History the outcome tag follows the odds: `right` ·
    `wrong` · `void` · `awaiting`; that tag is `{{market.outcome_tag}}`, empty on
@@ -70,11 +70,14 @@ Top to bottom, for every card:
    small and gray on the same line as the question (omit the span when empty).
 3. **The call, big** (24px display face), where a figure would be:
    `Buy YES` in green or `Buy NO` in red — `{{market.side}}` /
-   `{{market.side_upper}}` — with five small stars beside it, the first
-   `{{market.conviction}}` filled green. The stars hide only when the carousel
-   root carries `data-show-conviction="false"` (`{{show_conviction}}`).
-4. **Meta row**: `{{market.called_pct}} at call` · bar icon + `{{market.volume}}`
-   · clock icon + `{{market.ends_in}}`. Three items, one line.
+   `{{market.side_upper}}`.
+4. **Meta row**: five conviction stars first (bottom-left), the first
+   `{{market.conviction}}` filled in the call's colour (green under Buy YES, red
+   under Buy NO; they hide only when the carousel root carries
+   `data-show-conviction="false"`, `{{show_conviction}}`) · bar icon +
+   `{{market.volume}}` · clock icon + `{{market.ends_in}}`. Three items, one
+   line. The odds at the call are not printed; `{{market.called_pct}}` stays on
+   the card as data for the Tap Confirmed line.
 
 Card attributes the client reads: `data-state`, `data-slug`, `data-label`,
 `data-side`, `data-call-kind`, `data-time-line`, `data-called-pct`,
@@ -106,10 +109,10 @@ The block carries `data-signed-in="{{viewer.signed_in}}"`.
 
 A centred row under the block, live calls only (hidden on History):
 
-- Two buttons, **Agree** and **Disagree**, 40px tall (44px on phones). Soft
-  green and soft red at rest; bright green / bright red on hover and when
-  chosen (`.ad__btn--on`), no outline. Nobody is pre-selected unless
-  `{{user_side}}` says so.
+- Two buttons, **Agree** and **Disagree**, 40px tall (44px on phones). Bright
+  green and bright red from the start; hover and chosen look the same, no
+  outline (`.ad__btn--on` is kept on the chosen one for your own styling).
+  Nobody is pre-selected unless `{{user_side}}` says so.
 - A tap marks the side. Tapping the other switches it. Tapping the chosen one
   again deselects it. `{{market_closed}}` `true` disables both and shows
   `"Taps closed. Resolution next."` under them.
@@ -194,11 +197,12 @@ Descriptions in `TEMPLATE_VARS.md`; the generated table in `HANDOFF.md` §10.
 
 - All shows every listed market with a call; History shows resolved; the empty
   line appears on an empty tab.
-- Every card: odds top-right, the big Buy YES / Buy NO in the right colour with
-  the stars beside it, three meta items on one line, no overflow at 390px.
+- Every card: odds top-right, the big Buy YES / Buy NO in the right colour, the
+  stars bottom-left in that colour, no at-call stat, three meta items on one
+  line, no overflow at 390px.
 - The purple marker beside Thesis reads Called / Revised / Changed by state; a
   changed call also shows the change note.
-- Agree / Disagree: soft at rest, bright on hover / chosen, no outline, deselect
+- Agree / Disagree: bright from the start, no hover change, no outline, deselect
   works, closed markets disable with "Taps closed. Resolution next.", the split
   under the buttons never moves on a tap, the word is taps.
 - How it works opens from the header and the menu every time; onboarding only
