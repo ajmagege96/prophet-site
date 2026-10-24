@@ -105,19 +105,6 @@ ul, ol { list-style: none; }
   width: auto;
 }
 
-/* "How it Works" anchor – desktop only */
-.site-header__hiw {
-  display: none;
-  font-size: 12px;
-  color: var(--offwhite);
-  opacity: 0.7;
-  transition: opacity 0.15s;
-}
-.site-header__hiw:hover {
-  opacity: 1;
-  color: var(--green);
-  text-decoration: none;
-}
 
 /* Desktop nav */
 .site-header__nav {
@@ -329,7 +316,7 @@ ul, ol { list-style: none; }
 .carousel__card {
   position: relative;           /* anchors the Buy link on open-vote cards */
   flex: 0 0 calc(100% - 32px);
-  height: 184px;               /* fixed: cards never change size */
+  height: 214px;               /* fixed: cards never change size */
   overflow: hidden;
   scroll-snap-align: start;
   padding: 18px;
@@ -424,9 +411,19 @@ ul, ol { list-style: none; }
 .carousel__odds small { font-size: 11px; letter-spacing: 0.12em; opacity: 0.7; }
 .carousel__odds .prow__outcome { margin-left: 6px; align-self: center; }
 /* The call, big, where the figure was */
-.carousel__call { margin-top: auto; font-size: 24px; line-height: 1; letter-spacing: 0.06em; }
+.carousel__callrow { margin-top: auto; display: flex; align-items: baseline; gap: 10px; }
+.carousel__cap { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.5; white-space: nowrap; }
+.carousel__call { font-size: 24px; line-height: 1; letter-spacing: 0.06em; }
 .carousel__call--yes { color: var(--green); }
 .carousel__call--no { color: #e53935; }
+/* under the call: the Against the market tag and, when show_conviction is on, the stars; the row keeps its height so cards never shift */
+.carousel__flags { display: flex; align-items: center; gap: 10px; min-height: 18px; }
+.carousel__against { font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 8px; border: 1px solid rgba(242, 240, 230, 0.35); border-radius: 2px; opacity: 0.8; white-space: nowrap; }
+.carousel__against[hidden], .carousel__conv[hidden] { display: none; }
+.carousel__conv { display: inline-flex; gap: 2px; }
+.carousel__star .ico { width: 11px; height: 11px; fill: currentColor; opacity: 0.25; }
+.carousel__star--on .ico { opacity: 1; color: var(--green); }
+.carousel__meta > span[hidden] { display: none; }
 
 /* State badge, top-right of the card; only rendered for vote / called */
 .carousel__state {
@@ -618,7 +615,7 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
 .tc__line { font-size: 15px; line-height: 1.45; }
 .tc__sub { font-size: 13px; opacity: 0.7; line-height: 1.45; }
 .tc .mdl__cta { min-width: 200px; margin-top: 4px; }
-.ad__closed { font-size: 12px; opacity: 0.5; margin-left: 8px; }
+.ad__closed { font-size: 12px; opacity: 0.5; }
 .ad__closed[hidden] { display: none; }
 
 /* Hero on home: height from its content, so How it Works sits right under the Agree / Disagree row */
@@ -626,19 +623,19 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
 .hero--home .home-panel { height: auto; }
 
 /* Agree / Disagree: a row under the thesis. Agree green, Disagree red, on hover and when chosen */
-.ad { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 6px 0 10px; flex: 0 0 auto; }
+.ad { display: flex; flex-direction: column; align-items: center; gap: 8px; margin: 6px 0 10px; flex: 0 0 auto; }
 .ad[hidden] { display: none; }
-.ad__btn { min-height: 40px; padding: 0 22px; border: 1px solid; border-radius: 4px; font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; transition: color 0.15s, border-color 0.15s; }
-.ad__btn--agree { color: rgba(16, 240, 95, 0.5); border-color: rgba(16, 240, 95, 0.35); }
-.ad__btn--disagree { color: rgba(229, 57, 53, 0.55); border-color: rgba(229, 57, 53, 0.4); }   /* soft at rest, bright on hover or when chosen */
-.ad__btn--agree:hover, .ad__btn--agree.ad__btn--on { color: var(--green); border-color: var(--green); }
-.ad__btn--disagree:hover, .ad__btn--disagree.ad__btn--on { color: #e53935; border-color: #e53935; }
-.ad__btn[disabled] { opacity: 0.35; cursor: default; color: var(--offwhite); border-color: var(--outline); }
+.ad__row { display: flex; align-items: center; justify-content: center; gap: 10px; }
+.ad__btn { min-height: 40px; padding: 0 22px; border: 1px solid; border-radius: 4px; font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+.ad__btn--agree { color: var(--green); border-color: var(--green); }       /* bright from the start, no hover state */
+.ad__btn--disagree { color: #e53935; border-color: #e53935; }
+.ad__btn--on { outline: 1px solid currentColor; outline-offset: 2px; }      /* the chosen side: a thin outline */
+.ad__btn[disabled] { opacity: 0.35; cursor: default; color: var(--offwhite); border-color: var(--outline); outline: none; }
 .thesis__stateline { flex-direction: column; align-items: flex-end; gap: 6px; }
-.thesis__split { font-size: 14px; opacity: 0.7; white-space: nowrap; margin-left: 8px; }
-.thesis__split[hidden] { display: none; }
-.thesis__revised { font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--purple-text); opacity: 0.85; white-space: nowrap; }
-.thesis__revised:empty { display: none; }
+.ad__split { font-size: 14px; opacity: 0.7; white-space: nowrap; }
+.ad__split[hidden] { display: none; }
+.thesis__change { font-size: 12px; color: var(--purple-text); margin: 6px 0 0; }   /* "Changed his mind on Oct 23. He had called NO." */
+.thesis__change:empty { display: none; }
 .thesis__atcall { font-size: 11px; opacity: 0.5; white-space: nowrap; }
 .thesis__atcall:empty { display: none; }
 /* The thesis block's frame glows for a moment as each pulse of the board leaves it */
@@ -996,7 +993,6 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
   }
   .site-header__mark { height: 58px; }
   .site-header__wordmark { height: 16px; }
-  .site-header__hiw { display: inline; }
   .site-header__nav { display: flex; }
   .site-header__nav .site-header__ca { display: inline-flex; margin-left: 8px; }
   .site-header__menu-btn { display: none; }
@@ -1020,7 +1016,7 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
   .carousel__track--sliding { transition: transform 0.3s ease; }
   .carousel__card {
     flex: 0 0 calc(33.333% - 11px);
-    height: 196px;
+    height: 220px;
     padding: 20px;
   }
 
@@ -1065,7 +1061,6 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
 
   /* ── Header ── */
   .site-header { padding: 0 12px; }
-  .site-header__hiw { display: none; }
   .site-header__wordmark { height: 11px; }
   .site-header__nav { display: flex; margin-left: auto; }
   .site-header__nav > a { display: none; }
@@ -1131,7 +1126,9 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
   .filters__tag { font-size: 10px; }
   /* Resolved cards carry four meta items; keep them on one line inside the fixed card */
   .carousel__meta { gap: 4px 4px; font-size: 10px; }   /* four items (202px of text) on one line in a 216px row */
-  .thesis__top { flex-wrap: wrap; row-gap: 4px; }      /* label · number · at call · conviction · Revised wrap rather than run off */
+  .carousel__against { font-size: 9px; padding: 2px 5px; letter-spacing: 0.03em; }   /* Against the market + changed 1 time fit a 216px row */
+  .carousel__flags { gap: 6px; }
+  .thesis__top { flex-wrap: wrap; row-gap: 4px; }
   .filters::-webkit-scrollbar { display: none; }
   .filters__tag { flex: 0 0 auto; min-height: 34px; padding: 0 8px; display: inline-flex; align-items: center; }   /* 8px so four chips fit 390 */
   /* same height as desktop: padding only, no min-height */

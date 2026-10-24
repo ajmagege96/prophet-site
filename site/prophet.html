@@ -29,7 +29,7 @@
   <meta name="twitter:description" content="An agent that reads prediction markets, publishes a thesis before the outcome, and keeps a public record of every call.">
   <meta name="twitter:image" content="https://ajmagege96.github.io/prophet-site/site/assets/prophet-og-1200x630.png">
 
-  <link rel="stylesheet" href="styles.css?v=fca70ec7">
+  <link rel="stylesheet" href="styles.css?v=27f2cf46">
 </head>
 <body>
 
@@ -40,13 +40,14 @@
       <img src="assets/prophet-logo-transparent.svg" alt="" class="site-header__mark" width="48" height="48">
       <img src="assets/wordmark_offwhite.svg" alt="The Prophet" class="site-header__wordmark">
     </a>
-    <a href="#how-it-works" class="site-header__hiw heading" data-onboarding-open>How it Works</a>
   </div>
 
   <!-- Desktop nav -->
   <nav class="site-header__nav">
-    <a href="prophet.html" class="active">$Prophet</a>
+    <a href="prophet.html">$Prophet</a>
     <a href="{{docs_url}}" target="_blank" rel="noopener">Docs</a>
+    <!-- opens the How it works click-through, every time -->
+    <a href="#how-it-works" data-hiw-open>How it works</a>
     <!-- only when the viewer is signed in ({{viewer.signed_in}}); hover reads red -->
     <a href="{{logout_url}}" class="site-header__logout" data-logout>Logout</a>
     <button class="site-header__ca" data-ca="{{contract_address}}" data-ca-copy title="Copy contract address" aria-label="Copy contract address">
@@ -66,8 +67,8 @@
 
   <!-- Mobile panel -->
   <nav class="site-header__mobile-panel" data-menu-panel>
-    <a href="#how-it-works" data-onboarding-open>How it Works</a>
-    <a href="prophet.html" class="active">$Prophet</a>
+    <a href="#how-it-works" data-hiw-open>How it works</a>
+    <a href="prophet.html">$Prophet</a>
     <a href="{{docs_url}}" target="_blank" rel="noopener">Docs</a>
     <!-- only when the viewer is signed in ({{viewer.signed_in}}); gray, red on hover like the header -->
     <a href="{{logout_url}}" class="site-header__logout" data-logout>Logout</a>
@@ -225,8 +226,8 @@
 </main>
 
 <!-- partial:onboarding -->
-<!-- Onboarding modal. Opens on a first visit (remembered on the device in localStorage) and from the
-     How it Works link every time. Three slides; Next / Back / Get Started, dots, swipe on touch.
+<!-- Onboarding modal. Opens on a first visit only (remembered on the device in localStorage); the How it works
+     link opens its own click-through (partials/how-it-works.html). Three slides; Next / Back / Get Started, dots, swipe on touch.
      Closes on the X, Escape, or the backdrop. Static copy; no template variables. -->
 <div class="onb" data-onboarding hidden role="dialog" aria-modal="true" aria-label="How it Works">
   <div class="onb__backdrop" data-onboarding-close></div>
@@ -279,6 +280,67 @@
   </div>
 </div>
 <!-- /partial:onboarding -->
+
+<!-- partial:how-it-works -->
+<!-- How it works: a click-through on the onboarding shell. Opens from the How it works link in the header and the
+     menu, every time; never on its own. Four slides, placeholder titles; the lines are [COPY] until the founder writes them.
+     Next / Back / Get Started, dots, swipe on touch. Closes on the X, Escape, or the backdrop. Static copy; no template variables. -->
+<div class="onb" data-hiw hidden role="dialog" aria-modal="true" aria-label="How it works">
+  <div class="onb__backdrop" data-onboarding-close></div>
+  <div class="onb__panel outline" data-onboarding-panel>
+    <button class="onb__close" data-onboarding-close aria-label="Close">&times;</button>
+    <div class="onb__slides">
+      <section class="onb__slide" data-onboarding-slide>
+        <div class="onb__media outline">
+          <!-- PLACEHOLDER FRAME. Drop the recording in assets/ and add <source src="assets/how-1.mp4" type="video/mp4"> inside this <video>. -->
+          <video class="onb__video" muted autoplay loop playsinline poster="assets/onboarding-1-placeholder.png"></video>
+        </div>
+        <div class="onb__copy">
+        <h3 class="onb__title heading">What he does</h3>
+        <p class="onb__line">[COPY]</p>
+        </div>
+      </section>
+      <section class="onb__slide" data-onboarding-slide hidden>
+        <div class="onb__media outline">
+          <video class="onb__video" muted autoplay loop playsinline poster="assets/onboarding-2-placeholder.png"></video>
+        </div>
+        <div class="onb__copy">
+        <h3 class="onb__title heading">Agree or Disagree</h3>
+        <p class="onb__line">[COPY]</p>
+        </div>
+      </section>
+      <section class="onb__slide" data-onboarding-slide hidden>
+        <div class="onb__media outline">
+          <video class="onb__video" muted autoplay loop playsinline poster="assets/onboarding-3-placeholder.png"></video>
+        </div>
+        <div class="onb__copy">
+        <h3 class="onb__title heading">He can change his mind</h3>
+        <p class="onb__line">[COPY]</p>
+        </div>
+      </section>
+      <section class="onb__slide" data-onboarding-slide hidden>
+        <div class="onb__media outline">
+          <video class="onb__video" muted autoplay loop playsinline poster="assets/onboarding-1-placeholder.png"></video>
+        </div>
+        <div class="onb__copy">
+        <h3 class="onb__title heading">Election night keeps score</h3>
+        <p class="onb__line">[COPY]</p>
+        </div>
+      </section>
+    </div>
+    <div class="onb__foot">
+      <button class="onb__back" data-onboarding-back>Back</button>
+      <div class="onb__dots" aria-hidden="true">
+        <span class="onb__dot onb__dot--on" data-onboarding-dot="0"></span>
+        <span class="onb__dot" data-onboarding-dot="1"></span>
+        <span class="onb__dot" data-onboarding-dot="2"></span>
+        <span class="onb__dot" data-onboarding-dot="3"></span>
+      </div>
+      <button class="onb__next" data-onboarding-next>Next</button>
+    </div>
+  </div>
+</div>
+<!-- /partial:how-it-works -->
 
 <!-- partial:below-fold -->
 <!-- Sits under every panel. Static copy; the only variable is {{buy_url}}. -->
@@ -394,6 +456,6 @@
 </footer>
 <!-- /partial:footer -->
 
-<script src="app.js?v=2c469a41"></script>
+<script src="app.js?v=24935730"></script>
 </body>
 </html>

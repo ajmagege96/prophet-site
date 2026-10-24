@@ -1,0 +1,60 @@
+<!-- partial:how-it-works -->
+<!-- How it works: a click-through on the onboarding shell. Opens from the How it works link in the header and the
+     menu, every time; never on its own. Four slides, placeholder titles; the lines are [COPY] until the founder writes them.
+     Next / Back / Get Started, dots, swipe on touch. Closes on the X, Escape, or the backdrop. Static copy; no template variables. -->
+<div class="onb" data-hiw hidden role="dialog" aria-modal="true" aria-label="How it works">
+  <div class="onb__backdrop" data-onboarding-close></div>
+  <div class="onb__panel outline" data-onboarding-panel>
+    <button class="onb__close" data-onboarding-close aria-label="Close">&times;</button>
+    <div class="onb__slides">
+      <section class="onb__slide" data-onboarding-slide>
+        <div class="onb__media outline">
+          <!-- PLACEHOLDER FRAME. Drop the recording in assets/ and add <source src="assets/how-1.mp4" type="video/mp4"> inside this <video>. -->
+          <video class="onb__video" muted autoplay loop playsinline poster="assets/onboarding-1-placeholder.png"></video>
+        </div>
+        <div class="onb__copy">
+        <h3 class="onb__title heading">What he does</h3>
+        <p class="onb__line">[COPY]</p>
+        </div>
+      </section>
+      <section class="onb__slide" data-onboarding-slide hidden>
+        <div class="onb__media outline">
+          <video class="onb__video" muted autoplay loop playsinline poster="assets/onboarding-2-placeholder.png"></video>
+        </div>
+        <div class="onb__copy">
+        <h3 class="onb__title heading">Agree or Disagree</h3>
+        <p class="onb__line">[COPY]</p>
+        </div>
+      </section>
+      <section class="onb__slide" data-onboarding-slide hidden>
+        <div class="onb__media outline">
+          <video class="onb__video" muted autoplay loop playsinline poster="assets/onboarding-3-placeholder.png"></video>
+        </div>
+        <div class="onb__copy">
+        <h3 class="onb__title heading">He can change his mind</h3>
+        <p class="onb__line">[COPY]</p>
+        </div>
+      </section>
+      <section class="onb__slide" data-onboarding-slide hidden>
+        <div class="onb__media outline">
+          <video class="onb__video" muted autoplay loop playsinline poster="assets/onboarding-1-placeholder.png"></video>
+        </div>
+        <div class="onb__copy">
+        <h3 class="onb__title heading">Election night keeps score</h3>
+        <p class="onb__line">[COPY]</p>
+        </div>
+      </section>
+    </div>
+    <div class="onb__foot">
+      <button class="onb__back" data-onboarding-back>Back</button>
+      <div class="onb__dots" aria-hidden="true">
+        <span class="onb__dot onb__dot--on" data-onboarding-dot="0"></span>
+        <span class="onb__dot" data-onboarding-dot="1"></span>
+        <span class="onb__dot" data-onboarding-dot="2"></span>
+        <span class="onb__dot" data-onboarding-dot="3"></span>
+      </div>
+      <button class="onb__next" data-onboarding-next>Next</button>
+    </div>
+  </div>
+</div>
+<!-- /partial:how-it-works -->

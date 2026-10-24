@@ -19,14 +19,14 @@
   else wide.addListener(onChange);
 })();
 
-/* ── Onboarding modal (first-visit walkthrough) ───────── */
-/* Opens once per device (localStorage) and from any [data-onboarding-open]
-   link every time. Three slides: Next / Back / Get Started, dots, swipe,
-   arrow keys. Closes on the X, Escape, or the backdrop. Body scroll locked. */
-(function () {
-  var root = document.querySelector('[data-onboarding]');
-  if (!root) return;
-  var KEY = 'prophet.onboarded';
+/* ── Walkthrough modals ───────────────────────────────── */
+/* One shell, two instances. Onboarding ([data-onboarding]) opens once per device
+   (localStorage) on a first visit. How it works ([data-hiw]) opens from any
+   [data-hiw-open] link, every time. Slides: Next / Back / Get Started, dots,
+   swipe, arrow keys. Closes on the X, Escape, or the backdrop. Body scroll locked. */
+function walkthrough(root, opts) {
+  if (!root) return null;
+  var KEY = opts.key || null;
   var slides = root.querySelectorAll('[data-onboarding-slide]');
   var dots = root.querySelectorAll('[data-onboarding-dot]');
   var next = root.querySelector('[data-onboarding-next]');
@@ -60,7 +60,7 @@
     root.hidden = true;
     document.documentElement.classList.remove('onb-lock');
     for (var k = 0; k < slides.length; k++) { var v = slides[k].querySelector('video'); if (v) v.pause(); }
-    try { localStorage.setItem(KEY, '1'); } catch (e) {}
+    if (KEY) { try { localStorage.setItem(KEY, '1'); } catch (e) {} }
     if (lastFocus && lastFocus.focus) lastFocus.focus();
   }
   root.addEventListener('click', function (e) {
@@ -82,15 +82,19 @@
     var dx = e.changedTouches[0].clientX - sx; sx = null;
     if (Math.abs(dx) > 40) show(at + (dx < 0 ? 1 : -1));
   });
-  var openers = document.querySelectorAll('[data-onboarding-open]');
+  var openers = opts.openers ? document.querySelectorAll(opts.openers) : [];
   for (var i = 0; i < openers.length; i++) {
     openers[i].addEventListener('click', function (e) { e.preventDefault(); open(); });
   }
-  var seen = false;
-  try { seen = localStorage.getItem(KEY) === '1'; } catch (e) {}
-  if (!seen) open();
-  window.prophetOnboarding = { open: open, close: close, show: show };
-})();
+  if (KEY) {
+    var seen = false;
+    try { seen = localStorage.getItem(KEY) === '1'; } catch (e) {}
+    if (!seen) open();
+  }
+  return { open: open, close: close, show: show };
+}
+window.prophetOnboarding = walkthrough(document.querySelector('[data-onboarding]'), { key: 'prophet.onboarded', openers: '[data-onboarding-open]' });
+window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { openers: '[data-hiw-open]' });
 
 /* ── Preview fill ─────────────────────────────────────── */
 /* Any element with data-mock whose text is still an unfilled {{variable}}
@@ -154,11 +158,11 @@
   var thesisText = document.querySelector('[data-thesis-text]');
   var thesisLabel = document.querySelector('[data-thesis-label]');
   var thesisOutcome = document.querySelector('[data-thesis-outcome]');
-  var thesisRevised = document.querySelector('[data-thesis-revised]'), thesisSplit = document.querySelector('[data-thesis-split]'), adWrap = document.querySelector('[data-ad]');
+  var thesisChange = document.querySelector('[data-thesis-change]'), thesisSplit = document.querySelector('[data-thesis-split]'), adWrap = document.querySelector('[data-ad]');
   var taps = {};   /* slug -> 'agree' | 'disagree' (mock, in-memory; the server keeps the real side) */
   var VOID_LINE = 'Market closed by Polymarket before resolution.';
   function labelHTML(key) { return key === 'buy_yes' ? '<span class="lbl lbl--yes">Buy YES</span>' : key === 'buy_no' ? '<span class="lbl lbl--no">Buy NO</span>' : key === 'hold' ? '<span class="lbl lbl--hold">Hold</span>' : ''; }
-  function cardLabel(card) { var l = card.dataset.label; if (l && l !== 'none') return l; var st = (card.dataset.stance || '').toLowerCase(); return (card.dataset.state !== 'none' && st) ? 'buy_' + st : 'none'; }
+  function cardLabel(card) { var l = card.dataset.label; if (l && l !== 'none') return l; var st = (card.dataset.side || '').toLowerCase(); return (card.dataset.state !== 'none' && st) ? 'buy_' + st : 'none'; }
   var prevBtn = document.querySelector('[data-carousel-prev]');
   var nextBtn = document.querySelector('[data-carousel-next]');
   var activeIndex = -1;
@@ -303,8 +307,8 @@
   if (nextBtn) nextBtn.addEventListener('click', function () { page(1); });
 
   document.addEventListener('keydown', function (e) {
-    if (document.querySelector('[data-modal]:not([hidden]), [data-onboarding]:not([hidden])')) return;   /* an open modal owns the keys */
-    /* Tab cycles the four tags: No thesis → Open votes → Prophecies → History → …; Shift+Tab goes back */
+    if (document.querySelector('[data-modal]:not([hidden]), [data-onboarding]:not([hidden]), [data-hiw]:not([hidden])')) return;   /* an open modal owns the keys */
+    /* Tab cycles the two tabs: All → History → …; Shift+Tab goes back */
     if (e.key === 'Tab') {
       e.preventDefault();
       var order = ['called', 'resolved'];
@@ -347,16 +351,39 @@
     });
   }
 
-  /* ── Thesis block (called / vote-open / resolved markets) ── */
+  /* ── Card faces ── painted once: which meta spans show, the Against the market tag, the conviction row */
+  var deckRoot = track.closest('[data-carousel]');
+  var showConviction = !!deckRoot && deckRoot.getAttribute('data-show-conviction') === 'true';
+  function paintFace(card) {
+    var history = (card.dataset.state || '') === 'resolved';
+    var n = parseInt(card.dataset.changeCount || '0', 10) || 0;
+    var m = { time: !history, called: history, changed: history && n > 0, volume: !history, ends: !history };
+    var spans = card.querySelectorAll('[data-m]');
+    for (var i = 0; i < spans.length; i++) {
+      var k = spans[i].getAttribute('data-m');
+      spans[i].hidden = !m[k];
+      if (k === 'changed') spans[i].textContent = 'changed ' + n + ' time' + (n === 1 ? '' : 's');
+    }
+    var ag = card.querySelector('[data-against]'); if (ag) ag.hidden = card.dataset.againstMarket !== 'true';
+    var cv = card.querySelector('[data-conviction-row]');
+    if (cv) {
+      var c = parseInt(card.dataset.conviction || '0', 10) || 0;
+      cv.hidden = !(showConviction && c > 0);
+      if (!cv.hidden) { var h = ''; for (var s = 1; s <= 5; s++) h += '<span class="carousel__star' + (s <= c ? ' carousel__star--on' : '') + '">' + STAR_SVG + '</span>'; cv.innerHTML = h; }
+    }
+  }
+
+  /* ── Thesis block (live / resolved markets) ── */
   var STAR_SVG = '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"/></svg>';
+  for (var pf = 0; pf < cards.length; pf++) paintFace(cards[pf]);
   function renderThesis(card) {
     if (!thesisBox) return;
     var state = card.dataset.state || 'called';
     var history = state === 'resolved';
-    var revised = !!card.dataset.revisedAgo;
     thesisBox.hidden = false;
     thesisLabel.textContent = 'Thesis';
-    if (thesisRevised) thesisRevised.textContent = revised ? 'Revised ' + card.dataset.revisedAgo : '';
+    /* market.state "changed": the change note sits above the thesis; the time line on the card carries revised / changed */
+    if (thesisChange) thesisChange.textContent = (card.dataset.callKind === 'changed' && !history) ? (card.dataset.changeNote || '') : '';
     thesisText.textContent = card.dataset.thesis || '';
     /* History: how it played out */
     if (thesisOutcome) {
@@ -381,9 +408,9 @@
     var btns = adWrap.querySelectorAll('[data-ad-btn]');
     for (var i = 0; i < btns.length; i++) { btns[i].classList.toggle('ad__btn--on', btns[i].dataset.adBtn === side); btns[i].disabled = closed; }
     var cl = adWrap.querySelector('[data-ad-closed]'); if (cl) cl.hidden = !closed;
-    var n = parseInt(card.dataset.tradeCount || '0', 10) || 0, pct = card.dataset.agreePct || '';
+    var n = parseInt(card.dataset.tapCount || '0', 10) || 0, pct = card.dataset.agreePct || '';
     if (thesisSplit) {
-      if (n >= 3 && pct) { thesisSplit.textContent = pct + '% agree with ' + n + ' trade' + (n === 1 ? '' : 's'); thesisSplit.hidden = false; }
+      if (n >= 3 && pct) { thesisSplit.textContent = pct + '% agree · ' + n + ' tap' + (n === 1 ? '' : 's'); thesisSplit.hidden = false; }
       else if (side) { thesisSplit.textContent = 'You ' + side; thesisSplit.hidden = false; }
     }
   }
@@ -398,8 +425,6 @@
       taps[slug] = next;   /* the split is the server's figure and does not move on a tap */
       paintAgree(card);
       if (next) confirmTap(card, next);   /* every tap that sets a side: the Tap Confirmed modal */
-      return;
-      paintAgree(card);
     });
   }
 
@@ -414,15 +439,11 @@
   function esc(t) { return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
   /* {label} → Buy YES / Buy NO in its colour; {verdict} → right (green) / wrong (red); {price} → the odds at the call */
   function fillLine(line, card, side) {
-    var st = (card.dataset.stance || 'yes').toLowerCase();
-    var at = card.dataset.calledPct || ''; if (!at) { var sp = card.querySelector('[title="odds at call"]'); at = sp ? sp.textContent.replace(/ at call.*/, '') : ''; }
+    var st = (card.dataset.side || 'yes').toLowerCase();
+    var at = card.dataset.calledPct || '';
     var label = '<span class="lbl lbl--' + st + ' tc__word">Buy ' + st.toUpperCase() + '</span>';
     var verdict = side === 'agree' ? 'right' : 'wrong';   /* plain, not coloured */
     return esc(line).replace(/\{label\}/g, label).replace(/\{verdict\}/g, verdict).replace(/\{price\}/g, esc(at.replace('%', '')));
-  }
-  function crowdLine(card) {
-    var n = parseInt(card.dataset.tradeCount || '0', 10) || 0, pct = card.dataset.agreePct || '';
-    return (n >= 3 && pct) ? pct + '% agree with ' + n + ' trade' + (n === 1 ? '' : 's') : '';
   }
   function confirmTap(card, side) {
     if (!tapModal) return;
@@ -457,7 +478,7 @@
 
   /* ── Modals: Vote, Take sent ──────────────────────────── */
   /* Shared: close on X, Escape or the backdrop; body scroll locked while open. */
-  function anyModalOpen() { return !!document.querySelector('[data-modal]:not([hidden]), [data-onboarding]:not([hidden])'); }
+  function anyModalOpen() { return !!document.querySelector('[data-modal]:not([hidden]), [data-onboarding]:not([hidden]), [data-hiw]:not([hidden])'); }
   function openModal(m) { m.hidden = false; document.documentElement.classList.add('onb-lock'); var c = m.querySelector('.mdl__close'); if (c) c.focus(); }
   function closeModal(m) { m.hidden = true; if (!anyModalOpen()) document.documentElement.classList.remove('onb-lock'); }
   var modals = document.querySelectorAll('[data-modal]');
