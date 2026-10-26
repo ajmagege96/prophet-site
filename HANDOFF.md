@@ -15,11 +15,11 @@ sections 5–7 are the contracts your side has to honour.
 
 **History layout (Oct 25, founder).**
 - **Card**: the result tag moved from beside the odds to the bottom right of the meta row: right (green), wrong (red), void (gray), **pending** (purple; it was "awaiting", and `market.outcome` now sends `pending`). Conviction stars show on History cards too; the time to close is hidden there.
-- **Thesis block, History**: the result line sits at the top right of the block ("Resolved YES · right", or "Taps closed. Resolution next." while pending). Under the thesis, a hairline, a **RESOLUTION** label, and the copy: `{{market.outcome_note}}` on a resolved call, the void line on a void call. Pending shows no Resolution section.
+- **Thesis block, History**: the result line sits at the top right of the block ("Resolved YES · right" on a resolved call; nothing while pending or void). Under the thesis, a hairline, a **RESOLUTION** label, and the copy: `{{market.outcome_note}}` on a resolved call, the void line on a void call. Pending shows no Resolution section.
 
 **UI Changes (Oct 26 logic, built Oct 25).**
 - **Time marker** beside the Thesis label, by `{{market.state}}`: `called` / `revised` / `changed` → `{{market.time_line}}` ("Called 2h ago" / "Revised 3h ago" / "Changed 2h ago"); `pending` → "Pending", no time; `resolved` → "Resolved `{{market.resolved_ago}}`". On `changed` (he switched side) send `user_side` empty so the buttons start unselected. Void calls show no marker.
-- **Pending** = closed, end date passed, or price at 99 / 1. The card moves to History with the pending tag and its odds keep updating. The block's outcome line reads "Taps closed. Resolution next."; no outcome note yet.
+- **Pending** = closed, end date passed, or price at 99 / 1. The card moves to History with the pending tag and its odds keep updating. The block shows the "Pending" marker and nothing top right; no outcome note yet.
 - **Resolved**: under the outcome line (right / wrong, unchanged), `{{market.outcome_note}}`, one line in his voice on what happened. Mocks carry `[COPY]`.
 - **Calls tab** holds twenty cards at most. No template change; send twenty.
 - On phones the History tag drops under the 26px odds so it never runs off the card.
@@ -348,7 +348,7 @@ Other globals: `window.prophetOnboarding.open()`, `window.prophetHowItWorks.open
 |---|---|---|
 | `{{agree_pct}}` | Home | Agree / Disagree under the thesis: the user's side (`agree` / `disagree` / empty) is kept; from three taps the split under the buttons reads "71% agree · 38 taps" — the server's figure, unchanged by the user's own tap — below that only "You agree" / "You disagree"; `market_closed` `true` disables both buttons and shows "Taps closed. Resolution next." Signed-in only: a signed-out tap fires `prophet:signin` with `{then: 'agree', slug}` |
 | `{{buy_url}}` | $PROPHET; Home; below-fold | Buy $PROPHET link (pump.fun) |
-| `{{call_state}}` | Home | `live` / `resolved` / `void` / `closed`. Void shows "Market closed by Polymarket before resolution."; closed (pending) shows "Taps closed. Resolution next." |
+| `{{call_state}}` | Home | `live` / `resolved` / `void` / `closed`. Void shows "Market closed by Polymarket before resolution."; closed (pending) shows the "Pending" marker and nothing top right |
 | `{{contract_address}}` | $PROPHET; Home; header | $PROPHET contract address; the header pill shows first 6 … last 6 and copies the full value |
 | `{{docs_url}}` | $PROPHET; Home; header | External link to documentation site |
 | `{{jupiter_url}}` | $PROPHET; Home; footer; header | $PROPHET on Jupiter (footer token link) |

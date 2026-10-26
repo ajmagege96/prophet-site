@@ -97,8 +97,7 @@ card. Contents, and nothing else:
   client capitalises the first letter. No tap behaviour.
 - The thesis text, the latest revision (`{{market.thesis}}`).
 - History only, top right of the block: `Resolved YES · right` (right
-  green / wrong red), or `"Taps closed. Resolution next."` for a pending call
-  (`call_state` closed). Nothing there on a void call.
+  green / wrong red) on a resolved call. Nothing there while pending or void.
 - History only, under the thesis: a hairline, a **RESOLUTION** label styled like
   THESIS, and the copy — `{{market.outcome_note}}` (his one line on what
   happened) on a resolved call, or `"Market closed by Polymarket before
@@ -216,7 +215,7 @@ Descriptions in `TEMPLATE_VARS.md`; the generated table in `HANDOFF.md` §10.
 - The purple marker beside Thesis reads Called / Revised while live, "Pending
   resolution" when pending, "Resolved {time}" when resolved.
 - A pending card sits in History with the purple pending tag at the bottom right, a price that matches
-  Polymarket, and "Taps closed. Resolution next." under the thesis.
+  Polymarket, the "Pending" marker, and nothing at the top right of the block.
 - A resolved card shows the result line top right of the block, and the outcome
   note under RESOLUTION below a hairline.
 - A market where he changed side reads "Changed" with its time and the buttons

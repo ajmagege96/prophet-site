@@ -32,7 +32,7 @@ variable table in HANDOFF.md §10; design rules in CLAUDE.md; delta spec in BUIL
   (the earlier tap stays with the earlier call and is not shown).
 - The thesis text, latest revision. Nothing else for a live call.
 - History: the result line at the top right of the block — "Resolved YES ·
-  right", or "Taps closed. Resolution next." while pending. Under the
+  right" on a resolved call; nothing there while pending or void. Under the
   thesis, a hairline and a RESOLUTION section: the outcome note (one line in his
   voice on what happened) on a resolved call, "Market closed by Polymarket
   before resolution." on a void call, nothing while pending.
