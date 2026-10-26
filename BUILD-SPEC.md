@@ -63,9 +63,8 @@ Top to bottom, for every card:
 
 1. **Image** (44px) top-left; **market odds** top-right, big (26px display face)
    — `{{market.yes_pct}}` + "YES" — the live price, or the settled 100% / 0%
-   once resolved. In History the outcome tag follows the odds: `right` ·
-   `wrong` · `void` · `awaiting`; that tag is `{{market.outcome_tag}}`, empty on
-   live calls.
+   once resolved. In History the result tag (`{{market.outcome_tag}}`) sits at
+   the bottom right of the meta row instead.
 2. **Question**, two lines max. A ladder market prints `{{listed_leg_date}}`
    small and gray on the same line as the question (omit the span when empty).
 3. **The call, big** (24px display face), where a figure would be:
@@ -97,12 +96,13 @@ card. Contents, and nothing else:
   `resolved` → "Resolved `{{market.resolved_ago}}`". Void shows none. The
   client capitalises the first letter. No tap behaviour.
 - The thesis text, the latest revision (`{{market.thesis}}`).
-- History only: one line under the text — `Resolved YES · right · 2w ago`
-  (right green / wrong red), or `"Market closed by Polymarket before
-  resolution."` for `call_state` void, or `"Taps closed. Resolution next."` for
-  a pending call (`call_state` closed).
-- Resolved only, under that line: `{{market.outcome_note}}`, one line in his
-  voice on what happened.
+- History only, top right of the block: `Resolved YES · right · 2w ago` (right
+  green / wrong red), or `"Taps closed. Resolution next."` for a pending call
+  (`call_state` closed). Nothing there on a void call.
+- History only, under the thesis: a hairline, a **RESOLUTION** label styled like
+  THESIS, and the copy — `{{market.outcome_note}}` (his one line on what
+  happened) on a resolved call, or `"Market closed by Polymarket before
+  resolution."` on a void call. Hidden while pending.
 
 The block carries `data-signed-in="{{viewer.signed_in}}"`.
 
@@ -156,7 +156,9 @@ The History tab shows resolved calls as cards in the same structure: odds
 row with the odds at the call. Selecting one shows the thesis as last revised
 and the outcome line (section 5). Void calls carry the void tag and line and sit
 apart from any count. Pending calls (closed, end date passed, or price at 99 / 1)
-move here with the awaiting tag; their odds keep updating. On phones the tag
+move here with the pending tag; their odds keep updating. The result tag sits at
+the bottom right of the meta row — right (green), wrong (red), void (gray),
+pending (purple) — and the conviction stars show here too. On phones the tag
 drops under the odds.
 Nothing about the user's taps appears in History.
 
@@ -200,7 +202,7 @@ Oct 23 evening: `market.side`, `market.side_upper`, `market.time_line`,
 Oct 22: `label`, `call_state`, `listed_leg_date`, `agree_pct`, `user_side`,
 `market_closed`, `tap_modal.confirm_agree`, `tap_modal.confirm_disagree`,
 `tap_modal.scoring_line`. `market.outcome` takes `right` / `wrong` / `void` /
-`awaiting`; `market.filter_state` takes `called` / `resolved`.
+`pending` (was `awaiting`); `market.filter_state` takes `called` / `resolved`.
 Descriptions in `TEMPLATE_VARS.md`; the generated table in `HANDOFF.md` §10.
 
 ## 12. Check before shipping
@@ -212,9 +214,10 @@ Descriptions in `TEMPLATE_VARS.md`; the generated table in `HANDOFF.md` §10.
   line, no overflow at 390px.
 - The purple marker beside Thesis reads Called / Revised while live, "Pending
   resolution" when pending, "Resolved {time}" when resolved.
-- A pending card sits in History with the awaiting tag, a price that matches
+- A pending card sits in History with the purple pending tag at the bottom right, a price that matches
   Polymarket, and "Taps closed. Resolution next." under the thesis.
-- A resolved card shows the right / wrong line and the outcome note under it.
+- A resolved card shows the result line top right of the block, and the outcome
+  note under RESOLUTION below a hairline.
 - A market where he changed side reads "Called" with the new time and the
   buttons start unselected.
 - The Calls tab never shows more than twenty cards.

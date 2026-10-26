@@ -385,17 +385,19 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
       var cs = card.dataset.callState || '', rs = (card.dataset.resolvedSide || '').toLowerCase();
       thesisOutcome.hidden = !history;
       if (history) {
-        if (cs === 'void') thesisOutcome.textContent = VOID_LINE;
-        else if (cs === 'closed' || card.dataset.outcome === 'awaiting') thesisOutcome.textContent = 'Taps closed. Resolution next.';
+        if (cs === 'void') thesisOutcome.hidden = true;   /* the void line sits under Resolution */
+        else if (cs === 'closed' || card.dataset.outcome === 'pending' || card.dataset.outcome === 'awaiting') thesisOutcome.textContent = 'Taps closed. Resolution next.';
         else thesisOutcome.innerHTML = 'Resolved <span class="tally tally--' + rs + '">' + rs.toUpperCase() + '</span> · ' + (card.dataset.outcome === 'right' ? '<span class="lbl lbl--yes">right</span>' : '<span class="lbl lbl--no">wrong</span>') + (card.dataset.resolvedAgo ? ' · ' + card.dataset.resolvedAgo : '');
       }
     }
-    /* Resolved only: his one line on what happened, under the outcome line */
-    var noteEl = document.querySelector('[data-thesis-note]');
-    if (noteEl) {
-      var note = history && (card.dataset.callState || '') === 'resolved' ? (card.dataset.outcomeNote || '') : '';
+    /* Resolution section: his one line on a resolved call, the void line on a void one; hidden while pending */
+    var resEl = document.querySelector('[data-thesis-res]'), noteEl = document.querySelector('[data-thesis-note]');
+    if (resEl && noteEl) {
+      var cs1 = card.dataset.callState || '', note = '';
+      if (history && cs1 === 'resolved') note = card.dataset.outcomeNote || '';
+      else if (history && cs1 === 'void') note = VOID_LINE;
       if ((/^\{\{/).test(note)) note = '';
-      noteEl.textContent = note; noteEl.hidden = !note;
+      noteEl.textContent = note; resEl.hidden = !note;
     }
     paintAgree(card);
   }

@@ -20,7 +20,7 @@
 | `{{market.image_url}}` | Market image, imported from Polymarket (44px square on the card) |
 | `{{market.question}}` | Market question text |
 | `{{market.yes_pct}}` | Current YES percentage (e.g. "72%"); once resolved, the settled 100% / 0% |
-| `{{market.outcome_tag}}` | After the odds, top-right: empty for a live call; in History the tag `<span class="prow__outcome prow__outcome--right">right</span>` (right · wrong · void · awaiting). Was `market.state` before Oct 23 |
+| `{{market.outcome_tag}}` | History: the result tag at the bottom right of the card's meta row, `<span class="prow__outcome prow__outcome--right">right</span>` — right (green) · wrong (red) · void (gray) · pending (purple). Empty for a live call |
 | `{{market.volume}}` | Polymarket volume, short form (e.g. "$4.1M"), shown after a bar-chart icon |
 | `{{market.ends_in}}` | Relative time until the market ends (e.g. "12d", "3mo"), shown after a clock icon |
 | `{{label}}` | `buy_yes` / `buy_no`, carried on the card as `data-label`. Never inside the thesis text |
@@ -28,14 +28,14 @@
 | `{{market.time_line}}` | The purple marker beside the Thesis label while the call is live: "called 2h ago" / "revised 3h ago" (relative; the block capitalises it) |
 | `{{market.conviction}}`, `{{show_conviction}}` | Conviction 1–5, carried as `data-conviction`; five stars first in the meta row (bottom-left), the first n filled in the call's colour (green for Buy YES, red for Buy NO), the rest faint in the same colour. `show_conviction` on the carousel root hides them when it is `false`; anything else shows them |
 | `{{agree_pct}}`, `{{tap_count}}`, `{{user_side}}`, `{{market_closed}}` | Agree / Disagree under the thesis: the user's side (`agree` / `disagree` / empty) is kept; from three taps the split under the buttons reads "71% agree · 38 taps" — the server's figure, unchanged by the user's own tap — below that only "You agree" / "You disagree"; `market_closed` `true` disables both buttons and shows "Taps closed. Resolution next." Signed-in only: a signed-out tap fires `prophet:signin` with `{then: 'agree', slug}` |
-| `{{market.outcome}}` | History: `right` / `wrong` / `void` / `awaiting` — the tag in the badge and the outcome line |
+| `{{market.outcome}}` | History: `right` / `wrong` / `void` / `pending` (was `awaiting`) — the card tag and the result line |
 | `{{call_state}}` | `live` / `resolved` / `void` / `closed`. Void shows "Market closed by Polymarket before resolution."; closed (pending) shows "Taps closed. Resolution next." |
 | `{{listed_leg_date}}` | Ladder markets only: the leg's date (e.g. `Oct 20`), small and gray beside the question on the card face. Empty otherwise. When a leg rolls, the card returns to not evaluated with the next date and the old leg goes to History as resolved |
 | `{{market.outcome}}` | `won` / `lost` — resolved markets only, drives the tag in the badge |
 | `{{market.resolved_side}}` | `yes` / `no` — the side the market settled on |
 | `{{market.resolved_pct}}` | Closing YES % at settlement, e.g. `97%` |
 | `{{market.resolved_ago}}` | Relative time since resolution, e.g. `2w ago`; the marker reads "Resolved 2w ago" and the outcome line ends with it |
-| `{{market.outcome_note}}` | Resolved cards only: one line in his voice on what happened, under the outcome line in the thesis block. Empty for pending and void |
+| `{{market.outcome_note}}` | Resolved cards only: one line in his voice on what happened, under the RESOLUTION label below a hairline in the thesis block. Empty for pending and void (void shows the void line there instead) |
 | `{{market.called_pct}}` | Odds when the call was made, e.g. `84%`. Odds at the call, carried as `data-called-pct` for the Tap Confirmed price ("Buy YES at 84"); not printed on the card |
 | `{{market.side}}`, `{{market.side_upper}}` | `yes` / `no` and `YES` / `NO`: the call, printed big on the card as "Buy YES" (green) or "Buy NO" (red). Replace `thesis_stance` / `thesis_stance_upper` |
 | `{{market.thesis}}` | Full thesis text (called) or draft thesis (vote open), set as `data-thesis` on the card; shown in the Thesis block above the takes when the card is selected; empty otherwise |

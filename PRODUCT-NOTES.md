@@ -14,7 +14,7 @@ variable table in HANDOFF.md §10; design rules in CLAUDE.md; delta spec in BUIL
 ## Card (one per market with a call)
 - Market image; question (two lines max; a ladder market prints the leg's date beside
   the question); market odds top-right as "91% YES" (live price, or the settled
-  100% / 0% once resolved; in History a right / wrong / void / awaiting tag follows).
+  100% / 0% once resolved).
 - Big call: **Buy YES** (green) or **Buy NO** (red). He just calls it.
 - Meta row: five conviction stars first (1–5 filled, in the call's colour), then
   volume, then time to close. The odds at the call are NOT shown on the card.
@@ -31,12 +31,15 @@ variable table in HANDOFF.md §10; design rules in CLAUDE.md; delta spec in BUIL
   Agree / Disagree buttons start unselected (the earlier tap stays with the
   earlier call and is not shown).
 - The thesis text, latest revision. Nothing else for a live call.
-- History: an outcome line under the text — "Resolved YES · right · 2w ago",
-  "Market closed by Polymarket before resolution." (void), or "Taps closed.
-  Resolution next." (pending). Resolved cards add the outcome note under it:
-  one line in his voice on what happened.
+- History: the result line at the top right of the block — "Resolved YES ·
+  right · 2w ago", or "Taps closed. Resolution next." while pending. Under the
+  thesis, a hairline and a RESOLUTION section: the outcome note (one line in his
+  voice on what happened) on a resolved call, "Market closed by Polymarket
+  before resolution." on a void call, nothing while pending.
+- History cards: result tag at the bottom right — right (green), wrong (red),
+  void (gray), pending (purple). Conviction stars show on History cards too.
 - Pending = market closed, end date passed, or price at 99 / 1. The card moves
-  to History with the awaiting tag; its odds keep updating.
+  to History with the pending tag; its odds keep updating.
 - Calls tab: twenty cards at most.
 - Times are relative everywhere; a market's own dates (ladder leg, question text)
   print as dates.
@@ -71,7 +74,7 @@ side (yes | no), state (called | revised | pending | resolved), time_line
 conviction (1–5), called_pct (odds at the call,
 for the modal line only), volume, ends_in, listed_leg_date (ladders), thesis (latest
 revision), call_state (live | resolved | void | closed), outcome (right | wrong | void
-| awaiting), resolved_side, resolved_pct, resolved_ago, agree_pct, tap_count,
+| pending), resolved_side, resolved_pct, resolved_ago, agree_pct, tap_count,
 user_side (agree | disagree | empty), market_closed (true | false).
 Deck-level: show_conviction ("false" hides the stars; anything else shows them).
 Viewer: signed_in. Modal copy: tap_modal.confirm_agree, confirm_disagree,

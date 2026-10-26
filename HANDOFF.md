@@ -13,6 +13,10 @@ sections 5–7 are the contracts your side has to honour.
 
 ## 1. What changed since the last drop
 
+**History layout (Oct 25, founder).**
+- **Card**: the result tag moved from beside the odds to the bottom right of the meta row: right (green), wrong (red), void (gray), **pending** (purple; it was "awaiting", and `market.outcome` now sends `pending`). Conviction stars show on History cards too.
+- **Thesis block, History**: the result line sits at the top right of the block ("Resolved YES · right · 2w ago", or "Taps closed. Resolution next." while pending). Under the thesis, a hairline, a **RESOLUTION** label, and the copy: `{{market.outcome_note}}` on a resolved call, the void line on a void call. Pending shows no Resolution section.
+
 **UI Changes (Oct 26 logic, built Oct 25).**
 - **Time marker** beside the Thesis label, by `{{market.state}}`: `called` / `revised` → `{{market.time_line}}` ("Called 2h ago" / "Revised 3h ago"); `pending` → "Pending resolution", no time; `resolved` → "Resolved `{{market.resolved_ago}}`". `changed` is retired: a change of side is a new call (`called`, fresh `time_line`, `user_side` empty, so the buttons start unselected). Void calls show no marker.
 - **Pending** = closed, end date passed, or price at 99 / 1. The card moves to History with the awaiting tag and its odds keep updating. The block's outcome line reads "Taps closed. Resolution next."; no outcome note yet.
@@ -357,9 +361,9 @@ Other globals: `window.prophetOnboarding.open()`, `window.prophetHowItWorks.open
 | `{{market.ends_in}}` | Home | Relative time until the market ends (e.g. "12d", "3mo"), shown after a clock icon |
 | `{{market.filter_state}}` | Home | `called` (the Calls deck) or `resolved` (History); the two tabs |
 | `{{market.image_url}}` | Home | Market image, imported from Polymarket (44px square on the card) |
-| `{{market.outcome}}` | Home | History: `right` / `wrong` / `void` / `awaiting` — the tag in the badge and the outcome line |
-| `{{market.outcome_note}}` | Home | Resolved cards only: one line in his voice on what happened, under the outcome line in the thesis block. Empty for pending and void |
-| `{{market.outcome_tag}}` | Home | After the odds, top-right: empty for a live call; in History the tag `<span class="prow__outcome prow__outcome--right">right</span>` (right · wrong · void · awaiting). Was `market.state` before Oct 23 |
+| `{{market.outcome}}` | Home | History: `right` / `wrong` / `void` / `pending` (was `awaiting`) — the card tag and the result line |
+| `{{market.outcome_note}}` | Home | Resolved cards only: one line in his voice on what happened, under the RESOLUTION label below a hairline in the thesis block. Empty for pending and void (void shows the void line there instead) |
+| `{{market.outcome_tag}}` | Home | History: the result tag at the bottom right of the card's meta row, `<span class="prow__outcome prow__outcome--right">right</span>` — right (green) · wrong (red) · void (gray) · pending (purple). Empty for a live call |
 | `{{market.question}}` | Home | Market question text |
 | `{{market.resolved_ago}}` | Home | Relative time since resolution, e.g. `2w ago`; the marker reads "Resolved 2w ago" and the outcome line ends with it |
 | `{{market.resolved_pct}}` | Home | Closing YES % at settlement, e.g. `97%` |
