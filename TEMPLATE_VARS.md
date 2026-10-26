@@ -34,7 +34,7 @@
 | `{{market.outcome}}` | `won` / `lost` — resolved markets only, drives the tag in the badge |
 | `{{market.resolved_side}}` | `yes` / `no` — the side the market settled on |
 | `{{market.resolved_pct}}` | Closing YES % at settlement, e.g. `97%` |
-| `{{market.resolved_ago}}` | Relative time since resolution, e.g. `2w ago`; the marker reads "Resolved 2w ago" and the outcome line ends with it |
+| `{{market.resolved_ago}}` | Relative time since resolution, e.g. `2w ago`; the marker reads "Resolved 2w ago" and the result line carries no time |
 | `{{market.outcome_note}}` | Resolved cards only: one line in his voice on what happened, under the RESOLUTION label below a hairline in the thesis block. Empty for pending and void (void shows the void line there instead) |
 | `{{market.called_pct}}` | Odds when the call was made, e.g. `84%`. Odds at the call, carried as `data-called-pct` for the Tap Confirmed price ("Buy YES at 84"); not printed on the card |
 | `{{market.side}}`, `{{market.side_upper}}` | `yes` / `no` and `YES` / `NO`: the call, printed big on the card as "Buy YES" (green) or "Buy NO" (red). Replace `thesis_stance` / `thesis_stance_upper` |

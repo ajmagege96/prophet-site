@@ -15,7 +15,7 @@ sections 5–7 are the contracts your side has to honour.
 
 **History layout (Oct 25, founder).**
 - **Card**: the result tag moved from beside the odds to the bottom right of the meta row: right (green), wrong (red), void (gray), **pending** (purple; it was "awaiting", and `market.outcome` now sends `pending`). Conviction stars show on History cards too; the time to close is hidden there.
-- **Thesis block, History**: the result line sits at the top right of the block ("Resolved YES · right · 2w ago", or "Taps closed. Resolution next." while pending). Under the thesis, a hairline, a **RESOLUTION** label, and the copy: `{{market.outcome_note}}` on a resolved call, the void line on a void call. Pending shows no Resolution section.
+- **Thesis block, History**: the result line sits at the top right of the block ("Resolved YES · right", or "Taps closed. Resolution next." while pending). Under the thesis, a hairline, a **RESOLUTION** label, and the copy: `{{market.outcome_note}}` on a resolved call, the void line on a void call. Pending shows no Resolution section.
 
 **UI Changes (Oct 26 logic, built Oct 25).**
 - **Time marker** beside the Thesis label, by `{{market.state}}`: `called` / `revised` / `changed` → `{{market.time_line}}` ("Called 2h ago" / "Revised 3h ago" / "Changed 2h ago"); `pending` → "Pending", no time; `resolved` → "Resolved `{{market.resolved_ago}}`". On `changed` (he switched side) send `user_side` empty so the buttons start unselected. Void calls show no marker.
@@ -365,7 +365,7 @@ Other globals: `window.prophetOnboarding.open()`, `window.prophetHowItWorks.open
 | `{{market.outcome_note}}` | Home | Resolved cards only: one line in his voice on what happened, under the RESOLUTION label below a hairline in the thesis block. Empty for pending and void (void shows the void line there instead) |
 | `{{market.outcome_tag}}` | Home | History: the result tag at the bottom right of the card's meta row, `<span class="prow__outcome prow__outcome--right">right</span>` — right (green) · wrong (red) · void (gray) · pending (purple). Empty for a live call |
 | `{{market.question}}` | Home | Market question text |
-| `{{market.resolved_ago}}` | Home | Relative time since resolution, e.g. `2w ago`; the marker reads "Resolved 2w ago" and the outcome line ends with it |
+| `{{market.resolved_ago}}` | Home | Relative time since resolution, e.g. `2w ago`; the marker reads "Resolved 2w ago" and the result line carries no time |
 | `{{market.resolved_pct}}` | Home | Closing YES % at settlement, e.g. `97%` |
 | `{{market.resolved_side}}` | Home | `yes` / `no` — the side the market settled on |
 | `{{market.side}}` | Home | `yes` / `no` and `YES` / `NO`: the call, printed big on the card as "Buy YES" (green) or "Buy NO" (red). Replace `thesis_stance` / `thesis_stance_upper` |

@@ -387,7 +387,7 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
       if (history) {
         if (cs === 'void') thesisOutcome.hidden = true;   /* the void line sits under Resolution */
         else if (cs === 'closed' || card.dataset.outcome === 'pending' || card.dataset.outcome === 'awaiting') thesisOutcome.textContent = 'Taps closed. Resolution next.';
-        else thesisOutcome.innerHTML = 'Resolved <span class="tally tally--' + rs + '">' + rs.toUpperCase() + '</span> · ' + (card.dataset.outcome === 'right' ? '<span class="lbl lbl--yes">right</span>' : '<span class="lbl lbl--no">wrong</span>') + (card.dataset.resolvedAgo ? ' · ' + card.dataset.resolvedAgo : '');
+        else thesisOutcome.innerHTML = 'Resolved <span class="tally tally--' + rs + '">' + rs.toUpperCase() + '</span> · ' + (card.dataset.outcome === 'right' ? '<span class="lbl lbl--yes">right</span>' : '<span class="lbl lbl--no">wrong</span>');   /* no time here: the purple marker already reads Resolved {ago} */
       }
     }
     /* Resolution section: his one line on a resolved call, the void line on a void one; hidden while pending */

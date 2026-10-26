@@ -96,7 +96,7 @@ card. Contents, and nothing else:
   `resolved` → "Resolved `{{market.resolved_ago}}`". Void shows none. The
   client capitalises the first letter. No tap behaviour.
 - The thesis text, the latest revision (`{{market.thesis}}`).
-- History only, top right of the block: `Resolved YES · right · 2w ago` (right
+- History only, top right of the block: `Resolved YES · right` (right
   green / wrong red), or `"Taps closed. Resolution next."` for a pending call
   (`call_state` closed). Nothing there on a void call.
 - History only, under the thesis: a hairline, a **RESOLUTION** label styled like
