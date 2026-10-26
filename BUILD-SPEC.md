@@ -1,17 +1,17 @@
 # The Prophet — UI Build Spec: changes to theprophet.fun
 
-October 23, 2026 (evening revisions folded in) · preview https://ajmagege96.github.io/prophet-site/site/
+October 26, 2026 · preview https://ajmagege96.github.io/prophet-site/site/ (matches `main`)
 
 This is the delta between what theprophet.fun serves today and the UI in this
-drop. "Live" below is what the live page was found rendering when checked today:
-a deck of no-thesis cards with the prompt bar, the YES | NO stance switch, the
-Vote and Take-sent modals, the take-limit notices, Hold / not-evaluated cards,
-conviction stars and credits. All of that is replaced by what follows. The
-below-fold copy (How it Works, Tokenomics, Roadmap), the onboarding slides, the
-header, the footer and the $PROPHET page are unchanged and are not in this spec.
+drop. The live page still renders a deck of no-thesis cards with the prompt bar,
+the YES | NO stance switch, the Vote and Take-sent modals, take-limit notices,
+Hold / not-evaluated cards and credits. All of that is replaced by what follows.
+The below-fold copy (How it Works, Tokenomics, Roadmap), the onboarding slides,
+the footer and the $PROPHET page are unchanged and are not in this spec.
 
-The full reference is in the repo: `HANDOFF.md` (contracts, hooks, variable
-table), `TEMPLATE_VARS.md` (every variable), `CLAUDE.md` (design rules).
+Full reference in the repo: `HANDOFF.md` (contracts, hooks, variable table),
+`TEMPLATE_VARS.md` (every variable), `CLAUDE.md` (design rules),
+`PRODUCT-NOTES.md` (the same surface, written for the product side).
 
 ---
 
@@ -19,223 +19,213 @@ table), `TEMPLATE_VARS.md` (every variable), `CLAUDE.md` (design rules).
 
 The product has two verbs on the surface: **Agree** and **Disagree**. The words
 vote, take, credits and holders decide do not appear in the hero. Counts of
-agree / disagree actions are **taps**.
+agree / disagree actions are **taps**, never trades.
 
 ## 2. Remove
 
 | Live today | Status |
 |---|---|
-| Prompt bar: text field, Send, the YES \| NO stance switch, the takes-left count, the typewriter placeholder | Removed. There is no text entry on the site. |
+| Prompt bar: text field, Send, the YES \| NO stance switch, takes-left count, typewriter placeholder | Removed. No text entry on the site. |
 | Takes feed under the thesis block | Removed. |
-| Credits / contributors list in the thesis block | Removed. |
-| Vote modal, "Vote" button, tally, countdown, "Voted YES" state | Removed. |
-| Take-sent modal (loading, confirmed, limit states), "takes left today" | Removed. |
+| Credits / contributors list | Removed. |
+| Vote modal, Vote button, tally, countdown, "Voted YES" state | Removed. |
+| Take-sent modal (loading, confirmed, limit states) | Removed. |
 | Notices: Nothing to send, Pick a side, cooldown, out of takes | Removed. The Logged out notice stays. |
-| Hold and not-evaluated cards; `hold_reason`; `no_edge_line`; the Hold badge | Removed. The deck shows live calls only. |
-| Conviction (star + N) on cards, in the block, in History | Removed everywhere. He just calls it. |
-| His number (`prophet_probability`) on the face or in the block; "N% at call" field in the block; last-run line | Not shown anywhere. `prophet_probability` is still carried on the card for later. |
+| Hold and not-evaluated cards; `hold_reason`; `no_edge_line`; the Hold badge | Removed. |
+| His number (`prophet_probability`) anywhere; last-run line | Removed. |
+| "N% at call" on the card face | Removed. `called_pct` stays on the card as data for the Tap Confirmed line. |
 | Buy $PROPHET link on cards | Removed. |
-| The filter tags No thesis · Open votes · Prophecies | Replaced by two tabs, below. |
+| Filter tags No thesis · Open votes · Prophecies | Replaced by two tabs. |
+| Prophecies and Record pages | Archived; everything lives on the home carousel. |
 
 Variables that go with them: `market.take_count`, `market.vote_*`, `take.*`,
 `take_result.*`, `takes.*`, `takes_remaining_today`, `take_limit_reason`,
 `viewer.take_cooldown`, `market.viewer_takes_used`, `contributor.*`,
 `market.contributors_json`, `empty_no_takes`, `hold_reason`, `no_edge_line`,
-`window_class`, `market.conviction`, `last_run_at`, `viewer.balance`,
-`viewer.vote_share`, `tap_confirmed`.
+`window_class`, `last_run_at`, `viewer.balance`, `viewer.vote_share`,
+`prophet_probability`, `market.thesis_stance`, `market.thesis_stance_upper`,
+`market.called_ago`, `revised_ago`, `revised_number`, `trade_count`.
 
-## 3. Deck and tabs
+## 3. Header
 
-- Two tabs above the carousel: **Calls** · **History**. One is always on
-  (Calls by default); the Tab key switches. One gray highlight style, no colour.
-- **Calls** = every listed market with a call, `filter_state` `called`, in the order the server
-  sends (most interesting first). **History** = `filter_state` `resolved`.
-  Both decks are sent in the same `<!-- repeat: market -->` loop; the client
-  shows one at a time.
-- Empty tab: one centred line, `"No live calls right now. He's reading."` —
-  the `<p class="deck__empty">` after the track. Not padded.
-- Three cards across on desktop, one on phones with the next peeking. Cards are
-  a fixed height: 196px desktop, 184px phone. Nothing shifts on tab change.
+Logo and wordmark left; **How it Works** right of the logo on desktop and first
+in the mobile menu; it opens a four-slide click-through every time (section 10).
+Desktop nav: $PROPHET · Docs · Logout (signed in only, red on hover), then the
+contract-address pill. Mobile: logo, address pill, one menu button.
 
-## 4. The card face
+## 4. Deck and tabs
 
-Top to bottom, for every card:
+- Two tabs above the carousel: **Calls** · **History**. One always on (Calls by
+  default); the Tab key switches. Gray highlight, no colour.
+- **Calls** = every listed market with a call (`filter_state` `called`), in
+  the server's order, most interesting first, **twenty at most**.
+  **History** = `filter_state` `resolved`: resolved, pending and void calls.
+  Both come in the same `<!-- repeat: market -->` loop; the client shows one
+  tab at a time.
+- Empty tab: one centred line, "No live calls right now. He's reading."
+- Three cards across on desktop, one on phones with the next peeking. Fixed
+  height, 196px desktop / 184px phone; nothing shifts on tab change.
+- Exactly one card is selected: brighter white outline, and it flashes green
+  every 3s on the same beat as the thesis block, so the block reads as that
+  market's. Click selects; desktop arrows rotate the deck; arrow keys move the
+  selection; swipe on phones.
 
-1. **Image** (44px) top-left; **market odds** top-right, big (26px display face)
-   — `{{market.yes_pct}}` + "YES" — the live price, or the settled 100% / 0%
-   once resolved. In History the result tag (`{{market.outcome_tag}}`) sits at
-   the bottom right of the meta row instead.
+## 5. The card face
+
+Top to bottom:
+
+1. **Image** (44px) top-left; **market odds** top-right, 26px display face —
+   `{{market.yes_pct}}` + "YES" — the live price, or the settled 100% / 0%.
+   Pending odds keep updating; never frozen.
 2. **Question**, two lines max. A ladder market prints `{{listed_leg_date}}`
-   small and gray on the same line as the question (omit the span when empty).
-3. **The call, big** (24px display face), where a figure would be:
-   `Buy YES` in green or `Buy NO` in red — `{{market.side}}` /
-   `{{market.side_upper}}`.
-4. **Meta row**: five conviction stars first (bottom-left), the first
-   `{{market.conviction}}` filled in the call's colour (green under Buy YES, red
-   under Buy NO; they hide only when the carousel root carries
-   `data-show-conviction="false"`, `{{show_conviction}}`) · bar icon +
-   `{{market.volume}}` · clock icon + `{{market.ends_in}}`. Three items, one
-   line. The odds at the call are not printed; `{{market.called_pct}}` stays on
-   the card as data for the Tap Confirmed line.
+   small and gray beside it.
+3. **The call, big** (24px display face): `Buy YES` green or `Buy NO` red —
+   `{{market.side}}` / `{{market.side_upper}}`.
+4. **Meta row**:
+   - Calls: five conviction stars (`{{market.conviction}}` filled, in the call's
+     green or red, the rest faint in the same colour) · bar icon +
+     `{{market.volume}}` · clock icon + `{{market.ends_in}}`.
+   - History: stars · volume · and at the bottom right the result tag
+     `{{market.outcome_tag}}`: **right** (green), **wrong** (red), **void**
+     (gray), **pending** (purple). No time to close.
+   - The stars hide only when the carousel root carries
+     `data-show-conviction="false"` (`{{show_conviction}}`).
 
 Card attributes the client reads: `data-state`, `data-slug`, `data-label`,
 `data-side`, `data-call-kind`, `data-time-line`, `data-called-pct`,
-`data-conviction`, `data-call-state`,
-`data-outcome`, `data-resolved-side`, `data-resolved-pct`, `data-resolved-ago`,
-`data-leg-date`, `data-agree-pct`, `data-tap-count`, `data-user-side`,
-`data-market-closed`, `data-thesis`.
+`data-conviction`, `data-call-state`, `data-outcome`, `data-resolved-side`,
+`data-resolved-pct`, `data-resolved-ago`, `data-leg-date`,
+`data-resolution-text`, `data-outcome-note`, `data-agree-pct`,
+`data-tap-count`, `data-user-side`, `data-market-closed`, `data-thesis`.
 
-## 5. The thesis block
+## 6. The thesis block
 
 One block under the carousel for the selected card, outlined like the selected
-card. It reads as a normal thesis box with **one drop-down**:
+card. It reads as a normal thesis box with **one drop-down**.
 
-- **THESIS header**: the label and, beside it, the small purple marker, by
-  `{{market.state}}`: `called` / `revised` / `changed` → `{{market.time_line}}`
-  ("Called 3d ago" / "Revised 3h ago" / "Changed 2h ago"); `pending` →
-  "Pending", no time; `resolved` → "Resolved `{{market.resolved_ago}}`". Void
-  shows none. On History, `Resolved YES · right` (right green / wrong red) sits
-  at the right of the header on a resolved call. A chevron at the far right.
-- **The thesis text**, latest revision (`{{market.thesis}}`), always shown.
-- **The drop-down**, under a hairline, opened and closed by the header (the
-  chevron turns). Closed by default on Calls and History alike; it resets on
-  every card. Built so more parts can sit in it later. In it now:
-  **RESOLUTION** — `{{market.resolution_text}}`, plain fact built by the server
-  for every state, in gray (how the market pays on a live call, "Pays YES if
-  …"; the pending line; the disputed line; "Resolved NO on Oct 25. His call:
-  wrong."; the void line), then `{{market.outcome_note}}` at full strength, as
-  his voice, on a resolved call.
+- **Header**: THESIS, then a small purple marker by `{{market.state}}`:
+
+  | State | Tab | Marker |
+  |---|---|---|
+  | `called` | Calls | `{{market.time_line}}` — "Called 3d ago" |
+  | `revised` | Calls | "Revised 3h ago" (same side, updated) |
+  | `changed` | Calls | "Changed 2h ago" (he switched side) |
+  | `pending` | History | "Pending", no time |
+  | `resolved` | History | "Resolved `{{market.resolved_ago}}`" |
+  | void | History | none |
+
+  On a resolved call, "Resolved YES · right" (side and right green / wrong red,
+  no time) sits at the right of the header. Nothing there while pending or
+  void. A chevron at the far right opens the drop-down.
+- **Thesis text**, latest revision (`{{market.thesis}}`), always shown.
+- **Drop-down**, under a hairline. Closed by default on both tabs and on every
+  card change; the header toggles it. Built so more parts can join it later
+  (his calls on this market, chart, taps). In it now, **RESOLUTION**:
+
+  | State | Shows |
+  |---|---|
+  | Live | `{{market.resolution_text}}` — how the market pays: "Pays YES if Peltola wins the Alaska Senate race on November 3." Never empty. |
+  | Pending, trading closed or end date passed | `resolution_text` — "Trading has closed. … Nothing is scored until Polymarket confirms the result." |
+  | Pending, price at 99 / 1 | `resolution_text` — "The result is effectively in, but Polymarket has not confirmed it. Nothing is scored until it does." |
+  | Disputed | `resolution_text` — "The proposed result has been challenged. Polymarket's resolvers will rule, and nothing is scored until they do." |
+  | Resolved | Only `{{market.outcome_note}}`, his resolution copy in his voice. No fact line: the marker and the header already say what happened and when. |
+  | Void | `resolution_text` — "Polymarket closed this market without a result. His calls and every tap on them don't count." |
+
+  The plain-fact line renders in gray; his outcome note at full strength.
 
 The block carries `data-signed-in="{{viewer.signed_in}}"`.
 
-## 6. Agree / Disagree
+## 7. Agree / Disagree
 
-A centred row under the block, live calls only (hidden on History):
+A centred row under the block, Calls only (hidden on History):
 
-- Two buttons, **Agree** and **Disagree**, 40px tall (44px on phones). Bright
-  green and bright red from the start; hover and chosen look the same, no
-  outline (`.ad__btn--on` is kept on the chosen one for your own styling).
-  Nobody is pre-selected unless `{{user_side}}` says so.
-- A tap marks the side. Tapping the other switches it. Tapping the chosen one
-  again deselects it. `{{market_closed}}` `true` disables both and shows
-  `"Taps closed. Resolution next."` under them.
-- Under the buttons, centred, from three taps: **`{{agree_pct}}% agree ·
-  {{tap_count}} taps`** (e.g. "71% agree · 38 taps"). Below three taps and
-  with a side chosen: "You agree" / "You disagree". The figure is the server's;
-  the client never recomputes it on a tap — re-render it from the endpoint.
-  The word is **taps** everywhere; "trades" is gone.
-- Signed out (`viewer.signed_in` false): a tap dispatches `prophet:signin` on
-  `document` with `{then: 'agree', slug}` and does nothing else. After
-  sign-in, call `window.prophetTap.land(slug, 'agree' | 'disagree')` — the tap
-  lands and the confirmation shows.
+- **Agree** and **Disagree**, 40px tall (44px on phones), bright green and red
+  from the start; hover and chosen look the same, no outline. Nobody is
+  pre-selected unless `{{user_side}}` says so.
+- Tap marks the side; tap the other to switch; tap the chosen one to deselect.
+  `{{market_closed}}` true disables both and shows "Taps closed. Resolution
+  next." under them.
+- Under the buttons, centred, from three taps: "`{{agree_pct}}`% agree ·
+  `{{tap_count}}` taps" (e.g. "71% agree · 38 taps"); below three, only "You
+  agree" / "You disagree". The server's figure; never recomputed on a tap.
+- On a **changed** call send `user_side` empty: the buttons start unselected and
+  the earlier tap stays with the earlier call, unseen.
+- Signed out: a tap dispatches `prophet:signin` with `{then: 'agree', slug}` and
+  nothing else. After sign-in, `window.prophetTap.land(slug, side)` lands it.
 
-## 7. Tap Confirmed modal
+## 8. Tap Confirmed modal
 
-Opens on **every** tap that sets a side (a deselect shows nothing). Centred
-dialog on desktop; bottom sheet on phones. Closes on the X, the backdrop, or a
-swipe down. Top to bottom:
+Opens on every tap that sets a side (a deselect shows nothing). Centred dialog
+on desktop, bottom sheet on phones; X, backdrop or swipe down close it.
 
-1. Side chip — Agree (green) or Disagree (red) in the button's style.
-2. Confirmation line. Agree: `You're calling him right. Buy YES at 84. Let's
-   see if you're both right.` Disagree: `You're calling him wrong. Buy NO at
-   22, you say that's wrong.` The label is in its colour; right / wrong are
-   plain. The price is `called_pct` without the % sign.
-3. Scoring line: `Scored when the market resolves. Right or wrong, it's on
-   your record and you'll earn XP.`
-4. One button, **Next call** — closes and selects the next live call. On the
-   last card it reads **Back to top** and returns to the first.
+1. Side chip, Agree green / Disagree red.
+2. Agree: "You're calling him right. Buy YES at 84. Let's see if you're both
+   right." Disagree: "You're calling him wrong. Buy NO at 22, you say that's
+   wrong." Label in its colour; right / wrong plain; price is `called_pct`
+   without the %.
+3. "Scored when the market resolves. Right or wrong, it's on your record and
+   you'll earn XP."
+4. One button, **Next call** (**Back to top** on the last card).
 
-No second button, no token, no share, no XP figure. Every line is a config
-string on the modal root — `{{tap_modal.confirm_agree}}`,
-`{{tap_modal.confirm_disagree}}`, `{{tap_modal.scoring_line}}` — with `{label}`, `{verdict}` and `{price}` as
-tokens filled from the card and the side. The approved copy above is the
-fallback while a string is unfilled.
+Lines are config strings on the modal root: `{{tap_modal.confirm_agree}}`,
+`{{tap_modal.confirm_disagree}}`, `{{tap_modal.scoring_line}}`, with `{label}`,
+`{verdict}`, `{price}` tokens. The copy above is the fallback.
 
-## 8. History
-
-The History tab shows resolved calls as cards in the same structure: odds
-(settled 100% / 0%) with the outcome tag, the big Buy YES / Buy NO, the meta
-row with the odds at the call. Selecting one shows the thesis as last revised
-and the outcome line (section 5). Void calls carry the void tag and line and sit
-apart from any count. Pending calls (closed, end date passed, or price at 99 / 1)
-move here with the pending tag; their odds keep updating. The result tag sits at
-the bottom right of the meta row — right (green), wrong (red), void (gray),
-pending (purple) — and the conviction stars show here too. History cards drop
-the time to close; the meta row is stars · volume · tag. On phones the tag
-drops under the odds.
-Nothing about the user's taps appears in History.
-
-## 9. Layout
+## 9. Layout and motion
 
 - The home hero is as tall as its content; How it Works follows the Agree /
-  Disagree row directly. The $PROPHET panel is unchanged.
-- The selected card keeps its brighter outline and also flashes green on
-  the same 3s beat as the thesis block, at every width, so the thesis reads as
-  that market's. Decorative.
-- The decorative circuit board now runs around the thesis block (it used to run
-  around the prompt bar). Desktop only. Nothing to wire; safe to delete with
-  its `<canvas data-board>`.
+  Disagree row directly.
+- Every 3s the thesis block's frame and the selected card swell green over
+  ~0.9s and release as slowly. On desktop (1024px+) a circuit trace also leaves
+  the block. Decorative; nothing to wire.
 
-## 10. Header: How it works
+## 10. How it Works modal
 
-A **How it Works** link sits beside the logo on desktop (as before) and first
-in the mobile menu. It opens a click-through
-modal on the onboarding shell — `partials/how-it-works.html`, four slides with
-placeholder titles (What he does · Agree or Disagree · He can change his mind ·
-Election night keeps score) and `[COPY]` lines — every time it is clicked. The
-first-visit onboarding (`partials/onboarding.html`) is unchanged and opens on
-its own only once per device. Globals: `window.prophetHowItWorks.open()`,
-`window.prophetOnboarding.open()`.
+A four-slide click-through on the onboarding shell (`partials/how-it-works.html`):
+What he does · Agree or Disagree · He can change his mind · Election night
+keeps score. Lines are `[COPY]` until the founder writes them. Opens from the
+How it Works link every time, never on its own. The first-visit onboarding
+(`partials/onboarding.html`) opens once per device. Globals:
+`window.prophetHowItWorks.open()`, `window.prophetOnboarding.open()`.
 
-## 11. Variables added in this drop
+## 11. Variables
 
-Oct 26 PM: `market.resolution_text`, shown in the thesis box's drop-down.
+Added across this drop: `label`, `call_state`, `listed_leg_date`, `agree_pct`,
+`tap_count`, `user_side`, `market_closed`, `tap_modal.confirm_agree`,
+`tap_modal.confirm_disagree`, `tap_modal.scoring_line`, `market.side`,
+`market.side_upper`, `market.state` (called / revised / changed / pending /
+resolved), `market.time_line`, `market.conviction`, `show_conviction`,
+`market.outcome_tag`, `market.resolution_text`, `market.outcome_note`.
+`market.outcome` takes `right` / `wrong` / `void` / `pending`;
+`market.filter_state` takes `called` / `resolved`.
 
-Oct 26: `market.state` takes `pending` and `resolved`; `market.outcome_note`;
-`market.resolved_ago` now also feeds the marker. `changed` stays a Calls state
-(he switched side); send `user_side` empty with it.
+Not built, by the founder's call: `market.against_market`,
+`market.called_date`, `market.called_number`, `market.change_count`,
+`market.change_note`.
 
-Oct 23 evening: `market.side`, `market.side_upper`, `market.time_line`,
-`market.state` (called / revised / changed), `market.conviction`,
-`show_conviction`, `tap_count`. Not built, by the founder's call:
-`market.against_market`, `market.called_date`, `market.called_number`,
-`market.change_count`, `market.change_note`. The History tag after the odds is now `market.outcome_tag` (it was
-`market.state`). Retired: `market.thesis_stance`, `market.thesis_stance_upper`,
-`market.called_ago`, `revised_ago`, `revised_number`, `trade_count`,
-`prophet_probability` (nothing rendered it).
-
-Oct 22: `label`, `call_state`, `listed_leg_date`, `agree_pct`, `user_side`,
-`market_closed`, `tap_modal.confirm_agree`, `tap_modal.confirm_disagree`,
-`tap_modal.scoring_line`. `market.outcome` takes `right` / `wrong` / `void` /
-`pending` (was `awaiting`); `market.filter_state` takes `called` / `resolved`.
 Descriptions in `TEMPLATE_VARS.md`; the generated table in `HANDOFF.md` §10.
 
 ## 12. Check before shipping
 
-- Calls shows every listed market with a call; History shows resolved; the empty
-  line appears on an empty tab.
-- Every card: odds top-right, the big Buy YES / Buy NO in the right colour, the
-  stars bottom-left in that colour (faint on the unfilled ones), no at-call stat, three meta items on one
-  line, no overflow at 390px.
-- The purple marker beside Thesis reads Called / Revised while live, "Pending
-  resolution" when pending, "Resolved {time}" when resolved.
-- Every card shows the thesis with the drop-down closed; opening it on a live
-  card shows the pays line.
-- A pending card sits in History with the purple pending tag at the bottom
-  right, a price that matches Polymarket, the "Pending" marker, and the pending
-  line in the drop-down.
-- A resolved card shows the result line top right of the Thesis header; the
-  drop-down holds the fact line and his outcome note under it.
-- A market where he changed side reads "Changed" with its time and the buttons
-  start unselected.
-- The Calls tab never shows more than twenty cards.
-- Agree / Disagree: bright from the start, no hover change, no outline, deselect
-  works, closed markets disable with "Taps closed. Resolution next.", the split
-  under the buttons never moves on a tap, the word is taps.
-- How it works opens from the header and the menu every time; onboarding only
-  on a first visit.
-- Signed out: a tap fires `prophet:signin` and nothing else; `prophetTap.land`
-  shows the modal.
-- The modal opens on every side-setting tap; Next call advances; Back to top on
-  the last card; swipe down closes it on a phone.
-- No "vote", "take", "credits" or conviction anywhere in the hero.
+- Calls shows at most twenty cards; History holds resolved, pending and void;
+  the empty line shows on an empty tab.
+- Every card: odds top-right, Buy YES / Buy NO in its colour, stars in that
+  colour, no at-call stat, one meta line, no overflow at 390px. History cards
+  show the result tag bottom right and no time to close.
+- The marker reads Called / Revised / Changed with time on Calls, "Pending" or
+  "Resolved {time}" on History, nothing on void.
+- Every card opens with the drop-down closed. Opening it shows the pays line on
+  a live card, the pending line on a pending card, only his outcome note on a
+  resolved card, the void line on a void card.
+- A pending card sits in History with the purple pending tag and a price that
+  matches Polymarket.
+- A changed card reads "Changed" and its buttons start unselected.
+- Agree / Disagree: bright from the start, deselect works, closed markets
+  disable with "Taps closed. Resolution next.", the split never moves on a tap,
+  the word is taps.
+- Signed out: a tap fires `prophet:signin` only; `prophetTap.land` shows the
+  modal. The modal opens on every side-setting tap; Next call advances; Back to
+  top on the last card; swipe down closes it on a phone.
+- How it Works opens from the header and the menu every time; onboarding only on
+  a first visit.
+- No "vote", "take", "credits" or "trades" anywhere in the hero.

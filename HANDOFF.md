@@ -14,7 +14,7 @@ sections 5–7 are the contracts your side has to honour.
 ## 1. What changed since the last drop
 
 **Thesis box drop-down (Oct 26 PM logic, built Oct 25–26).**
-- The box reads as a normal thesis box: THESIS header (label, purple marker, the "Resolved YES · right" line at the right on History) and the thesis text, always shown. One chevron in the header drops down the rest under a hairline; closed by default on Calls and History, reset on every card. In it now: **Resolution** — `{{market.resolution_text}}`, plain fact you build for every state, then `{{market.outcome_note}}` in his voice on a resolved call. More parts can join the drop-down later. Nothing to wire; the client handles the toggle.
+- The box reads as a normal thesis box: THESIS header (label, purple marker, the "Resolved YES · right" line at the right on History) and the thesis text, always shown. One chevron in the header drops down the rest under a hairline; closed by default on Calls and History, reset on every card. In it now: **Resolution** — `{{market.resolution_text}}`, plain fact you build (pays line, pending, disputed or void line); on a resolved call only `{{market.outcome_note}}`, his resolution copy (any resolution_text is ignored there). More parts can join the drop-down later. Nothing to wire; the client handles the toggle.
 - Kept from earlier founder calls where the spec differs: the pending marker reads "Pending" (not "Pending resolution") and the History tag reads "pending" in purple (not "awaiting").
 
 **History layout (Oct 25, founder).**
@@ -250,7 +250,7 @@ or modal root is the whole contract.
 | `data-label` | `label` | buy_yes · buy_no |
 | `data-side` | `market.side` | yes / no; the face prints Buy `market.side_upper` |
 | `data-call-kind`, `data-time-line` | `market.state`, `market.time_line` | called / revised / pending / resolved; the purple marker beside the Thesis label |
-| `data-resolution-text`, `data-outcome-note` | `market.resolution_text`, `market.outcome_note` | the Resolution section: plain fact for every state, then his line on a resolved call |
+| `data-resolution-text`, `data-outcome-note` | `market.resolution_text`, `market.outcome_note` | the Resolution drop-down: plain fact (live, pending, disputed, void), or only his outcome note on a resolved call |
 | `data-called-pct` | `market.called_pct` | odds at the call, data only: the Tap Confirmed price |
 | `data-conviction` | `market.conviction` | 1–5 stars first in the meta row, in the call's colour; hidden only when the carousel root has `data-show-conviction="false"` (`show_conviction`) |
 | `data-thesis` | `market.thesis` | the thesis, latest revision |
@@ -366,10 +366,10 @@ Other globals: `window.prophetOnboarding.open()`, `window.prophetHowItWorks.open
 | `{{market.filter_state}}` | Home | `called` (the Calls deck) or `resolved` (History); the two tabs |
 | `{{market.image_url}}` | Home | Market image, imported from Polymarket (44px square on the card) |
 | `{{market.outcome}}` | Home | History: `right` / `wrong` / `void` / `pending` (was `awaiting`) — the card tag and the result line |
-| `{{market.outcome_note}}` | Home | Resolved cards only: one line in his voice on what happened, under the resolution line, at full strength. Empty for live, pending and void |
+| `{{market.outcome_note}}` | Home | Resolved cards only: his resolution copy, in his voice — the only thing in the RESOLUTION drop-down on a resolved call, at full strength. Empty for live, pending and void |
 | `{{market.outcome_tag}}` | Home | History: the result tag at the bottom right of the card's meta row, `<span class="prow__outcome prow__outcome--right">right</span>` — right (green) · wrong (red) · void (gray) · pending (purple). Empty for a live call |
 | `{{market.question}}` | Home | Market question text |
-| `{{market.resolution_text}}` | Home | The RESOLUTION section's plain-fact line, built by the server for every state and never empty: pays line on a live call ("Pays YES if …"); "Trading has closed. … Nothing is scored until Polymarket confirms the result." or "The result is effectively in, but Polymarket has not confirmed it. Nothing is scored until it does." while pending; "The proposed result has been challenged. Polymarket's resolvers will rule, and nothing is scored until they do." when disputed; "Resolved NO on Oct 25. His call: wrong." when resolved; "Polymarket closed this market without a result. His calls and every tap on them don't count." when void. Rendered as given, in gray |
+| `{{market.resolution_text}}` | Home | The RESOLUTION line in the thesis box drop-down, plain fact built by the server: how the market pays on a live call ("Pays YES if …", never empty); "Trading has closed. … Nothing is scored until Polymarket confirms the result." or "The result is effectively in, but Polymarket has not confirmed it. Nothing is scored until it does." while pending; "The proposed result has been challenged. Polymarket's resolvers will rule, and nothing is scored until they do." when disputed; "Polymarket closed this market without a result. His calls and every tap on them don't count." when void. Ignored on a resolved call. Rendered as given, in gray |
 | `{{market.resolved_ago}}` | Home | Relative time since resolution, e.g. `2w ago`; the marker reads "Resolved 2w ago" and the result line carries no time |
 | `{{market.resolved_pct}}` | Home | Closing YES % at settlement, e.g. `97%` |
 | `{{market.resolved_side}}` | Home | `yes` / `no` — the side the market settled on |

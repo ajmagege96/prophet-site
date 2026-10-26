@@ -397,6 +397,7 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
       var fact = card.dataset.resolutionText || '';
       if ((/^\{\{/).test(fact)) fact = '';
       if (!fact && history && cs1 === 'void') fact = VOID_LINE;
+      if (history && cs1 === 'resolved') fact = '';   /* resolved: only his resolution copy; the marker already carries Resolved {ago} */
       var note = (history && cs1 === 'resolved') ? (card.dataset.outcomeNote || '') : '';
       if ((/^\{\{/).test(note)) note = '';
       factEl.textContent = fact; factEl.hidden = !fact;
