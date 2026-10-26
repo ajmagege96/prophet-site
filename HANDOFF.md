@@ -47,7 +47,7 @@ product; the two verbs are Agree and Disagree.
   with the new `{{agree_pct}}` / `{{trade_count}}`.
 - **History** is back: `filter_state` resolved; `{{market.outcome}}` right /
   wrong / void / awaiting drives the badge tag and the outcome line;
-  `{{call_state}}` closed reads "Awaiting resolution", void reads the void
+  `{{call_state}}` closed reads "Awaiting resolution" (superseded Oct 26: "Taps closed. Resolution next."), void reads the void
   line and sits apart from the count. Thesis shown as last revised.
 - **Removed**: the prompt bar and its switch, the typewriter, the takes feed,
   credits, the Vote modal, the Take-sent modal with its limit state, the
