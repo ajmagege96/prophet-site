@@ -24,12 +24,12 @@ variable table in HANDOFF.md §10; design rules in CLAUDE.md; delta spec in BUIL
 
 ## Thesis block (for the selected card)
 - Label "Thesis", then a purple marker driven by state:
-  called / revised → "Called 2h ago" / "Revised 3h ago";
-  pending → "Pending resolution" (no time);
-  resolved → "Resolved 2h ago"; void → nothing.
-  A change of side is a new call: it reads "Called {new time}" and the
-  Agree / Disagree buttons start unselected (the earlier tap stays with the
-  earlier call and is not shown).
+  Calls: called / revised / changed → "Called 2h ago" / "Revised 3h ago" /
+  "Changed 2h ago";
+  History: pending → "Pending" (no time); resolved → "Resolved 2h ago";
+  void → nothing.
+  On changed (he switched side) the Agree / Disagree buttons start unselected
+  (the earlier tap stays with the earlier call and is not shown).
 - The thesis text, latest revision. Nothing else for a live call.
 - History: the result line at the top right of the block — "Resolved YES ·
   right · 2w ago", or "Taps closed. Resolution next." while pending. Under the
@@ -70,8 +70,8 @@ variable table in HANDOFF.md §10; design rules in CLAUDE.md; delta spec in BUIL
 
 ## Data the server sends per market
 slug, question, image_url, yes_pct (live or settled), filter_state (called | resolved),
-side (yes | no), state (called | revised | pending | resolved), time_line
-("called 2h ago" / "revised 3h ago", live only), outcome_note (resolved only),
+side (yes | no), state (called | revised | changed | pending | resolved), time_line
+("called 2h ago" / "revised 3h ago" / "changed 2h ago", live only), outcome_note (resolved only),
 conviction (1–5), called_pct (odds at the call,
 for the modal line only), volume, ends_in, listed_leg_date (ladders), thesis (latest
 revision), call_state (live | resolved | void | closed), outcome (right | wrong | void
@@ -80,9 +80,6 @@ user_side (agree | disagree | empty), market_closed (true | false).
 Deck-level: show_conviction ("false" hides the stars; anything else shows them).
 Viewer: signed_in. Modal copy: tap_modal.confirm_agree, confirm_disagree,
 scoring_line (the approved copy above is the fallback).
-
-## Retired
-The "changed" state value (Oct 26).
 
 ## Not built (dropped from the Oct 23 spec)
 "Against the market" tag; "Changed his mind on {date}. He had called {side}." note;

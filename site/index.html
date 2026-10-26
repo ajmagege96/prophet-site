@@ -126,8 +126,8 @@
              (hidden only when the deck's show_conviction is "false"), then volume and ends-in. The odds at the call stay on the
              card as data-called-pct for the Tap Confirmed line; they are not printed.
              market.state is called / revised (Calls) or pending / resolved (History). It drives the purple marker beside the Thesis
-             label: {{market.time_line}} ("called 2h ago" / "revised 3h ago"), "Pending resolution", or "Resolved {{market.resolved_ago}}".
-             A change of side is a new call: state called, user_side empty. Calls holds twenty cards at most; the server sends twenty.
+             label: {{market.time_line}} ("called 2h ago" / "revised 3h ago" / "changed 2h ago"), "Pending", or "Resolved {{market.resolved_ago}}".
+             changed = he changed side: user_side comes empty so the buttons start unselected. Calls holds twenty cards at most.
              Ladder markets print listed_leg_date beside the question. -->
         <template>
         <div class="carousel__card outline" data-card data-state="{{market.filter_state}}" data-slug="{{market.slug}}" data-label="{{label}}" data-side="{{market.side}}" data-call-kind="{{market.state}}" data-outcome-note="{{market.outcome_note}}" data-time-line="{{market.time_line}}" data-called-pct="{{market.called_pct}}" data-conviction="{{market.conviction}}" data-call-state="{{call_state}}" data-outcome="{{market.outcome}}" data-resolved-side="{{market.resolved_side}}" data-resolved-pct="{{market.resolved_pct}}" data-resolved-ago="{{market.resolved_ago}}" data-leg-date="{{listed_leg_date}}" data-agree-pct="{{agree_pct}}" data-tap-count="{{tap_count}}" data-user-side="{{user_side}}" data-market-closed="{{market_closed}}" data-thesis="{{market.thesis}}">
@@ -164,7 +164,7 @@
           <span class="carousel__meta"><span class="carousel__conv" data-conviction-row hidden title="conviction"></span><span title="volume"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>$760K</span><span title="ends in"><svg class="ico ico--stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>7mo</span></span>
         </div>
 
-        <div class="carousel__card outline" data-card data-state="called" data-slug="btc-100k" data-agree-pct="62" data-tap-count="14" data-user-side="" data-market-closed="false" data-label="buy_yes" data-side="yes" data-call-kind="called" data-time-line="called 2h ago" data-conviction="2" data-called-pct="68%" data-thesis="Spot demand is doing what the halving alone never could: ETF inflows have been positive for nine straight weeks and miners have stopped selling. The level is a round number, not a wall. I&#x27;m wrong if inflows turn negative for a month.">
+        <div class="carousel__card outline" data-card data-state="called" data-slug="btc-100k" data-agree-pct="62" data-tap-count="14" data-user-side="" data-market-closed="false" data-label="buy_yes" data-side="yes" data-call-kind="changed" data-time-line="changed 2h ago" data-conviction="2" data-called-pct="68%" data-thesis="Spot demand is doing what the halving alone never could: ETF inflows have been positive for nine straight weeks and miners have stopped selling. The level is a round number, not a wall. I&#x27;m wrong if inflows turn negative for a month.">
           <div class="carousel__top">
             <img class="carousel__img" src="https://polymarket-upload.s3.us-east-2.amazonaws.com/BTC+fullsize.png" alt="" loading="lazy">
             <span class="carousel__odds heading">72%<small>YES</small></span>
@@ -297,7 +297,7 @@
           <div class="thesis__top">
             <span class="thesis__label heading" data-thesis-label>Thesis</span>
             <!-- purple, by {{market.state}}: called / revised → {{market.time_line}} ("Called 2h ago" / "Revised 3h ago");
-                 pending → "Pending resolution"; resolved → "Resolved {{market.resolved_ago}}" -->
+                 changed → "Changed 2h ago"; pending → "Pending"; resolved → "Resolved {{market.resolved_ago}}" -->
             <span class="thesis__revised" data-thesis-revised></span>
           </div>
           <!-- History, top right: "Resolved YES · right · 2w ago", or "Taps closed. Resolution next." when pending -->
@@ -595,6 +595,6 @@
 </footer>
 <!-- /partial:footer -->
 
-<script src="app.js?v=add64776"></script>
+<script src="app.js?v=dbcdf214"></script>
 </body>
 </html>

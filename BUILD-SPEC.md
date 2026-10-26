@@ -91,8 +91,8 @@ One block under the carousel for the selected card, outlined like the selected
 card. Contents, and nothing else:
 
 - Label **THESIS**, and beside it the small purple marker, by
-  `{{market.state}}`: `called` / `revised` → `{{market.time_line}}` ("Called 2h
-  ago" / "Revised 3h ago"); `pending` → "Pending resolution", no time;
+  `{{market.state}}`: `called` / `revised` / `changed` → `{{market.time_line}}` ("Called 2h
+  ago" / "Revised 3h ago" / "Changed 2h ago"); `pending` → "Pending", no time;
   `resolved` → "Resolved `{{market.resolved_ago}}`". Void shows none. The
   client capitalises the first letter. No tap behaviour.
 - The thesis text, the latest revision (`{{market.thesis}}`).
@@ -188,8 +188,8 @@ its own only once per device. Globals: `window.prophetHowItWorks.open()`,
 ## 11. Variables added in this drop
 
 Oct 26: `market.state` takes `pending` and `resolved`; `market.outcome_note`;
-`market.resolved_ago` now also feeds the marker. Retired: the `changed` state
-value (a change of side is a new call with `user_side` empty).
+`market.resolved_ago` now also feeds the marker. `changed` stays a Calls state
+(he switched side); send `user_side` empty with it.
 
 Oct 23 evening: `market.side`, `market.side_upper`, `market.time_line`,
 `market.state` (called / revised / changed), `market.conviction`,
@@ -219,8 +219,8 @@ Descriptions in `TEMPLATE_VARS.md`; the generated table in `HANDOFF.md` §10.
   Polymarket, and "Taps closed. Resolution next." under the thesis.
 - A resolved card shows the result line top right of the block, and the outcome
   note under RESOLUTION below a hairline.
-- A market where he changed side reads "Called" with the new time and the
-  buttons start unselected.
+- A market where he changed side reads "Changed" with its time and the buttons
+  start unselected.
 - The Calls tab never shows more than twenty cards.
 - Agree / Disagree: bright from the start, no hover change, no outline, deselect
   works, closed markets disable with "Taps closed. Resolution next.", the split

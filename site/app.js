@@ -373,9 +373,9 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
     var history = state === 'resolved';
     thesisBox.hidden = false;
     thesisLabel.textContent = 'Thesis';
-    /* the purple marker by state: called / revised → the time line; pending → "Pending resolution"; resolved → "Resolved {ago}" */
+    /* the purple marker by state: called / revised / changed → the time line; pending → "Pending"; resolved → "Resolved {ago}" */
     var kind = card.dataset.callKind || '', cs0 = card.dataset.callState || '', tl = '';
-    if (kind === 'pending' || (history && cs0 === 'closed')) tl = 'Pending resolution';
+    if (kind === 'pending' || (history && cs0 === 'closed')) tl = 'Pending';
     else if (kind === 'resolved' || history) tl = (cs0 === 'void') ? '' : 'Resolved' + (card.dataset.resolvedAgo ? ' ' + card.dataset.resolvedAgo : '');
     else tl = card.dataset.timeLine || '';
     if (thesisRevised) thesisRevised.textContent = tl ? tl.charAt(0).toUpperCase() + tl.slice(1) : '';
