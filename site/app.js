@@ -390,17 +390,34 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
         else thesisOutcome.innerHTML = 'Resolved <span class="tally tally--' + rs + '">' + rs.toUpperCase() + '</span> · ' + (card.dataset.outcome === 'right' ? '<span class="lbl lbl--yes">right</span>' : '<span class="lbl lbl--no">wrong</span>');   /* no time here: the purple marker already reads Resolved {ago} */
       }
     }
-    /* Resolution section: his one line on a resolved call, the void line on a void one; hidden while pending */
-    var resEl = document.querySelector('[data-thesis-res]'), noteEl = document.querySelector('[data-thesis-note]');
-    if (resEl && noteEl) {
-      var cs1 = card.dataset.callState || '', note = '';
-      if (history && cs1 === 'resolved') note = card.dataset.outcomeNote || '';
-      else if (history && cs1 === 'void') note = VOID_LINE;
+    /* Resolution section: the server's plain-fact line for every state, plus his outcome note on a resolved call */
+    var factEl = document.querySelector('[data-thesis-fact]'), noteEl = document.querySelector('[data-thesis-note]');
+    if (factEl && noteEl) {
+      var cs1 = card.dataset.callState || '';
+      var fact = card.dataset.resolutionText || '';
+      if ((/^\{\{/).test(fact)) fact = '';
+      if (!fact && history && cs1 === 'void') fact = VOID_LINE;
+      var note = (history && cs1 === 'resolved') ? (card.dataset.outcomeNote || '') : '';
       if ((/^\{\{/).test(note)) note = '';
-      noteEl.textContent = note; resEl.hidden = !note;
+      factEl.textContent = fact; factEl.hidden = !fact;
+      noteEl.textContent = note; noteEl.hidden = !note;
+      var resSec = document.querySelector('[data-tsec="resolution"]'); if (resSec) resSec.hidden = !fact && !note;
     }
+    /* Calls: Thesis open, Resolution closed. History: Resolution open, Thesis closed. */
+    setSection('thesis', !history);
+    setSection('resolution', history);
     paintAgree(card);
   }
+  /* ── Thesis box sections: a header opens and closes its body ── */
+  function setSection(name, open) {
+    var sec = document.querySelector('[data-tsec="' + name + '"]'); if (!sec) return;
+    var head = sec.querySelector('[data-tsec-toggle]'), body = sec.querySelector('[data-tsec-body]');
+    body.hidden = !open; head.setAttribute('aria-expanded', open ? 'true' : 'false'); sec.classList.toggle('tsec--open', open);
+  }
+  if (thesisBox) thesisBox.addEventListener('click', function (e) {
+    var head = e.target.closest('[data-tsec-toggle]'); if (!head) return;
+    var sec = head.closest('[data-tsec]'); setSection(sec.getAttribute('data-tsec'), head.getAttribute('aria-expanded') !== 'true');
+  });
   /* ── Agree / Disagree ── */
   function paintAgree(card) {
     if (!adWrap) return;

@@ -600,9 +600,19 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
 /* History: the result line sits top right of the block */
 .thesis__head > .thesis__outcome { margin-left: auto; align-self: center; white-space: nowrap; }
 /* Resolution: a hairline, the label, then his line (or the void line) */
-.thesis__res { border-top: 1px solid var(--outline); margin-top: 10px; padding-top: 10px; display: flex; flex-direction: column; gap: 6px; }
-.thesis__res[hidden] { display: none; }
-.thesis__note { font-size: 13px; line-height: 1.45; opacity: 0.8; margin: 0; }
+/* Sections: a header row that opens and closes its body; a hairline between sections */
+.tsec[hidden] { display: none; }
+.tsec + .tsec { border-top: 1px solid var(--outline); margin-top: 10px; padding-top: 10px; }
+.tsec__head { display: flex; align-items: center; gap: 10px; width: 100%; padding: 0; margin: 0; background: none; border: 0; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.tsec__chev { flex: 0 0 auto; margin-left: auto; opacity: 0.55; transition: transform 0.2s ease; }
+.thesis__outcome:not([hidden]) + .tsec__chev { margin-left: 10px; }
+.tsec--open .tsec__chev { transform: rotate(180deg); }
+.tsec__head:hover .tsec__chev { opacity: 1; }
+.tsec__body { margin-top: 8px; display: flex; flex-direction: column; gap: 6px; }
+.tsec__body[hidden] { display: none; }
+.thesis__fact { font-size: 13px; line-height: 1.45; opacity: 0.6; margin: 0; }   /* plain fact, from the server */
+.thesis__fact[hidden], .thesis__note[hidden] { display: none; }
+.thesis__note { font-size: 13px; line-height: 1.45; margin: 0; }   /* his line: full strength, so it reads as his voice against the plain fact */
 .carousel__state .prow__outcome { padding: 1px 5px; font-size: 9px; margin-left: 2px; }
 .thesis__state { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: rgba(242, 240, 230, 0.85); }   /* same: no opacity, so VOTE OPEN and the star match the cards */
 .thesis__state--vote { color: var(--purple-text); }
@@ -1126,6 +1136,8 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
      and Vote; on a phone that is one line too many, so the badge and Vote wrap to a
      second line, right-aligned, instead of running off the edge. */
   .thesis__head { flex-wrap: wrap; row-gap: 6px; }
+  .tsec__head.thesis__head { flex-wrap: nowrap; }   /* the label and marker wrap inside their own group; the result line and chevron stay on the first row */
+  .tsec__head .thesis__outcome { font-size: 11px; }
   .thesis__label { white-space: nowrap; }
   /* Open vote on a phone: the state line (badge + Vote) is too long for the head, so it
      moves under the reasoning, where a resolved market shows its outcome line. */   /* Vote sits beside the badge */

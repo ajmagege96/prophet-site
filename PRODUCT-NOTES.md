@@ -30,12 +30,26 @@ variable table in HANDOFF.md §10; design rules in CLAUDE.md; delta spec in BUIL
   void → nothing.
   On changed (he switched side) the Agree / Disagree buttons start unselected
   (the earlier tap stays with the earlier call and is not shown).
-- The thesis text, latest revision. Nothing else for a live call.
-- History: the result line at the top right of the block — "Resolved YES ·
-  right" on a resolved call; nothing there while pending or void. Under the
-  thesis, a hairline and a RESOLUTION section: the outcome note (one line in his
-  voice on what happened) on a resolved call, "Market closed by Polymarket
-  before resolution." on a void call, nothing while pending.
+- The box is sectioned (collapsible, Polymarket-style), built for more sections
+  later. Two now:
+  THESIS: the thesis text, latest revision.
+  RESOLUTION: resolution_text, plain fact the server builds for every state —
+    live: how the market pays ("Pays YES if Peltola wins the Alaska Senate race
+    on November 3."), never empty;
+    pending, trading closed / end date passed: "Trading has closed. ... Nothing
+    is scored until Polymarket confirms the result.";
+    pending, price at 99 / 1: "The result is effectively in, but Polymarket has
+    not confirmed it. Nothing is scored until it does.";
+    disputed: "The proposed result has been challenged. Polymarket's resolvers
+    will rule, and nothing is scored until they do.";
+    resolved: "Resolved NO on October 25. His call: wrong." then outcome_note
+    (his voice) under it;
+    void: "Polymarket closed this market without a result. His calls and every
+    tap on them don't count."
+- Calls cards: Thesis open, Resolution closed. History cards: Resolution open,
+  Thesis closed.
+- History: "Resolved YES · right" sits at the right of the Thesis header on a
+  resolved call; nothing there while pending or void.
 - History cards: result tag at the bottom right — right (green), wrong (red),
   void (gray), pending (purple). Conviction stars show on History cards too;
   no time to close on History cards.
@@ -74,7 +88,7 @@ side (yes | no), state (called | revised | changed | pending | resolved), time_l
 ("called 2h ago" / "revised 3h ago" / "changed 2h ago", live only), outcome_note (resolved only),
 conviction (1–5), called_pct (odds at the call,
 for the modal line only), volume, ends_in, listed_leg_date (ladders), thesis (latest
-revision), call_state (live | resolved | void | closed), outcome (right | wrong | void
+revision), resolution_text (every state), call_state (live | resolved | void | closed), outcome (right | wrong | void
 | pending), resolved_side, resolved_pct, resolved_ago, agree_pct, tap_count,
 user_side (agree | disagree | empty), market_closed (true | false).
 Deck-level: show_conviction ("false" hides the stars; anything else shows them).

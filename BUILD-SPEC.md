@@ -88,20 +88,27 @@ Card attributes the client reads: `data-state`, `data-slug`, `data-label`,
 ## 5. The thesis block
 
 One block under the carousel for the selected card, outlined like the selected
-card. Contents, and nothing else:
+card. It is **sectioned, Polymarket-style**: each section is a header row
+(label, then a chevron at the right) that opens and closes its body, with a
+hairline between sections. Built so more sections can be added later as further
+`.tsec` blocks. Two sections now:
 
-- Label **THESIS**, and beside it the small purple marker, by
-  `{{market.state}}`: `called` / `revised` / `changed` → `{{market.time_line}}` ("Called 2h
-  ago" / "Revised 3h ago" / "Changed 2h ago"); `pending` → "Pending", no time;
-  `resolved` → "Resolved `{{market.resolved_ago}}`". Void shows none. The
-  client capitalises the first letter. No tap behaviour.
-- The thesis text, the latest revision (`{{market.thesis}}`).
-- History only, top right of the block: `Resolved YES · right` (right
-  green / wrong red) on a resolved call. Nothing there while pending or void.
-- History only, under the thesis: a hairline, a **RESOLUTION** label styled like
-  THESIS, and the copy — `{{market.outcome_note}}` (his one line on what
-  happened) on a resolved call, or `"Market closed by Polymarket before
-  resolution."` on a void call. Hidden while pending.
+- **THESIS**. Header: the label and, beside it, the small purple marker, by
+  `{{market.state}}`: `called` / `revised` / `changed` → `{{market.time_line}}`
+  ("Called 3d ago" / "Revised 3h ago" / "Changed 2h ago"); `pending` →
+  "Pending", no time; `resolved` → "Resolved `{{market.resolved_ago}}`". Void
+  shows none. On History, `Resolved YES · right` (right green / wrong red) sits
+  at the right of this header on a resolved call; nothing there while pending
+  or void. Body: the thesis text, latest revision (`{{market.thesis}}`).
+- **RESOLUTION**. Body: `{{market.resolution_text}}`, plain fact built by the
+  server for every state, in gray — how the market pays on a live call ("Pays
+  YES if …"), the pending line (trading closed / 99 or 1), the disputed line,
+  "Resolved NO on Oct 25. His call: wrong." when resolved, or the void line.
+  On a resolved call `{{market.outcome_note}}` follows at full strength, as his
+  voice.
+
+Calls cards open Thesis and close Resolution; History cards open Resolution and
+close Thesis. Either header toggles its section.
 
 The block carries `data-signed-in="{{viewer.signed_in}}"`.
 
@@ -186,6 +193,8 @@ its own only once per device. Globals: `window.prophetHowItWorks.open()`,
 
 ## 11. Variables added in this drop
 
+Oct 26 PM: `market.resolution_text`. The thesis box is sectioned.
+
 Oct 26: `market.state` takes `pending` and `resolved`; `market.outcome_note`;
 `market.resolved_ago` now also feeds the marker. `changed` stays a Calls state
 (he switched side); send `user_side` empty with it.
@@ -214,10 +223,12 @@ Descriptions in `TEMPLATE_VARS.md`; the generated table in `HANDOFF.md` §10.
   line, no overflow at 390px.
 - The purple marker beside Thesis reads Called / Revised while live, "Pending
   resolution" when pending, "Resolved {time}" when resolved.
-- A pending card sits in History with the purple pending tag at the bottom right, a price that matches
-  Polymarket, the "Pending" marker, and nothing at the top right of the block.
-- A resolved card shows the result line top right of the block, and the outcome
-  note under RESOLUTION below a hairline.
+- A live card opens Thesis; Resolution, when opened, shows the pays line.
+- A pending card sits in History with the purple pending tag at the bottom
+  right, a price that matches Polymarket, the "Pending" marker, and Resolution
+  open with the pending line.
+- A resolved card shows the result line top right of the Thesis header, and
+  Resolution open with the fact line and his outcome note under it.
 - A market where he changed side reads "Changed" with its time and the buttons
   start unselected.
 - The Calls tab never shows more than twenty cards.
