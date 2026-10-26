@@ -430,7 +430,7 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
     var slug = tapKey(card), side = taps.hasOwnProperty(slug) ? taps[slug] : (card.dataset.userSide || '');
     var closed = card.dataset.marketClosed === 'true';
     var btns = adWrap.querySelectorAll('[data-ad-btn]');
-    for (var i = 0; i < btns.length; i++) { btns[i].classList.toggle('ad__btn--on', btns[i].dataset.adBtn === side); btns[i].disabled = closed; }
+    for (var i = 0; i < btns.length; i++) { btns[i].classList.toggle('ad__btn--on', btns[i].dataset.adBtn === side); btns[i].classList.toggle('ad__btn--off', !!side && btns[i].dataset.adBtn !== side); btns[i].disabled = closed; }
     var cl = adWrap.querySelector('[data-ad-closed]'); if (cl) cl.hidden = !closed;
     var n = parseInt(card.dataset.tapCount || '0', 10) || 0, pct = card.dataset.agreePct || '';
     if (thesisSplit) {
@@ -445,10 +445,10 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
       var signedIn = (thesisBox.getAttribute('data-signed-in') || '');
       if (signedIn === 'false') { document.dispatchEvent(new CustomEvent('prophet:signin', { detail: { then: 'agree', slug: card.dataset.slug } })); return; }
       var slug = tapKey(card), prev = taps.hasOwnProperty(slug) ? taps[slug] : (card.dataset.userSide || '');
-      var next = prev === b.dataset.adBtn ? '' : b.dataset.adBtn;   /* tap the chosen side again to deselect */
-      taps[slug] = next;   /* the split is the server's figure and does not move on a tap */
+      if (prev) { openAlready(prev); return; }   /* a tap is final: either button now says so */
+      taps[slug] = b.dataset.adBtn;   /* the split is the server's figure and does not move on a tap */
       paintAgree(card);
-      if (next) confirmTap(card, next);   /* every tap that sets a side: the Tap Confirmed modal */
+      confirmTap(card, b.dataset.adBtn);   /* the Tap Confirmed modal */
     });
   }
 
@@ -535,6 +535,12 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
         openNotice('logged-out');
       }
     });
+  }
+  /* Already tapped: "You agreed already." / "You disagreed already." (config strings on the notice root) */
+  function openAlready(side) {
+    var n = notice('already'); if (!n) return;
+    q(n, '[data-already-line]').textContent = side === 'agree' ? val(n, 'already-agree', 'You agreed already.') : val(n, 'already-disagree', 'You disagreed already.');
+    openModal(n);
   }
   function openNotice(name) {
     var n = notice(name); if (!n) return;

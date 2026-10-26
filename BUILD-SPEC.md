@@ -140,9 +140,12 @@ The block carries `data-signed-in="{{viewer.signed_in}}"`.
 A centred row under the block, Calls only (hidden on History):
 
 - **Agree** and **Disagree**, 40px tall (44px on phones), bright green and red
-  from the start; hover and chosen look the same, no outline. Nobody is
-  pre-selected unless `{{user_side}}` says so.
-- Tap marks the side; tap the other to switch; tap the chosen one to deselect.
+  until the user taps; no hover change, no outline. Nobody is pre-selected
+  unless `{{user_side}}` says so.
+- **A tap is final.** The chosen side stays bright and the other dims (~35%).
+  Tapping either button again opens a small notice — "You agreed already." /
+  "You disagreed already." (`{{notice.already_agree}}`,
+  `{{notice.already_disagree}}`) with OK. No switching, no deselect.
   `{{market_closed}}` true disables both and shows "Taps closed. Resolution
   next." under them.
 - Under the buttons, centred, from three taps: "`{{agree_pct}}`% agree ·
@@ -155,7 +158,7 @@ A centred row under the block, Calls only (hidden on History):
 
 ## 8. Tap Confirmed modal
 
-Opens on every tap that sets a side (a deselect shows nothing). Centred dialog
+Opens on the user's one tap on a call. Centred dialog
 on desktop, bottom sheet on phones; X, backdrop or swipe down close it.
 
 1. Side chip, Agree green / Disagree red.
@@ -192,7 +195,8 @@ How it Works link every time, never on its own. The first-visit onboarding
 
 Added across this drop: `label`, `call_state`, `listed_leg_date`, `agree_pct`,
 `tap_count`, `user_side`, `market_closed`, `tap_modal.confirm_agree`,
-`tap_modal.confirm_disagree`, `tap_modal.scoring_line`, `market.side`,
+`tap_modal.confirm_disagree`, `tap_modal.scoring_line`, `notice.already_agree`,
+`notice.already_disagree`, `market.side`,
 `market.side_upper`, `market.state` (called / revised / changed / pending /
 resolved), `market.time_line`, `market.conviction`, `show_conviction`,
 `market.outcome_tag`, `market.resolution_text`, `market.outcome_note`.
@@ -220,11 +224,13 @@ Descriptions in `TEMPLATE_VARS.md`; the generated table in `HANDOFF.md` §10.
 - A pending card sits in History with the purple pending tag and a price that
   matches Polymarket.
 - A changed card reads "Changed" and its buttons start unselected.
-- Agree / Disagree: bright from the start, deselect works, closed markets
-  disable with "Taps closed. Resolution next.", the split never moves on a tap,
-  the word is taps.
+- Agree / Disagree: bright until the first tap; after it the chosen side stays
+  bright, the other dims, and tapping either opens "You agreed already." /
+  "You disagreed already."; a changed call starts fresh; closed markets disable
+  with "Taps closed. Resolution next."; the split never moves on a tap; the
+  word is taps.
 - Signed out: a tap fires `prophet:signin` only; `prophetTap.land` shows the
-  modal. The modal opens on every side-setting tap; Next call advances; Back to
+  modal. Tap Confirmed opens on the first tap; Next call advances; Back to
   top on the last card; swipe down closes it on a phone.
 - How it Works opens from the header and the menu every time; onboarding only on
   a first visit.

@@ -29,7 +29,7 @@
   <meta name="twitter:description" content="An agent that reads prediction markets, publishes a thesis before the outcome, and keeps a public record of every call.">
   <meta name="twitter:image" content="https://ajmagege96.github.io/prophet-site/site/assets/prophet-og-1200x630.png">
 
-  <link rel="stylesheet" href="styles.css?v=72b15203">
+  <link rel="stylesheet" href="styles.css?v=3ec5cffc">
 </head>
 <body>
 
@@ -319,7 +319,8 @@
     </div>
 
     <!-- ── Agree / Disagree: centred under the thesis. Signed in only; signed out opens sign-in.
-         Both bright from the start, no hover or chosen state; tap again to deselect; both lock when the market closes.
+         Both bright until the user taps; then the chosen side stays bright and the other dims. A tap is final: tapping either
+         again opens the "already" notice. Both lock when the market closes.
          Under the buttons, centred: "71% agree · 38 taps" from three taps; below that, only the user's own side. ── -->
     <div class="ad" data-ad hidden>
       <div class="ad__row">
@@ -363,6 +364,19 @@
     <div class="nt">
       <p class="nt__title heading">Logged out</p>
       <p class="nt__line">You have successfully logged out.</p>
+      <button class="mdl__cta" data-modal-close>OK</button>
+    </div>
+  </div>
+</div>
+<!-- Already tapped: a tap is final. Tapping either button on a call the user has already taken a side on opens this.
+     The line is a config string per side; the copy below is the fallback. -->
+<div class="mdl" data-modal data-notice="already" hidden role="alertdialog" aria-modal="true" aria-label="Already tapped"
+     data-already-agree="{{notice.already_agree}}" data-already-disagree="{{notice.already_disagree}}">
+  <div class="mdl__backdrop" data-modal-close></div>
+  <div class="mdl__panel mdl__panel--small outline">
+    <button class="mdl__close" data-modal-close aria-label="Close">&times;</button>
+    <div class="nt">
+      <p class="nt__title heading" data-already-line></p>
       <button class="mdl__cta" data-modal-close>OK</button>
     </div>
   </div>
@@ -600,6 +614,6 @@
 </footer>
 <!-- /partial:footer -->
 
-<script src="app.js?v=494d1a24"></script>
+<script src="app.js?v=5860eeac"></script>
 </body>
 </html>

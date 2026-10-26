@@ -62,15 +62,20 @@ and Oct 26 PM logic, with the founder's UI calls on top.
     His calls and every tap on them don't count."
 
 ## Agree / Disagree (Calls only, signed in only)
-- Two buttons under the box, bright green / bright red from the start. Nobody
-  pre-selected unless the server says the user already tapped.
-- Tap sets a side; tap the other to switch; tap the chosen one to deselect.
+- Two buttons under the box, bright green / bright red until the user taps.
+  Nobody pre-selected unless the server says the user already tapped.
+- A tap is final: one side per user per call. After it, the chosen button
+  stays bright and the other dims. Tapping either again opens a small notice:
+  "You agreed already." / "You disagreed already." (config strings
+  notice.already_agree / notice.already_disagree) with OK. No switching, no
+  deselect. A changed call is a new call: user_side comes empty and the user
+  can tap again.
 - Under the buttons: "71% agree · 38 taps" from three taps; below three, only
   "You agree" / "You disagree". The server's figures; never changed
   client-side on a tap.
 - Market closed: both disabled, "Taps closed. Resolution next." under them.
 - Signed out: a tap fires a sign-in event; after sign-in the server lands it.
-- Every tap that sets a side opens Tap Confirmed: side chip; "You're calling
+- The tap opens Tap Confirmed: side chip; "You're calling
   him right. Buy YES at 84. Let's see if you're both right." (Agree) / "You're
   calling him wrong. Buy NO at 22, you say that's wrong." (Disagree), price =
   odds at the call; "Scored when the market resolves. Right or wrong, it's on
@@ -96,7 +101,8 @@ tap_count, user_side (agree | disagree | empty; empty on a changed call),
 market_closed (true | false).
 Deck: show_conviction ("false" hides the stars), at most twenty Calls cards.
 Viewer: signed_in. Modal copy: tap_modal.confirm_agree, confirm_disagree,
-scoring_line (the copy above is the fallback).
+scoring_line; notice.already_agree, notice.already_disagree (the copy above
+is the fallback).
 
 ## Not built (founder's call)
 "Against the market" tag; "Changed his mind on {date}" note; History "called

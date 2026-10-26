@@ -13,6 +13,9 @@ sections 5–7 are the contracts your side has to honour.
 
 ## 1. What changed since the last drop
 
+**Taps are final (Oct 26).**
+- One side per user per call. After the tap the chosen button stays bright and the other dims; tapping either again opens the "already" notice — "You agreed already." / "You disagreed already." (`{{notice.already_agree}}`, `{{notice.already_disagree}}`, `data-notice="already"`). No switching, no deselect. Reject a second tap server-side too. A changed call sends `user_side` empty, so the user can tap again.
+
 **Thesis box drop-down (Oct 26 PM logic, built Oct 25–26).**
 - The box reads as a normal thesis box: THESIS header (label, purple marker, the "Resolved YES · right" line at the right on History) and the thesis text, always shown. One chevron in the header drops down the rest under a hairline; closed by default on Calls and History, reset on every card. In it now: **Resolution** — `{{market.resolution_text}}`, plain fact you build (pays line, pending, disputed or void line); on a resolved call only `{{market.outcome_note}}`, his resolution copy (any resolution_text is ignored there). More parts can join the drop-down later. Nothing to wire; the client handles the toggle.
 - Kept from earlier founder calls where the spec differs: the pending marker reads "Pending" (not "Pending resolution") and the History tag reads "pending" in purple (not "awaiting").
@@ -346,11 +349,11 @@ Other globals: `window.prophetOnboarding.open()`, `window.prophetHowItWorks.open
 
 ## 10. Variable reference
 
-71 variables actually present in the files right now, with where each appears.
+73 variables actually present in the files right now, with where each appears.
 
 | Variable | Where | Holds |
 |---|---|---|
-| `{{agree_pct}}` | Home | Agree / Disagree under the thesis: the user's side (`agree` / `disagree` / empty) is kept; from three taps the split under the buttons reads "71% agree · 38 taps" — the server's figure, unchanged by the user's own tap — below that only "You agree" / "You disagree"; `market_closed` `true` disables both buttons and shows "Taps closed. Resolution next." Signed-in only: a signed-out tap fires `prophet:signin` with `{then: 'agree', slug}` |
+| `{{agree_pct}}` | Home | Agree / Disagree under the thesis: the user's side (`agree` / `disagree` / empty); once set, that button stays bright, the other dims, and a tap on either opens the already notice — taps are final; from three taps the split under the buttons reads "71% agree · 38 taps" — the server's figure, unchanged by the user's own tap — below that only "You agree" / "You disagree"; `market_closed` `true` disables both buttons and shows "Taps closed. Resolution next." Signed-in only: a signed-out tap fires `prophet:signin` with `{then: 'agree', slug}` |
 | `{{buy_url}}` | $PROPHET; Home; below-fold | Buy $PROPHET link (pump.fun) |
 | `{{call_state}}` | Home | `live` / `resolved` / `void` / `closed`. Void shows "Market closed by Polymarket before resolution."; closed (pending) shows the "Pending" marker and nothing top right. When `resolution_text` is empty on a void call the UI falls back to "Market closed by Polymarket before resolution." |
 | `{{contract_address}}` | $PROPHET; Home; header | $PROPHET contract address; the header pill shows first 6 … last 6 and copies the full value |
@@ -381,7 +384,9 @@ Other globals: `window.prophetOnboarding.open()`, `window.prophetHowItWorks.open
 | `{{market.time_line}}` | Home | The purple marker beside the Thesis label while the call is live: "called 2h ago" / "revised 3h ago" / "changed 2h ago" (relative; the block capitalises it) |
 | `{{market.volume}}` | Home | Polymarket volume, short form (e.g. "$4.1M"), shown after a bar-chart icon |
 | `{{market.yes_pct}}` | Home | Current YES percentage (e.g. "72%"); once resolved, the settled 100% / 0% |
-| `{{market_closed}}` | Home | Agree / Disagree under the thesis: the user's side (`agree` / `disagree` / empty) is kept; from three taps the split under the buttons reads "71% agree · 38 taps" — the server's figure, unchanged by the user's own tap — below that only "You agree" / "You disagree"; `market_closed` `true` disables both buttons and shows "Taps closed. Resolution next." Signed-in only: a signed-out tap fires `prophet:signin` with `{then: 'agree', slug}` |
+| `{{market_closed}}` | Home | Agree / Disagree under the thesis: the user's side (`agree` / `disagree` / empty); once set, that button stays bright, the other dims, and a tap on either opens the already notice — taps are final; from three taps the split under the buttons reads "71% agree · 38 taps" — the server's figure, unchanged by the user's own tap — below that only "You agree" / "You disagree"; `market_closed` `true` disables both buttons and shows "Taps closed. Resolution next." Signed-in only: a signed-out tap fires `prophet:signin` with `{then: 'agree', slug}` |
+| `{{notice.already_agree}}` | Home | The line in the small notice that opens when the user taps either button on a call they already took a side on. Fallback copy: "You agreed already." / "You disagreed already." |
+| `{{notice.already_disagree}}` | Home | The line in the small notice that opens when the user taps either button on a call they already took a side on. Fallback copy: "You agreed already." / "You disagreed already." |
 | `{{pool_last_week}}` | $PROPHET | Last week's reward pool; the line reads "paid to the community" |
 | `{{pumpfun_url}}` | $PROPHET; Home; footer; header | $PROPHET on pump.fun (footer token link) |
 | `{{show_conviction}}` | Home | Conviction 1–5, carried as `data-conviction`; five stars first in the meta row (bottom-left), the first n filled in the call's colour (green for Buy YES, red for Buy NO), the rest faint in the same colour. `show_conviction` on the carousel root hides them when it is `false`; anything else shows them |
@@ -389,7 +394,7 @@ Other globals: `window.prophetOnboarding.open()`, `window.prophetHowItWorks.open
 | `{{swap_impact}}` | $PROPHET | Swap meta line, left: slip and price impact |
 | `{{swap_slippage}}` | $PROPHET | Swap meta line, left: slip and price impact |
 | `{{swap_sol_balance}}` | $PROPHET | The viewer's SOL balance, right of the swap meta line (e.g. "2.41 SOL") |
-| `{{tap_count}}` | Home | Agree / Disagree under the thesis: the user's side (`agree` / `disagree` / empty) is kept; from three taps the split under the buttons reads "71% agree · 38 taps" — the server's figure, unchanged by the user's own tap — below that only "You agree" / "You disagree"; `market_closed` `true` disables both buttons and shows "Taps closed. Resolution next." Signed-in only: a signed-out tap fires `prophet:signin` with `{then: 'agree', slug}` |
+| `{{tap_count}}` | Home | Agree / Disagree under the thesis: the user's side (`agree` / `disagree` / empty); once set, that button stays bright, the other dims, and a tap on either opens the already notice — taps are final; from three taps the split under the buttons reads "71% agree · 38 taps" — the server's figure, unchanged by the user's own tap — below that only "You agree" / "You disagree"; `market_closed` `true` disables both buttons and shows "Taps closed. Resolution next." Signed-in only: a signed-out tap fires `prophet:signin` with `{then: 'agree', slug}` |
 | `{{tap_modal.confirm_agree}}` | Home | The confirmation line; `{label}` (Buy YES green / Buy NO red), `{verdict}` (right / wrong, plain) and `{price}` are filled from the card and the side. Approved copy while unfilled: "You're calling him {verdict}. {label} at {price}. Let's see if you're both right." / "You're calling him {verdict}. {label} at {price}, you say that's {verdict}." |
 | `{{tap_modal.confirm_disagree}}` | Home | The confirmation line; `{label}` (Buy YES green / Buy NO red), `{verdict}` (right / wrong, plain) and `{price}` are filled from the card and the side. Approved copy while unfilled: "You're calling him {verdict}. {label} at {price}. Let's see if you're both right." / "You're calling him {verdict}. {label} at {price}, you say that's {verdict}." |
 | `{{tap_modal.scoring_line}}` | Home | Approved copy while unfilled: "Scored when the market resolves. Right or wrong, it's on your record and you'll earn XP." |
@@ -412,7 +417,7 @@ Other globals: `window.prophetOnboarding.open()`, `window.prophetHowItWorks.open
 | `{{trade.amount}}` | $PROPHET | Live-trades strip (`<!-- repeat: trade -->`): `buy` / `sell` and the amount |
 | `{{trade.side}}` | $PROPHET | Live-trades strip (`<!-- repeat: trade -->`): `buy` / `sell` and the amount |
 | `{{tradeleague_url}}` | $PROPHET; Home; footer | Link for the "Automated by TradeLeague" footer lockup |
-| `{{user_side}}` | Home | Agree / Disagree under the thesis: the user's side (`agree` / `disagree` / empty) is kept; from three taps the split under the buttons reads "71% agree · 38 taps" — the server's figure, unchanged by the user's own tap — below that only "You agree" / "You disagree"; `market_closed` `true` disables both buttons and shows "Taps closed. Resolution next." Signed-in only: a signed-out tap fires `prophet:signin` with `{then: 'agree', slug}` |
+| `{{user_side}}` | Home | Agree / Disagree under the thesis: the user's side (`agree` / `disagree` / empty); once set, that button stays bright, the other dims, and a tap on either opens the already notice — taps are final; from three taps the split under the buttons reads "71% agree · 38 taps" — the server's figure, unchanged by the user's own tap — below that only "You agree" / "You disagree"; `market_closed` `true` disables both buttons and shows "Taps closed. Resolution next." Signed-in only: a signed-out tap fires `prophet:signin` with `{then: 'agree', slug}` |
 | `{{viewer.signed_in}}` | $PROPHET; Home; header | `true` / `false`, on the thesis block. When false an Agree / Disagree tap fires `prophet:signin` instead |
 | `{{wallet_burn_url}}` | $PROPHET | Explorer links for the three public wallets (Trading Wallet, Rewards Pool, Buy-and-Burn); shown as labels, never as addresses |
 | `{{wallet_burn_value}}` | $PROPHET | Tokens burned, red (e.g. "8.4M"); the "$PROPHET" ticker after it stays gray, then a red flame icon |

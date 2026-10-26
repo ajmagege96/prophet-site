@@ -27,7 +27,7 @@
 | `{{market.state}}` | `called` / `revised` / `changed` (Calls) or `pending` / `resolved` (History) — the call's state, carried as `data-call-kind`. Drives the purple marker: the time line while live ("Called 2h ago" / "Revised 3h ago" / "Changed 2h ago"), "Pending" when pending, "Resolved {resolved_ago}" when resolved. On `changed` (he switched side) send `user_side` empty so the buttons start unselected |
 | `{{market.time_line}}` | The purple marker beside the Thesis label while the call is live: "called 2h ago" / "revised 3h ago" / "changed 2h ago" (relative; the block capitalises it) |
 | `{{market.conviction}}`, `{{show_conviction}}` | Conviction 1–5, carried as `data-conviction`; five stars first in the meta row (bottom-left), the first n filled in the call's colour (green for Buy YES, red for Buy NO), the rest faint in the same colour. `show_conviction` on the carousel root hides them when it is `false`; anything else shows them |
-| `{{agree_pct}}`, `{{tap_count}}`, `{{user_side}}`, `{{market_closed}}` | Agree / Disagree under the thesis: the user's side (`agree` / `disagree` / empty) is kept; from three taps the split under the buttons reads "71% agree · 38 taps" — the server's figure, unchanged by the user's own tap — below that only "You agree" / "You disagree"; `market_closed` `true` disables both buttons and shows "Taps closed. Resolution next." Signed-in only: a signed-out tap fires `prophet:signin` with `{then: 'agree', slug}` |
+| `{{agree_pct}}`, `{{tap_count}}`, `{{user_side}}`, `{{market_closed}}` | Agree / Disagree under the thesis: the user's side (`agree` / `disagree` / empty); once set, that button stays bright, the other dims, and a tap on either opens the already notice — taps are final; from three taps the split under the buttons reads "71% agree · 38 taps" — the server's figure, unchanged by the user's own tap — below that only "You agree" / "You disagree"; `market_closed` `true` disables both buttons and shows "Taps closed. Resolution next." Signed-in only: a signed-out tap fires `prophet:signin` with `{then: 'agree', slug}` |
 | `{{market.outcome}}` | History: `right` / `wrong` / `void` / `pending` (was `awaiting`) — the card tag and the result line |
 | `{{call_state}}` | `live` / `resolved` / `void` / `closed`. Void shows "Market closed by Polymarket before resolution."; closed (pending) shows the "Pending" marker and nothing top right. When `resolution_text` is empty on a void call the UI falls back to "Market closed by Polymarket before resolution." |
 | `{{listed_leg_date}}` | Ladder markets only: the leg's date (e.g. `Oct 20`), small and gray beside the question on the card face. Empty otherwise. When a leg rolls, the card returns to not evaluated with the next date and the old leg goes to History as resolved |
@@ -117,6 +117,12 @@ MVP and kept only so they come back with the page. `{{explainer_record}}`,
 
 
 | `{{logout_url}}` | The Logout link in the header and menu; render the link only when `{{viewer.signed_in}}` is true. While unfilled, the click fires a `prophet:logout` event and shows the Logged out notice |
+
+### Already-tapped notice
+
+| Variable | Meaning |
+|---|---|
+| `{{notice.already_agree}}`, `{{notice.already_disagree}}` | The line in the small notice that opens when the user taps either button on a call they already took a side on. Fallback copy: "You agreed already." / "You disagreed already." |
 
 ### Tap Confirmed modal
 
