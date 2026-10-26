@@ -88,27 +88,23 @@ Card attributes the client reads: `data-state`, `data-slug`, `data-label`,
 ## 5. The thesis block
 
 One block under the carousel for the selected card, outlined like the selected
-card. It is **sectioned, Polymarket-style**: each section is a header row
-(label, then a chevron at the right) that opens and closes its body, with a
-hairline between sections. Built so more sections can be added later as further
-`.tsec` blocks. Two sections now:
+card. It reads as a normal thesis box with **one drop-down**:
 
-- **THESIS**. Header: the label and, beside it, the small purple marker, by
+- **THESIS header**: the label and, beside it, the small purple marker, by
   `{{market.state}}`: `called` / `revised` / `changed` → `{{market.time_line}}`
   ("Called 3d ago" / "Revised 3h ago" / "Changed 2h ago"); `pending` →
   "Pending", no time; `resolved` → "Resolved `{{market.resolved_ago}}`". Void
   shows none. On History, `Resolved YES · right` (right green / wrong red) sits
-  at the right of this header on a resolved call; nothing there while pending
-  or void. Body: the thesis text, latest revision (`{{market.thesis}}`).
-- **RESOLUTION**. Body: `{{market.resolution_text}}`, plain fact built by the
-  server for every state, in gray — how the market pays on a live call ("Pays
-  YES if …"), the pending line (trading closed / 99 or 1), the disputed line,
-  "Resolved NO on Oct 25. His call: wrong." when resolved, or the void line.
-  On a resolved call `{{market.outcome_note}}` follows at full strength, as his
-  voice.
-
-Calls cards open Thesis and close Resolution; History cards open Resolution and
-close Thesis. Either header toggles its section.
+  at the right of the header on a resolved call. A chevron at the far right.
+- **The thesis text**, latest revision (`{{market.thesis}}`), always shown.
+- **The drop-down**, under a hairline, opened and closed by the header (the
+  chevron turns). Closed by default on Calls and History alike; it resets on
+  every card. Built so more parts can sit in it later. In it now:
+  **RESOLUTION** — `{{market.resolution_text}}`, plain fact built by the server
+  for every state, in gray (how the market pays on a live call, "Pays YES if
+  …"; the pending line; the disputed line; "Resolved NO on Oct 25. His call:
+  wrong."; the void line), then `{{market.outcome_note}}` at full strength, as
+  his voice, on a resolved call.
 
 The block carries `data-signed-in="{{viewer.signed_in}}"`.
 
@@ -193,7 +189,7 @@ its own only once per device. Globals: `window.prophetHowItWorks.open()`,
 
 ## 11. Variables added in this drop
 
-Oct 26 PM: `market.resolution_text`. The thesis box is sectioned.
+Oct 26 PM: `market.resolution_text`, shown in the thesis box's drop-down.
 
 Oct 26: `market.state` takes `pending` and `resolved`; `market.outcome_note`;
 `market.resolved_ago` now also feeds the marker. `changed` stays a Calls state
@@ -223,12 +219,13 @@ Descriptions in `TEMPLATE_VARS.md`; the generated table in `HANDOFF.md` §10.
   line, no overflow at 390px.
 - The purple marker beside Thesis reads Called / Revised while live, "Pending
   resolution" when pending, "Resolved {time}" when resolved.
-- A live card opens Thesis; Resolution, when opened, shows the pays line.
+- Every card shows the thesis with the drop-down closed; opening it on a live
+  card shows the pays line.
 - A pending card sits in History with the purple pending tag at the bottom
-  right, a price that matches Polymarket, the "Pending" marker, and Resolution
-  open with the pending line.
-- A resolved card shows the result line top right of the Thesis header, and
-  Resolution open with the fact line and his outcome note under it.
+  right, a price that matches Polymarket, the "Pending" marker, and the pending
+  line in the drop-down.
+- A resolved card shows the result line top right of the Thesis header; the
+  drop-down holds the fact line and his outcome note under it.
 - A market where he changed side reads "Changed" with its time and the buttons
   start unselected.
 - The Calls tab never shows more than twenty cards.

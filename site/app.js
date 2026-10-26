@@ -401,22 +401,24 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
       if ((/^\{\{/).test(note)) note = '';
       factEl.textContent = fact; factEl.hidden = !fact;
       noteEl.textContent = note; noteEl.hidden = !note;
-      var resSec = document.querySelector('[data-tsec="resolution"]'); if (resSec) resSec.hidden = !fact && !note;
+      hasMore = !!(fact || note);
     }
-    /* Calls: Thesis open, Resolution closed. History: Resolution open, Thesis closed. */
-    setSection('thesis', !history);
-    setSection('resolution', history);
+    /* the drop-down starts closed on every card; the chevron shows only when there is something under it */
+    setMore(false);
     paintAgree(card);
   }
-  /* ── Thesis box sections: a header opens and closes its body ── */
-  function setSection(name, open) {
-    var sec = document.querySelector('[data-tsec="' + name + '"]'); if (!sec) return;
-    var head = sec.querySelector('[data-tsec-toggle]'), body = sec.querySelector('[data-tsec-body]');
-    body.hidden = !open; head.setAttribute('aria-expanded', open ? 'true' : 'false'); sec.classList.toggle('tsec--open', open);
+  /* ── Thesis box drop-down: one chevron in the header shows or hides Resolution under the thesis ── */
+  var hasMore = false;
+  function setMore(open) {
+    var more = document.querySelector('[data-tsec-more]'), head = document.querySelector('[data-tsec-toggle]');
+    if (!more || !head) return;
+    open = open && hasMore;
+    more.hidden = !open; head.setAttribute('aria-expanded', open ? 'true' : 'false');
+    thesisBox.classList.toggle('thesis--more', open); thesisBox.classList.toggle('thesis--nomore', !hasMore);
   }
   if (thesisBox) thesisBox.addEventListener('click', function (e) {
-    var head = e.target.closest('[data-tsec-toggle]'); if (!head) return;
-    var sec = head.closest('[data-tsec]'); setSection(sec.getAttribute('data-tsec'), head.getAttribute('aria-expanded') !== 'true');
+    var head = e.target.closest('[data-tsec-toggle]'); if (!head || !hasMore) return;
+    setMore(head.getAttribute('aria-expanded') !== 'true');
   });
   /* ── Agree / Disagree ── */
   function paintAgree(card) {

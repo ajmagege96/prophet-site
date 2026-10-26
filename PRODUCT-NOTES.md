@@ -30,9 +30,9 @@ variable table in HANDOFF.md §10; design rules in CLAUDE.md; delta spec in BUIL
   void → nothing.
   On changed (he switched side) the Agree / Disagree buttons start unselected
   (the earlier tap stays with the earlier call and is not shown).
-- The box is sectioned (collapsible, Polymarket-style), built for more sections
-  later. Two now:
-  THESIS: the thesis text, latest revision.
+- The box shows the thesis as normal. One chevron in its header drops down
+  the rest (closed by default on Calls and History; built for more parts
+  later). In the drop-down now:
   RESOLUTION: resolution_text, plain fact the server builds for every state —
     live: how the market pays ("Pays YES if Peltola wins the Alaska Senate race
     on November 3."), never empty;
@@ -46,8 +46,6 @@ variable table in HANDOFF.md §10; design rules in CLAUDE.md; delta spec in BUIL
     (his voice) under it;
     void: "Polymarket closed this market without a result. His calls and every
     tap on them don't count."
-- Calls cards: Thesis open, Resolution closed. History cards: Resolution open,
-  Thesis closed.
 - History: "Resolved YES · right" sits at the right of the Thesis header on a
   resolved call; nothing there while pending or void.
 - History cards: result tag at the bottom right — right (green), wrong (red),

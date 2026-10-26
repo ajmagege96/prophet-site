@@ -601,15 +601,15 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
 .thesis__head > .thesis__outcome { margin-left: auto; align-self: center; white-space: nowrap; }
 /* Resolution: a hairline, the label, then his line (or the void line) */
 /* Sections: a header row that opens and closes its body; a hairline between sections */
+.tsec { border-top: 1px solid var(--outline); margin-top: 10px; padding-top: 10px; display: flex; flex-direction: column; gap: 6px; }
 .tsec[hidden] { display: none; }
-.tsec + .tsec { border-top: 1px solid var(--outline); margin-top: 10px; padding-top: 10px; }
+.thesis--nomore .tsec__chev { display: none; }
+.thesis--nomore .tsec__head { cursor: default; }
 .tsec__head { display: flex; align-items: center; gap: 10px; width: 100%; padding: 0; margin: 0; background: none; border: 0; color: inherit; font: inherit; text-align: left; cursor: pointer; }
 .tsec__chev { flex: 0 0 auto; margin-left: auto; opacity: 0.55; transition: transform 0.2s ease; }
 .thesis__outcome:not([hidden]) + .tsec__chev { margin-left: 10px; }
-.tsec--open .tsec__chev { transform: rotate(180deg); }
+.thesis--more .tsec__chev { transform: rotate(180deg); }
 .tsec__head:hover .tsec__chev { opacity: 1; }
-.tsec__body { margin-top: 8px; display: flex; flex-direction: column; gap: 6px; }
-.tsec__body[hidden] { display: none; }
 .thesis__fact { font-size: 13px; line-height: 1.45; opacity: 0.6; margin: 0; }   /* plain fact, from the server */
 .thesis__fact[hidden], .thesis__note[hidden] { display: none; }
 .thesis__note { font-size: 13px; line-height: 1.45; margin: 0; }   /* his line: full strength, so it reads as his voice against the plain fact */

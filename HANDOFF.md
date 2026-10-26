@@ -13,9 +13,8 @@ sections 5–7 are the contracts your side has to honour.
 
 ## 1. What changed since the last drop
 
-**Sectioned thesis box (Oct 26 PM logic, built Oct 25).**
-- The box under the deck is now collapsible sections, Polymarket-style: a header row (label, chevron) per section, hairline between. Two sections: **Thesis** (the thesis text; the marker beside the label; on History the "Resolved YES · right" line at the right of this header) and **Resolution** (`{{market.resolution_text}}`, plain fact you build for every state, then `{{market.outcome_note}}` in his voice on a resolved call). Add more later as further `.tsec` blocks.
-- Calls: Thesis open, Resolution closed. History: Resolution open, Thesis closed. Nothing to wire; the client handles the toggles.
+**Thesis box drop-down (Oct 26 PM logic, built Oct 25–26).**
+- The box reads as a normal thesis box: THESIS header (label, purple marker, the "Resolved YES · right" line at the right on History) and the thesis text, always shown. One chevron in the header drops down the rest under a hairline; closed by default on Calls and History, reset on every card. In it now: **Resolution** — `{{market.resolution_text}}`, plain fact you build for every state, then `{{market.outcome_note}}` in his voice on a resolved call. More parts can join the drop-down later. Nothing to wire; the client handles the toggle.
 - Kept from earlier founder calls where the spec differs: the pending marker reads "Pending" (not "Pending resolution") and the History tag reads "pending" in purple (not "awaiting").
 
 **History layout (Oct 25, founder).**
