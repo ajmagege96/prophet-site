@@ -158,7 +158,8 @@ and the outcome line (section 5). Void calls carry the void tag and line and sit
 apart from any count. Pending calls (closed, end date passed, or price at 99 / 1)
 move here with the pending tag; their odds keep updating. The result tag sits at
 the bottom right of the meta row — right (green), wrong (red), void (gray),
-pending (purple) — and the conviction stars show here too. On phones the tag
+pending (purple) — and the conviction stars show here too. History cards drop
+the time to close; the meta row is stars · volume · tag. On phones the tag
 drops under the odds.
 Nothing about the user's taps appears in History.
 

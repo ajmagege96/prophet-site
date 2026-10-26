@@ -397,6 +397,7 @@ ul, ol { list-style: none; }
   font-size: 11px;
 }
 .carousel__meta > span:not(.prow__outcome) { opacity: 0.55; }
+.carousel__card[data-state="resolved"] .carousel__meta > [title="ends in"] { display: none; }   /* History: nothing left to run */
 /* History: right / wrong / void / pending at the bottom right of the card */
 .carousel__meta > .prow__outcome { margin-left: auto; font-size: 9px; padding: 1px 6px; line-height: 1.3; }
 .carousel__meta > span {

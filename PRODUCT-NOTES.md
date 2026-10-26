@@ -37,7 +37,8 @@ variable table in HANDOFF.md §10; design rules in CLAUDE.md; delta spec in BUIL
   voice on what happened) on a resolved call, "Market closed by Polymarket
   before resolution." on a void call, nothing while pending.
 - History cards: result tag at the bottom right — right (green), wrong (red),
-  void (gray), pending (purple). Conviction stars show on History cards too.
+  void (gray), pending (purple). Conviction stars show on History cards too;
+  no time to close on History cards.
 - Pending = market closed, end date passed, or price at 99 / 1. The card moves
   to History with the pending tag; its odds keep updating.
 - Calls tab: twenty cards at most.

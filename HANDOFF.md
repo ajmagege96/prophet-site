@@ -14,7 +14,7 @@ sections 5–7 are the contracts your side has to honour.
 ## 1. What changed since the last drop
 
 **History layout (Oct 25, founder).**
-- **Card**: the result tag moved from beside the odds to the bottom right of the meta row: right (green), wrong (red), void (gray), **pending** (purple; it was "awaiting", and `market.outcome` now sends `pending`). Conviction stars show on History cards too.
+- **Card**: the result tag moved from beside the odds to the bottom right of the meta row: right (green), wrong (red), void (gray), **pending** (purple; it was "awaiting", and `market.outcome` now sends `pending`). Conviction stars show on History cards too; the time to close is hidden there.
 - **Thesis block, History**: the result line sits at the top right of the block ("Resolved YES · right · 2w ago", or "Taps closed. Resolution next." while pending). Under the thesis, a hairline, a **RESOLUTION** label, and the copy: `{{market.outcome_note}}` on a resolved call, the void line on a void call. Pending shows no Resolution section.
 
 **UI Changes (Oct 26 logic, built Oct 25).**
