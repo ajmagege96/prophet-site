@@ -1,6 +1,6 @@
 # The Prophet — UI as built, for the product / logic side
 
-Front end at commit 60e850c (Oct 24 2026). Preview: https://ajmagege96.github.io/prophet-site/site/
+Front end with the Oct 26 logic changes (Oct 25 2026). Preview: https://ajmagege96.github.io/prophet-site/site/
 This is what the surface shows and what the product side has to supply. Full
 variable table in HANDOFF.md §10; design rules in CLAUDE.md; delta spec in BUILD-SPEC.md.
 
@@ -23,12 +23,21 @@ variable table in HANDOFF.md §10; design rules in CLAUDE.md; delta spec in BUIL
   the thesis block.
 
 ## Thesis block (for the selected card)
-- Label "Thesis", then a purple time marker: "Called 3d ago" / "Revised 3h ago" /
-  "Changed 2h ago", driven by the call's state (called / revised / changed).
+- Label "Thesis", then a purple marker driven by state:
+  called / revised → "Called 2h ago" / "Revised 3h ago";
+  pending → "Pending resolution" (no time);
+  resolved → "Resolved 2h ago"; void → nothing.
+  A change of side is a new call: it reads "Called {new time}" and the
+  Agree / Disagree buttons start unselected (the earlier tap stays with the
+  earlier call and is not shown).
 - The thesis text, latest revision. Nothing else for a live call.
 - History: an outcome line under the text — "Resolved YES · right · 2w ago",
-  "Market closed by Polymarket before resolution." (void), or "Awaiting resolution"
-  (closed, not yet resolved).
+  "Market closed by Polymarket before resolution." (void), or "Taps closed.
+  Resolution next." (pending). Resolved cards add the outcome note under it:
+  one line in his voice on what happened.
+- Pending = market closed, end date passed, or price at 99 / 1. The card moves
+  to History with the awaiting tag; its odds keep updating.
+- Calls tab: twenty cards at most.
 - Times are relative everywhere; a market's own dates (ladder leg, question text)
   print as dates.
 
@@ -57,8 +66,9 @@ variable table in HANDOFF.md §10; design rules in CLAUDE.md; delta spec in BUIL
 
 ## Data the server sends per market
 slug, question, image_url, yes_pct (live or settled), filter_state (called | resolved),
-side (yes | no), state (called | revised | changed), time_line ("called 2d ago" /
-"revised 2h ago" / "changed 2h ago"), conviction (1–5), called_pct (odds at the call,
+side (yes | no), state (called | revised | pending | resolved), time_line
+("called 2h ago" / "revised 3h ago", live only), outcome_note (resolved only),
+conviction (1–5), called_pct (odds at the call,
 for the modal line only), volume, ends_in, listed_leg_date (ladders), thesis (latest
 revision), call_state (live | resolved | void | closed), outcome (right | wrong | void
 | awaiting), resolved_side, resolved_pct, resolved_ago, agree_pct, tap_count,
@@ -66,6 +76,9 @@ user_side (agree | disagree | empty), market_closed (true | false).
 Deck-level: show_conviction ("false" hides the stars; anything else shows them).
 Viewer: signed_in. Modal copy: tap_modal.confirm_agree, confirm_disagree,
 scoring_line (the approved copy above is the fallback).
+
+## Retired
+The "changed" state value (Oct 26).
 
 ## Not built (dropped from the Oct 23 spec)
 "Against the market" tag; "Changed his mind on {date}. He had called {side}." note;

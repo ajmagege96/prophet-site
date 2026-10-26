@@ -159,7 +159,8 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
   var thesisLabel = document.querySelector('[data-thesis-label]');
   var thesisOutcome = document.querySelector('[data-thesis-outcome]');
   var thesisRevised = document.querySelector('[data-thesis-revised]'), thesisSplit = document.querySelector('[data-thesis-split]'), adWrap = document.querySelector('[data-ad]');
-  var taps = {};   /* slug -> 'agree' | 'disagree' (mock, in-memory; the server keeps the real side) */
+  var taps = {};   /* call -> 'agree' | 'disagree' (mock, in-memory; the server keeps the real side) */
+  function tapKey(card) { return card.dataset.slug + ':' + (card.dataset.side || ''); }   /* a change of side is a new call, so an earlier tap does not carry over */
   var VOID_LINE = 'Market closed by Polymarket before resolution.';
   function labelHTML(key) { return key === 'buy_yes' ? '<span class="lbl lbl--yes">Buy YES</span>' : key === 'buy_no' ? '<span class="lbl lbl--no">Buy NO</span>' : key === 'hold' ? '<span class="lbl lbl--hold">Hold</span>' : ''; }
   function cardLabel(card) { var l = card.dataset.label; if (l && l !== 'none') return l; var st = (card.dataset.side || '').toLowerCase(); return (card.dataset.state !== 'none' && st) ? 'buy_' + st : 'none'; }
@@ -372,8 +373,11 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
     var history = state === 'resolved';
     thesisBox.hidden = false;
     thesisLabel.textContent = 'Thesis';
-    /* the time line in purple beside the label: Called 3d ago / Revised 3h ago / Changed 2h ago */
-    var tl = history ? '' : (card.dataset.timeLine || '');
+    /* the purple marker by state: called / revised → the time line; pending → "Pending resolution"; resolved → "Resolved {ago}" */
+    var kind = card.dataset.callKind || '', cs0 = card.dataset.callState || '', tl = '';
+    if (kind === 'pending' || (history && cs0 === 'closed')) tl = 'Pending resolution';
+    else if (kind === 'resolved' || history) tl = (cs0 === 'void') ? '' : 'Resolved' + (card.dataset.resolvedAgo ? ' ' + card.dataset.resolvedAgo : '');
+    else tl = card.dataset.timeLine || '';
     if (thesisRevised) thesisRevised.textContent = tl ? tl.charAt(0).toUpperCase() + tl.slice(1) : '';
     thesisText.textContent = card.dataset.thesis || '';
     /* History: how it played out */
@@ -382,9 +386,16 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
       thesisOutcome.hidden = !history;
       if (history) {
         if (cs === 'void') thesisOutcome.textContent = VOID_LINE;
-        else if (cs === 'closed' || card.dataset.outcome === 'awaiting') thesisOutcome.textContent = 'Awaiting resolution';
+        else if (cs === 'closed' || card.dataset.outcome === 'awaiting') thesisOutcome.textContent = 'Taps closed. Resolution next.';
         else thesisOutcome.innerHTML = 'Resolved <span class="tally tally--' + rs + '">' + rs.toUpperCase() + '</span> · ' + (card.dataset.outcome === 'right' ? '<span class="lbl lbl--yes">right</span>' : '<span class="lbl lbl--no">wrong</span>') + (card.dataset.resolvedAgo ? ' · ' + card.dataset.resolvedAgo : '');
       }
+    }
+    /* Resolved only: his one line on what happened, under the outcome line */
+    var noteEl = document.querySelector('[data-thesis-note]');
+    if (noteEl) {
+      var note = history && (card.dataset.callState || '') === 'resolved' ? (card.dataset.outcomeNote || '') : '';
+      if ((/^\{\{/).test(note)) note = '';
+      noteEl.textContent = note; noteEl.hidden = !note;
     }
     paintAgree(card);
   }
@@ -394,7 +405,7 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
     var live = (card.dataset.state || '') === 'called';
     adWrap.hidden = !live; if (thesisSplit) thesisSplit.hidden = true;
     if (!live) return;
-    var slug = card.dataset.slug, side = taps.hasOwnProperty(slug) ? taps[slug] : (card.dataset.userSide || '');
+    var slug = tapKey(card), side = taps.hasOwnProperty(slug) ? taps[slug] : (card.dataset.userSide || '');
     var closed = card.dataset.marketClosed === 'true';
     var btns = adWrap.querySelectorAll('[data-ad-btn]');
     for (var i = 0; i < btns.length; i++) { btns[i].classList.toggle('ad__btn--on', btns[i].dataset.adBtn === side); btns[i].disabled = closed; }
@@ -411,7 +422,7 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
       var card = cards[activeIndex];
       var signedIn = (thesisBox.getAttribute('data-signed-in') || '');
       if (signedIn === 'false') { document.dispatchEvent(new CustomEvent('prophet:signin', { detail: { then: 'agree', slug: card.dataset.slug } })); return; }
-      var slug = card.dataset.slug, prev = taps.hasOwnProperty(slug) ? taps[slug] : (card.dataset.userSide || '');
+      var slug = tapKey(card), prev = taps.hasOwnProperty(slug) ? taps[slug] : (card.dataset.userSide || '');
       var next = prev === b.dataset.adBtn ? '' : b.dataset.adBtn;   /* tap the chosen side again to deselect */
       taps[slug] = next;   /* the split is the server's figure and does not move on a tap */
       paintAgree(card);
@@ -465,7 +476,7 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
     });
   }
   /* After sign-in the server lands the tap and shows the confirmation: window.prophetTap.land(slug, 'agree' | 'disagree') */
-  window.prophetTap = { land: function (slug, side) { for (var i = 0; i < cards.length; i++) if (cards[i].dataset.slug === slug) { taps[slug] = side; paintAgree(cards[i]); confirmTap(cards[i], side); return; } } };
+  window.prophetTap = { land: function (slug, side) { for (var i = 0; i < cards.length; i++) if (cards[i].dataset.slug === slug) { taps[tapKey(cards[i])] = side; paintAgree(cards[i]); confirmTap(cards[i], side); return; } } };
 
   /* ── Modals: Vote, Take sent ──────────────────────────── */
   /* Shared: close on X, Escape or the backdrop; body scroll locked while open. */

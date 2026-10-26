@@ -13,6 +13,13 @@ sections 5–7 are the contracts your side has to honour.
 
 ## 1. What changed since the last drop
 
+**UI Changes (Oct 26 logic, built Oct 25).**
+- **Time marker** beside the Thesis label, by `{{market.state}}`: `called` / `revised` → `{{market.time_line}}` ("Called 2h ago" / "Revised 3h ago"); `pending` → "Pending resolution", no time; `resolved` → "Resolved `{{market.resolved_ago}}`". `changed` is retired: a change of side is a new call (`called`, fresh `time_line`, `user_side` empty, so the buttons start unselected). Void calls show no marker.
+- **Pending** = closed, end date passed, or price at 99 / 1. The card moves to History with the awaiting tag and its odds keep updating. The block's outcome line reads "Taps closed. Resolution next."; no outcome note yet.
+- **Resolved**: under the outcome line (right / wrong, unchanged), `{{market.outcome_note}}`, one line in his voice on what happened. Mocks carry `[COPY]`.
+- **Calls tab** holds twenty cards at most. No template change; send twenty.
+- On phones the History tag drops under the 26px odds so it never runs off the card.
+
 **UI Revisions (Oct 23 evening spec, built Oct 23–24; only the additions, the settled layout stays).**
 - **Card face**: the big call is still **Buy YES** green / **Buy NO** red, now from `{{market.side}}` / `{{market.side_upper}}`, the market odds top-right a step bigger (26px). The meta row starts with five conviction stars, bottom-left (`{{market.conviction}}` filled, green under Buy YES / red under Buy NO; hidden only when the carousel root's `data-show-conviction="{{show_conviction}}"` is `false`), then volume and time to close. The at-call stat is off the face; `{{market.called_pct}}` stays as data for the Tap Confirmed line. Cards stay 196px desktop / 184px phone.
 - **Thesis block**: the purple marker beside the label is now the time line, `{{market.time_line}}` ("called 2d ago" / "revised 2h ago" / "changed 2h ago" by `{{market.state}}` called / revised / changed; the block capitalises it).
@@ -234,7 +241,8 @@ or modal root is the whole contract.
 | `data-slug` | `market.slug` | row key |
 | `data-label` | `label` | buy_yes · buy_no |
 | `data-side` | `market.side` | yes / no; the face prints Buy `market.side_upper` |
-| `data-call-kind`, `data-time-line` | `market.state`, `market.time_line` | called / revised / changed and the purple marker beside the Thesis label |
+| `data-call-kind`, `data-time-line` | `market.state`, `market.time_line` | called / revised / pending / resolved; the purple marker beside the Thesis label |
+| `data-outcome-note` | `market.outcome_note` | resolved only: his line under the outcome line |
 | `data-called-pct` | `market.called_pct` | odds at the call, data only: the Tap Confirmed price |
 | `data-conviction` | `market.conviction` | 1–5 stars first in the meta row, in the call's colour; hidden only when the carousel root has `data-show-conviction="false"` (`show_conviction`) |
 | `data-thesis` | `market.thesis` | the thesis, latest revision |
@@ -330,13 +338,13 @@ Other globals: `window.prophetOnboarding.open()`, `window.prophetHowItWorks.open
 
 ## 10. Variable reference
 
-69 variables actually present in the files right now, with where each appears.
+70 variables actually present in the files right now, with where each appears.
 
 | Variable | Where | Holds |
 |---|---|---|
 | `{{agree_pct}}` | Home | Agree / Disagree under the thesis: the user's side (`agree` / `disagree` / empty) is kept; from three taps the split under the buttons reads "71% agree · 38 taps" — the server's figure, unchanged by the user's own tap — below that only "You agree" / "You disagree"; `market_closed` `true` disables both buttons and shows "Taps closed. Resolution next." Signed-in only: a signed-out tap fires `prophet:signin` with `{then: 'agree', slug}` |
 | `{{buy_url}}` | $PROPHET; Home; below-fold | Buy $PROPHET link (pump.fun) |
-| `{{call_state}}` | Home | `live` / `resolved` / `void` / `closed`. Void shows "Market closed by Polymarket before resolution."; closed shows "Awaiting resolution" |
+| `{{call_state}}` | Home | `live` / `resolved` / `void` / `closed`. Void shows "Market closed by Polymarket before resolution."; closed (pending) shows "Taps closed. Resolution next." |
 | `{{contract_address}}` | $PROPHET; Home; header | $PROPHET contract address; the header pill shows first 6 … last 6 and copies the full value |
 | `{{docs_url}}` | $PROPHET; Home; header | External link to documentation site |
 | `{{jupiter_url}}` | $PROPHET; Home; footer; header | $PROPHET on Jupiter (footer token link) |
@@ -350,17 +358,18 @@ Other globals: `window.prophetOnboarding.open()`, `window.prophetHowItWorks.open
 | `{{market.filter_state}}` | Home | `called` (the Calls deck) or `resolved` (History); the two tabs |
 | `{{market.image_url}}` | Home | Market image, imported from Polymarket (44px square on the card) |
 | `{{market.outcome}}` | Home | History: `right` / `wrong` / `void` / `awaiting` — the tag in the badge and the outcome line |
+| `{{market.outcome_note}}` | Home | Resolved cards only: one line in his voice on what happened, under the outcome line in the thesis block. Empty for pending and void |
 | `{{market.outcome_tag}}` | Home | After the odds, top-right: empty for a live call; in History the tag `<span class="prow__outcome prow__outcome--right">right</span>` (right · wrong · void · awaiting). Was `market.state` before Oct 23 |
 | `{{market.question}}` | Home | Market question text |
-| `{{market.resolved_ago}}` | Home | Relative time since resolution, e.g. `2w ago` |
+| `{{market.resolved_ago}}` | Home | Relative time since resolution, e.g. `2w ago`; the marker reads "Resolved 2w ago" and the outcome line ends with it |
 | `{{market.resolved_pct}}` | Home | Closing YES % at settlement, e.g. `97%` |
 | `{{market.resolved_side}}` | Home | `yes` / `no` — the side the market settled on |
 | `{{market.side}}` | Home | `yes` / `no` and `YES` / `NO`: the call, printed big on the card as "Buy YES" (green) or "Buy NO" (red). Replace `thesis_stance` / `thesis_stance_upper` |
 | `{{market.side_upper}}` | Home | `yes` / `no` and `YES` / `NO`: the call, printed big on the card as "Buy YES" (green) or "Buy NO" (red). Replace `thesis_stance` / `thesis_stance_upper` |
 | `{{market.slug}}` | Home | URL-safe identifier for the market (used in `<!-- repeat: market -->`) |
-| `{{market.state}}` | Home | `called` / `revised` / `changed` — the call's state, carried as `data-call-kind` |
+| `{{market.state}}` | Home | `called` / `revised` (Calls) or `pending` / `resolved` (History) — the call's state, carried as `data-call-kind`. Drives the purple marker: the time line while live, "Pending resolution" when pending, "Resolved {resolved_ago}" when resolved. `changed` is retired: a change of side is a new call, state `called`, with `user_side` empty |
 | `{{market.thesis}}` | Home | Full thesis text (called) or draft thesis (vote open), set as `data-thesis` on the card; shown in the Thesis block above the takes when the card is selected; empty otherwise |
-| `{{market.time_line}}` | Home | The purple marker beside the Thesis label, one line by state: "called 2d ago" / "revised 2h ago" / "changed 2h ago" (relative; the block capitalises it). Replaces `called_ago` and `revised_ago` |
+| `{{market.time_line}}` | Home | The purple marker beside the Thesis label while the call is live: "called 2h ago" / "revised 3h ago" (relative; the block capitalises it) |
 | `{{market.volume}}` | Home | Polymarket volume, short form (e.g. "$4.1M"), shown after a bar-chart icon |
 | `{{market.yes_pct}}` | Home | Current YES percentage (e.g. "72%"); once resolved, the settled 100% / 0% |
 | `{{market_closed}}` | Home | Agree / Disagree under the thesis: the user's side (`agree` / `disagree` / empty) is kept; from three taps the split under the buttons reads "71% agree · 38 taps" — the server's figure, unchanged by the user's own tap — below that only "You agree" / "You disagree"; `market_closed` `true` disables both buttons and shows "Taps closed. Resolution next." Signed-in only: a signed-out tap fires `prophet:signin` with `{then: 'agree', slug}` |

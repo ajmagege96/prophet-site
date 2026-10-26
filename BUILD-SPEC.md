@@ -91,15 +91,18 @@ Card attributes the client reads: `data-state`, `data-slug`, `data-label`,
 One block under the carousel for the selected card, outlined like the selected
 card. Contents, and nothing else:
 
-- Label **THESIS**, and beside it the small purple time marker
-  `{{market.time_line}}` — "Called 3d ago" / "Revised 3h ago" / "Changed 2h
-  ago" by `{{market.state}}` (the client capitalises the first letter). No tap
-  behaviour.
+- Label **THESIS**, and beside it the small purple marker, by
+  `{{market.state}}`: `called` / `revised` → `{{market.time_line}}` ("Called 2h
+  ago" / "Revised 3h ago"); `pending` → "Pending resolution", no time;
+  `resolved` → "Resolved `{{market.resolved_ago}}`". Void shows none. The
+  client capitalises the first letter. No tap behaviour.
 - The thesis text, the latest revision (`{{market.thesis}}`).
 - History only: one line under the text — `Resolved YES · right · 2w ago`
   (right green / wrong red), or `"Market closed by Polymarket before
-  resolution."` for `call_state` void, or `"Awaiting resolution"` for
-  `call_state` closed.
+  resolution."` for `call_state` void, or `"Taps closed. Resolution next."` for
+  a pending call (`call_state` closed).
+- Resolved only, under that line: `{{market.outcome_note}}`, one line in his
+  voice on what happened.
 
 The block carries `data-signed-in="{{viewer.signed_in}}"`.
 
@@ -152,7 +155,9 @@ The History tab shows resolved calls as cards in the same structure: odds
 (settled 100% / 0%) with the outcome tag, the big Buy YES / Buy NO, the meta
 row with the odds at the call. Selecting one shows the thesis as last revised
 and the outcome line (section 5). Void calls carry the void tag and line and sit
-apart from any count. Closed-but-unresolved calls read Awaiting resolution.
+apart from any count. Pending calls (closed, end date passed, or price at 99 / 1)
+move here with the awaiting tag; their odds keep updating. On phones the tag
+drops under the odds.
 Nothing about the user's taps appears in History.
 
 ## 9. Layout
@@ -179,6 +184,10 @@ its own only once per device. Globals: `window.prophetHowItWorks.open()`,
 
 ## 11. Variables added in this drop
 
+Oct 26: `market.state` takes `pending` and `resolved`; `market.outcome_note`;
+`market.resolved_ago` now also feeds the marker. Retired: the `changed` state
+value (a change of side is a new call with `user_side` empty).
+
 Oct 23 evening: `market.side`, `market.side_upper`, `market.time_line`,
 `market.state` (called / revised / changed), `market.conviction`,
 `show_conviction`, `tap_count`. Not built, by the founder's call:
@@ -196,12 +205,19 @@ Descriptions in `TEMPLATE_VARS.md`; the generated table in `HANDOFF.md` §10.
 
 ## 12. Check before shipping
 
-- All shows every listed market with a call; History shows resolved; the empty
+- Calls shows every listed market with a call; History shows resolved; the empty
   line appears on an empty tab.
 - Every card: odds top-right, the big Buy YES / Buy NO in the right colour, the
   stars bottom-left in that colour (faint on the unfilled ones), no at-call stat, three meta items on one
   line, no overflow at 390px.
-- The purple marker beside Thesis reads Called / Revised / Changed by state.
+- The purple marker beside Thesis reads Called / Revised while live, "Pending
+  resolution" when pending, "Resolved {time}" when resolved.
+- A pending card sits in History with the awaiting tag, a price that matches
+  Polymarket, and "Taps closed. Resolution next." under the thesis.
+- A resolved card shows the right / wrong line and the outcome note under it.
+- A market where he changed side reads "Called" with the new time and the
+  buttons start unselected.
+- The Calls tab never shows more than twenty cards.
 - Agree / Disagree: bright from the start, no hover change, no outline, deselect
   works, closed markets disable with "Taps closed. Resolution next.", the split
   under the buttons never moves on a tap, the word is taps.
