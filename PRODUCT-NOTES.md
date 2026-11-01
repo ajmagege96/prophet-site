@@ -1,6 +1,6 @@
 # The Prophet — UI as built, for the product / logic side
 
-October 26, 2026 · preview https://ajmagege96.github.io/prophet-site/site/
+October 31, 2026 · preview https://ajmagege96.github.io/prophet-site/site/
 What the surface shows and what the server has to send. Builds on the Oct 26
 and Oct 26 PM logic, with the founder's UI calls on top.
 
@@ -103,6 +103,47 @@ Deck: show_conviction ("false" hides the stars), at most twenty Calls cards.
 Viewer: signed_in. Modal copy: tap_modal.confirm_agree, confirm_disagree,
 scoring_line; notice.already_agree, notice.already_disagree (the copy above
 is the fallback).
+
+## Midterms page (midterms.html, "Midterms" in the header)
+- 74 races: 3 Balance of Power markets (Balance of Power, Senate control, House
+  control), 35 Senate seats, 36 governors. One locked call each. No deck, no
+  carousel; the home tabs carry no midterm race.
+- The page reads two feeds and computes every stat itself (no stats endpoint):
+  race list per race: event_id, leg_id, market_id, group (balance | senate |
+    governors), kind (race | control | bop), state code, race name, called leg,
+    party (D | R | I), runner-up, runner-up party, layer (featured | contested |
+    safe), featured flag;
+  calls (live + History endpoints, listed set): market_id, leg_id, side,
+    stars, thesis, settlement_line, price_at_call and live_price (the called
+    leg's YES price; the page flips it for a NO), state (live | pending |
+    resolved | void), pending_reason (closed | price | disputed), outcome
+    (right | wrong), outcome_line, taps_agree, taps_disagree, user_side.
+  Joined on market_id + leg_id.
+- Stats (headline and per group): Called = races with a call; Resolved =
+  resolved right or wrong; Right = resolved right; Hit rate = right ÷ resolved,
+  void excluded, a dash until one resolves. Five-star line: count, then how
+  many right. No money lines anywhere.
+- Order in a group: featured, then contested by price closest to 50, then safe
+  (collapsed behind a count, remembered per viewer). Featured races show twice:
+  card and row.
+- Maps: a seat takes the party of his pick (a NO takes the runner-up's);
+  seats not up stay neutral; void dashed; resolved seats get ✓ / ✗.
+- His pick, never a double negative: YES → the called candidate or party; NO
+  two-candidate → the runner-up; NO multi-candidate (AK, CA, ID, MI, RI) →
+  "Not" + the called candidate; NO on Balance of Power → "Not a Democratic
+  sweep"; NO on Senate / House control → the other party.
+- Card: race and group, state tag, pick with party chip, stars, "N% at call ·
+  M% now" for his side (settled 100 / 0 once resolved, last price when void),
+  Agree / Disagree with the tally. Open it for the thesis and the settlement
+  line, the outcome line once resolved, the void line when void.
+- Row: race · pick · stars · live price · tag · tally. Opens the card in place
+  (phone) or beside the list (desktop).
+- Tags: Pending · Pending · disputed · Right · Wrong · Void. Taps: one per call,
+  final, the already notice, Tap Confirmed; locked from pending on. Pending
+  races stay in their group.
+- Every visible string on the page is placeholder copy for Awetu.
+- Open: five stars are held for outcomes knowable from a primary source, so
+  the five-star line may be thin at launch.
 
 ## Not built (founder's call)
 "Against the market" tag; "Changed his mind on {date}" note; History "called

@@ -1212,3 +1212,279 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
 
   later();
 })();
+
+/* ── Midterms page ────────────────────────────────────── */
+/* 74 races, one locked call each. Reads the race list and the calls (two JSON blobs the server fills; midterms-mock.js
+   while they are unfilled), joins them on market_id + leg_id and computes every stat on the page. */
+(function () {
+  var root = document.querySelector('[data-midterms]');
+  if (!root) return;
+  var nav = document.querySelectorAll('[data-nav="midterms"]');
+  for (var ni = 0; ni < nav.length; ni++) nav[ni].classList.add('active');
+
+  function blob(sel, key) {
+    var el = root.querySelector(sel), raw = el ? el.textContent.trim() : '';
+    if (raw && !(/^\{\{/).test(raw)) { try { return JSON.parse(raw); } catch (e) {} }
+    var m = window.PROPHET_MIDTERMS_MOCK; return m ? m[key] : [];
+  }
+  var list = blob('[data-midterms-races]', 'races'), calls = blob('[data-midterms-calls]', 'calls');
+  var byKey = {};
+  for (var ci = 0; ci < calls.length; ci++) byKey[calls[ci].market_id + '|' + calls[ci].leg_id] = calls[ci];
+  var races = [];
+  for (var ri = 0; ri < list.length; ri++) {
+    var r = list[ri], c = byKey[r.market_id + '|' + r.leg_id];
+    if (!c) continue;
+    races.push({ id: r.market_id, group: r.group, kind: r.kind || 'race', state: r.state || '', race: r.race, leg: r.leg, party: r.party,
+      ru: r.runner_up, ruParty: r.runner_up_party, layer: r.layer, featured: !!r.featured,
+      side: c.side, stars: +c.stars || 0, thesis: c.thesis || '', settle: c.settlement_line || '', atCall: +c.price_at_call,
+      price: +c.live_price, status: c.state || 'live', reason: c.pending_reason || '', outcome: c.outcome || '',
+      outcomeLine: c.outcome_line || '', agree: +c.taps_agree || 0, disagree: +c.taps_disagree || 0, userSide: c.user_side || '' });
+  }
+  var MULTI = { AK: 1, CA: 1, ID: 1, MI: 1, RI: 1 };   /* multi-candidate races: a NO reads "Not" + the called candidate */
+  var PARTY_WORD = { D: 'Democratic', R: 'Republican', I: 'Independent' };
+  var VOID_LINE = "Polymarket closed this market without a result. His calls and every tap on them don't count.";
+  var STAR = (root.querySelector('[data-mt-star]') || {}).innerHTML || '';
+  var signedIn = root.getAttribute('data-signed-in') || '';
+  var taps = {};   /* market_id -> side, mock and in-memory; the server keeps the real one */
+
+  function esc(t) { return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+  function other(p) { return p === 'D' ? 'R' : 'D'; }
+  /* His pick, never a double negative */
+  function pick(r) {
+    if (r.side === 'yes') return { text: r.leg, party: r.kind === 'bop' ? '' : r.party };
+    if (r.kind === 'bop') return { text: 'Not a ' + PARTY_WORD[r.party] + ' sweep', party: '' };
+    if (r.kind === 'control') { var o = other(r.party); return { text: o === 'D' ? 'Democrats' : 'Republicans', party: o }; }
+    if (MULTI[r.state]) return { text: 'Not ' + r.leg, party: '' };
+    return { text: r.ru, party: r.ruParty };
+  }
+  function mapParty(r) { return r.side === 'yes' ? r.party : r.ruParty; }   /* a NO colours the seat by the runner-up's party */
+  function sidePrice(p, r) { return r.side === 'yes' ? p : 100 - p; }   /* prices read for his side */
+  function locked(r) { return r.status !== 'live'; }
+  function tagHTML(r) {
+    if (r.status === 'pending') return '<span class="prow__outcome prow__outcome--pending">' + (r.reason === 'disputed' ? 'Pending · disputed' : 'Pending') + '</span>';
+    if (r.status === 'resolved') return '<span class="prow__outcome prow__outcome--' + r.outcome + '">' + (r.outcome === 'right' ? 'Right' : 'Wrong') + '</span>';
+    if (r.status === 'void') return '<span class="prow__outcome prow__outcome--void">Void</span>';
+    return '';
+  }
+  function chip(p) { return p ? '<span class="mt-chip mt-chip--' + p.toLowerCase() + '">' + p + '</span>' : ''; }
+  function pickHTML(r) { var k = pick(r); return '<span class="mt-pick__name">' + esc(k.text) + '</span>' + chip(k.party); }
+  function starsHTML(r) { var h = ''; for (var s = 1; s <= 5; s++) h += '<span class="carousel__star' + (s <= r.stars ? ' carousel__star--on' : '') + '">' + STAR + '</span>'; return '<span class="mt-stars" title="' + r.stars + ' of 5">' + h + '</span>'; }
+  function side(r) { return taps.hasOwnProperty(r.id) ? taps[r.id] : r.userSide; }
+  function tally(r, short) {
+    var n = r.agree + r.disagree;
+    if (n >= 3) return Math.round(r.agree * 100 / n) + '% agree · ' + n + ' tap' + (n === 1 ? '' : 's');
+    var s = side(r); return s ? 'You ' + s : (short ? '' : '');
+  }
+  function priceNow(r) {
+    if (r.status === 'resolved') return sidePrice(r.price, r) + '% settled';
+    if (r.status === 'void') return sidePrice(r.price, r) + '% last';
+    return sidePrice(r.price, r) + '% now';
+  }
+
+  /* ── stats (headline and per group) ── */
+  function stats(set) {
+    var called = 0, resolved = 0, right = 0;
+    for (var i = 0; i < set.length; i++) {
+      if (set[i].side) called++;
+      if (set[i].status === 'resolved') { resolved++; if (set[i].outcome === 'right') right++; }
+    }
+    var dash = '—';
+    return [['Called', called], ['Resolved', resolved ? resolved : dash], ['Right', resolved ? right : dash],
+            ['Hit rate', resolved ? Math.round(right * 100 / resolved) + '%' : dash]];
+  }
+  function statsHTML(set) {
+    return stats(set).map(function (s) { return '<div class="mt-stat"><span class="mt-stat__label">' + s[0] + '</span><span class="mt-stat__value">' + s[1] + '</span></div>'; }).join('');
+  }
+
+  /* ── maps: one tile per state; seats in play take the party of his pick, the rest stay neutral ── */
+  var TILES = { AK:[0,0], ME:[11,0], WI:[6,1], VT:[10,1], NH:[11,1], WA:[0,2], ID:[1,2], MT:[2,2], ND:[3,2], MN:[4,2], IL:[5,2], MI:[6,2], NY:[9,2], MA:[10,2],
+    OR:[0,3], NV:[1,3], WY:[2,3], SD:[3,3], IA:[4,3], IN:[5,3], OH:[6,3], PA:[7,3], NJ:[8,3], CT:[9,3], RI:[10,3],
+    CA:[0,4], UT:[1,4], CO:[2,4], NE:[3,4], MO:[4,4], KY:[5,4], WV:[6,4], VA:[7,4], MD:[8,4], DE:[9,4],
+    AZ:[1,5], NM:[2,5], KS:[3,5], AR:[4,5], TN:[5,5], NC:[6,5], SC:[7,5], DC:[8,5], OK:[3,6], LA:[4,6], MS:[5,6], AL:[6,6], GA:[7,6], HI:[0,7], TX:[3,7], FL:[8,7] };
+  function mapSVG(group) {
+    var seats = {}; races.forEach(function (r) { if (r.group === group && r.state) seats[r.state] = r; });
+    var T = 30, G = 3, out = '';
+    for (var st in TILES) {
+      var x = TILES[st][0] * (T + G), y = TILES[st][1] * (T + G), r = seats[st];
+      var cls = r ? 'mt-tile mt-tile--' + (r.status === 'void' ? 'void' : mapParty(r).toLowerCase()) : 'mt-tile mt-tile--off';
+      out += '<g class="' + cls + '"' + (r ? ' data-mt-open="' + r.id + '"' : '') + '><title>' + (r ? esc(r.race + ': ' + pick(r).text) : st) + '</title>' +
+        '<rect x="' + x + '" y="' + y + '" width="' + T + '" height="' + T + '" rx="2"/>' +
+        '<text x="' + (x + T / 2) + '" y="' + (y + T / 2 + 4) + '" text-anchor="middle">' + st + '</text>';
+      if (r && r.status === 'resolved') {
+        var ok = r.outcome === 'right';
+        out += '<rect class="mt-mark__bg" x="' + (x + T - 12) + '" y="' + (y + 1) + '" width="11" height="11"/>' +
+          '<text class="mt-mark mt-mark--' + r.outcome + '" x="' + (x + T - 6.5) + '" y="' + (y + 10) + '" text-anchor="middle">' + (ok ? '✓' : '✗') + '</text>';
+      }
+      out += '</g>';
+    }
+    return '<svg class="mt-map__svg" viewBox="0 0 ' + (12 * (T + G) - G) + ' ' + (8 * (T + G) - G) + '" role="img" aria-label="' + group + ' map">' + out + '</svg>';
+  }
+
+  /* ── card (featured ten, and any opened row) ── */
+  function adHTML(r) {
+    var s = side(r), lk = locked(r);
+    var btn = function (k, label) { return '<button class="ad__btn ad__btn--' + k + (s === k ? ' ad__btn--on' : '') + (s && s !== k ? ' ad__btn--off' : '') + '" data-mt-tap="' + k + '"' + (lk ? ' disabled' : '') + '>' + label + '</button>'; };
+    var t = tally(r);
+    return '<div class="ad mt-ad"><div class="ad__row">' + btn('agree', 'Agree') + btn('disagree', 'Disagree') + '</div>' +
+      (t ? '<span class="thesis__split">' + t + '</span>' : '') +
+      (r.status === 'pending' ? '<span class="ad__closed">Taps closed. Resolution next.</span>' : '') + '</div>';
+  }
+  function bodyHTML(r) {
+    var line = r.status === 'resolved' ? r.outcomeLine : r.status === 'void' ? VOID_LINE : r.settle;
+    var lineCls = r.status === 'resolved' ? 'thesis__note' : 'thesis__fact';
+    return '<p class="thesis__text">' + esc(r.thesis) + '</p>' + (line ? '<p class="' + lineCls + '">' + esc(line) + '</p>' : '');
+  }
+  function cardHTML(r, open) {
+    return '<article class="mt-card outline' + (open ? ' mt-card--open' : '') + '" data-mt-card="' + r.id + '">' +
+      '<div class="mt-card__top" data-mt-toggle><span class="mt-card__race">' + esc(r.race) + '</span>' + tagHTML(r) +
+      '<svg class="tsec__chev" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></div>' +
+      '<div class="mt-pick" data-mt-toggle>' + pickHTML(r) + '</div>' +
+      '<div class="mt-card__meta" data-mt-toggle>' + starsHTML(r) + '<span class="mt-price">' + sidePrice(r.atCall, r) + '% at call · ' + priceNow(r) + '</span></div>' +
+      '<div class="mt-card__body"' + (open ? '' : ' hidden') + '>' + bodyHTML(r) + '</div>' +
+      adHTML(r) + '</article>';
+  }
+  function rowHTML(r) {
+    var t = tally(r, true);
+    return '<div class="mt-row" data-mt-row="' + r.id + '" tabindex="0">' +
+      '<span class="mt-row__race">' + esc(r.group === 'balance' ? r.race : stateName(r)) + '</span>' +
+      '<span class="mt-row__pick">' + pickHTML(r) + '</span>' + starsHTML(r) +
+      '<span class="mt-row__price">' + sidePrice(r.price, r) + '%</span>' +
+      '<span class="mt-row__tag">' + tagHTML(r) + '</span>' +
+      '<span class="mt-row__tally">' + (t || '') + '</span></div>';
+  }
+  function stateName(r) { return r.race.replace(/ (Senate|Governor)$/, ''); }
+
+  /* ── groups ── */
+  var group = 'balance', openId = '', SAFE_KEY = 'prophet.midterms.safe.';
+  function ordered(g) {
+    var set = races.filter(function (r) { return r.group === g; });
+    var f = set.filter(function (r) { return r.featured; });
+    var c = set.filter(function (r) { return !r.featured && r.layer !== 'safe'; }).sort(function (a, b) { return Math.abs(a.price - 50) - Math.abs(b.price - 50); });
+    var s = set.filter(function (r) { return !r.featured && r.layer === 'safe'; });
+    return { all: set, lead: f.concat(c), safe: s };
+  }
+  function safeOpen(g) { try { return localStorage.getItem(SAFE_KEY + g) === '1'; } catch (e) { return false; } }
+  function isDesk() { return window.matchMedia('(min-width: 1024px)').matches; }
+  function renderGroup() {
+    var o = ordered(group), rows = root.querySelector('[data-mt-rows]'), so = safeOpen(group);
+    root.querySelector('[data-mt-stats="group"]').innerHTML = statsHTML(o.all);
+    var h = o.lead.map(rowWithCard).join('');
+    if (o.safe.length) {
+      h += '<button class="mt-safe" data-mt-safe aria-expanded="' + so + '">' + o.safe.length + ' safe ' + (group === 'governors' ? 'races' : 'seats') +
+        '<svg class="tsec__chev" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>';
+      if (so) h += o.safe.map(rowWithCard).join('');
+    }
+    rows.innerHTML = h;
+    var tabs = root.querySelectorAll('[data-mt-group]');
+    for (var i = 0; i < tabs.length; i++) tabs[i].classList.toggle('filters__tag--on', tabs[i].getAttribute('data-mt-group') === group);
+    renderPane();
+  }
+  function rowWithCard(r) {
+    var open = r.id === openId;
+    return rowHTML(r).replace('class="mt-row"', 'class="mt-row' + (open ? ' mt-row--open' : '') + '"') + (open && !isDesk() ? '<div class="mt-inplace">' + cardHTML(r, true) + '</div>' : '');
+  }
+  function renderPane() {
+    var pane = root.querySelector('[data-mt-pane]'), list = root.querySelector('[data-mt-list]');
+    var r = openId && isDesk() ? find(openId) : null;
+    if (r && r.group !== group) r = null;
+    pane.hidden = !r; list.classList.toggle('mt-list--pane', !!r);
+    pane.innerHTML = r ? '<button class="mdl__close mt-pane__close" data-mt-close aria-label="Close">&times;</button>' + cardHTML(r, true) : '';
+  }
+  function find(id) { for (var i = 0; i < races.length; i++) if (races[i].id === id) return races[i]; }
+  function renderFeatured() {
+    root.querySelector('[data-mt-featured]').innerHTML = races.filter(function (r) { return r.featured; }).map(function (r) { return cardHTML(r, false); }).join('');
+  }
+  function renderSide() {
+    root.querySelector('[data-mt-stats="all"]').innerHTML = statsHTML(races);
+    var maps = root.querySelectorAll('[data-mt-map]');
+    for (var i = 0; i < maps.length; i++) maps[i].querySelector('[data-mt-map-svg]').innerHTML = mapSVG(maps[i].getAttribute('data-mt-map'));
+    var five = races.filter(function (r) { return r.stars === 5; }), fr = five.filter(function (r) { return r.status === 'resolved'; }), fright = fr.filter(function (r) { return r.outcome === 'right'; });
+    root.querySelector('[data-mt-five]').innerHTML = '<span class="mt-five__n">' + five.length + '</span> five-star calls' + (fr.length ? ' · <span class="mt-five__n">' + fright.length + '</span> right' : '');
+  }
+  function renderAll() { renderSide(); renderFeatured(); renderGroup(); }
+  function refreshRace(id) {   /* repaint every place a race shows after a tap */
+    var r = find(id); if (!r) return;
+    var cards = root.querySelectorAll('[data-mt-card="' + id + '"]');
+    for (var i = 0; i < cards.length; i++) { var open = !cards[i].querySelector('.mt-card__body').hidden; cards[i].outerHTML = cardHTML(r, open); }
+    var rows = root.querySelectorAll('[data-mt-row="' + id + '"] .mt-row__tally');
+    for (var k = 0; k < rows.length; k++) rows[k].textContent = tally(r, true) || '';
+  }
+
+  /* ── interactions ── */
+  root.addEventListener('click', function (e) {
+    var t;
+    if ((t = e.target.closest('[data-mt-map-tab]'))) {
+      var m = t.getAttribute('data-mt-map-tab'); root.setAttribute('data-mt-mapshow', m);
+      var mt = root.querySelectorAll('[data-mt-map-tab]'); for (var i = 0; i < mt.length; i++) mt[i].classList.toggle('filters__tag--on', mt[i] === t);
+      return;
+    }
+    if ((t = e.target.closest('[data-mt-group]'))) { group = t.getAttribute('data-mt-group'); openId = ''; renderGroup(); return; }
+    if ((t = e.target.closest('[data-mt-safe]'))) { try { localStorage.setItem(SAFE_KEY + group, safeOpen(group) ? '0' : '1'); } catch (x) {} renderGroup(); return; }
+    if ((t = e.target.closest('[data-mt-close]'))) { openId = ''; renderGroup(); return; }
+    if ((t = e.target.closest('[data-mt-tap]'))) { onTap(t); return; }
+    if ((t = e.target.closest('[data-mt-row]'))) { var id = t.getAttribute('data-mt-row'); openId = openId === id ? '' : id; renderGroup(); return; }
+    if ((t = e.target.closest('[data-mt-open]'))) {   /* a map tile opens its race in its group */
+      var r0 = find(t.getAttribute('data-mt-open')); group = r0.group; openId = r0.id;
+      if (r0.layer === 'safe') { try { localStorage.setItem(SAFE_KEY + group, '1'); } catch (x) {} }
+      renderGroup(); var row = root.querySelector('[data-mt-row="' + r0.id + '"]'); if (row && row.scrollIntoView) row.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      return;
+    }
+    if ((t = e.target.closest('[data-mt-toggle]'))) {
+      var card = t.closest('[data-mt-card]'), body = card.querySelector('.mt-card__body');
+      body.hidden = !body.hidden; card.classList.toggle('mt-card--open', !body.hidden); return;
+    }
+  });
+  root.addEventListener('keydown', function (e) {
+    var row = e.target.closest && e.target.closest('[data-mt-row]');
+    if (row && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); row.click(); }
+  });
+  var lastDesk = isDesk();
+  window.addEventListener('resize', function () { if (isDesk() !== lastDesk) { lastDesk = isDesk(); renderGroup(); } });
+
+  /* ── Agree / Disagree: one tap per call, final; the "already" notice; locked once pending; signed out → sign-in ── */
+  var tapModal = document.querySelector('[data-tap-modal]'), already = document.querySelector('[data-notice="already"]');
+  function val(el, key, fb) { var v = el ? (el.getAttribute('data-' + key) || '') : ''; return (!v || (/^\{\{/).test(v)) ? fb : v; }
+  function openM(m) { if (!m) return; m.hidden = false; document.documentElement.classList.add('onb-lock'); var c = m.querySelector('.mdl__close'); if (c) c.focus(); }
+  function closeM(m) { if (!m) return; m.hidden = true; if (!document.querySelector('[data-modal]:not([hidden]), [data-onboarding]:not([hidden]), [data-hiw]:not([hidden])')) document.documentElement.classList.remove('onb-lock'); }
+  [tapModal, already].forEach(function (m) { if (m) m.addEventListener('click', function (e) { if (e.target.closest('[data-modal-close]')) closeM(m); }); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { var o = document.querySelector('[data-modal]:not([hidden])'); if (o) { e.preventDefault(); closeM(o); } } }, true);
+  var COPY = { agree: "You're calling him {verdict}. {label} at {price}. Let's see if you're both right.",
+               disagree: "You're calling him {verdict}. {label} at {price}, you say that's {verdict}.",
+               scoring: "Scored when the market resolves. Right or wrong, it's on your record and you'll earn XP." };
+  var lastTapped = '';
+  function onTap(b) {
+    var card = b.closest('[data-mt-card]'), r = find(card.getAttribute('data-mt-card')), k = b.getAttribute('data-mt-tap');
+    if (!r || locked(r)) return;
+    if (signedIn === 'false') { document.dispatchEvent(new CustomEvent('prophet:signin', { detail: { then: 'agree', slug: r.id } })); return; }
+    var prev = side(r);
+    if (prev) { if (already) { already.querySelector('[data-already-line]').textContent = prev === 'agree' ? val(already, 'already-agree', 'You agreed already.') : val(already, 'already-disagree', 'You disagreed already.'); openM(already); } return; }
+    taps[r.id] = k; refreshRace(r.id); confirm(r, k);
+  }
+  function confirm(r, k) {
+    if (!tapModal) return; lastTapped = r.id;
+    var chipEl = tapModal.querySelector('[data-tc-chip]');
+    chipEl.textContent = k === 'agree' ? 'Agree' : 'Disagree'; chipEl.className = 'ad__btn tc__chip ad__btn--' + k + ' ad__btn--on';
+    var label = '<span class="tc__word">' + esc(pick(r).text) + '</span>';
+    tapModal.querySelector('[data-tc-confirm]').innerHTML = esc(val(tapModal, k === 'agree' ? 'confirm-agree' : 'confirm-disagree', COPY[k]))
+      .replace(/\{label\}/g, label).replace(/\{verdict\}/g, k === 'agree' ? 'right' : 'wrong').replace(/\{price\}/g, String(sidePrice(r.atCall, r)));
+    tapModal.querySelector('[data-tc-scoring]').textContent = val(tapModal, 'scoring-line', COPY.scoring);
+    var nx = nextRace(r); tapModal.querySelector('[data-tc-next]').textContent = nx ? 'Next call' : 'Back to top';
+    openM(tapModal);
+  }
+  function nextRace(r) {   /* the next open call in the same place: the featured ten, or the race's group */
+    var seq = r.featured && root.querySelector('[data-mt-featured] [data-mt-card="' + r.id + '"]') && !openId ? races.filter(function (x) { return x.featured; }) : (function () { var o = ordered(r.group); return o.lead.concat(o.safe); })();
+    for (var i = seq.indexOf(r) + 1; i < seq.length; i++) if (!locked(seq[i])) return seq[i];
+    return null;
+  }
+  if (tapModal) tapModal.querySelector('[data-tc-next]').addEventListener('click', function () {
+    closeM(tapModal); var r = find(lastTapped); if (!r) return; var nx = nextRace(r);
+    if (!nx) { window.scrollTo({ top: 0, behavior: 'smooth' }); return; }
+    if (r.featured && !openId) { var el = root.querySelector('[data-mt-featured] [data-mt-card="' + nx.id + '"]'); if (el) { el.scrollIntoView({ block: 'nearest', inline: 'start', behavior: 'smooth' }); var b = el.querySelector('.mt-card__body'); b.hidden = false; el.classList.add('mt-card--open'); } return; }
+    group = nx.group; openId = nx.id; if (nx.layer === 'safe') { try { localStorage.setItem(SAFE_KEY + group, '1'); } catch (x) {} } renderGroup();
+    var row = root.querySelector('[data-mt-row="' + nx.id + '"]'); if (row) row.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  });
+  window.prophetMidterms = { races: races, land: function (id, k) { var r = find(id); if (r && !side(r) && !locked(r)) { taps[id] = k; refreshRace(id); confirm(r, k); } } };
+
+  root.setAttribute('data-mt-mapshow', 'senate');
+  renderAll();
+})();

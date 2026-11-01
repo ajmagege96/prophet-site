@@ -1,6 +1,6 @@
 # The Prophet — UI Build Spec: changes to theprophet.fun
 
-October 26, 2026 · preview https://ajmagege96.github.io/prophet-site/site/ (matches `main`)
+October 31, 2026 · preview https://ajmagege96.github.io/prophet-site/site/ (matches `main`)
 
 This is the delta between what theprophet.fun serves today and the UI in this
 drop. The live page still renders a deck of no-thesis cards with the prompt bar,
@@ -50,8 +50,10 @@ Variables that go with them: `market.take_count`, `market.vote_*`, `take.*`,
 
 Logo and wordmark left; **How it Works** right of the logo on desktop and first
 in the mobile menu; it opens a four-slide click-through every time (section 10).
-Desktop nav: $PROPHET · Docs · Logout (signed in only, red on hover), then the
-contract-address pill. Mobile: logo, address pill, one menu button.
+Desktop nav: **Midterms** · $PROPHET · Docs · Logout (signed in only, red on
+hover), then the contract-address pill. Mobile: logo, address pill, one menu
+button; the menu holds How it Works, Midterms, $PROPHET, Docs, Logout.
+Midterms is green while you are on that page (section 13).
 
 ## 4. Deck and tabs
 
@@ -191,6 +193,87 @@ How it Works link every time, never on its own. The first-visit onboarding
 (`partials/onboarding.html`) opens once per device. Globals:
 `window.prophetHowItWorks.open()`, `window.prophetOnboarding.open()`.
 
+## 13. Midterms page
+
+`site/midterms.html`: 74 races (3 Balance of Power markets, 35 Senate seats, 36
+governors), one locked call each. Its own rules: no deck, no carousel; the home
+Calls and History tabs carry no midterm race. Every visible string is
+placeholder copy.
+
+**Data.** Two JSON arrays the server fills, inside
+`<script type="application/json">` tags: `{{midterms.races_json}}` (event id,
+leg id, market id, group, kind, state code, race name, called leg, party,
+runner-up, runner-up party, layer, featured) and `{{midterms.calls_json}}` (market
+id, leg id, side, stars, thesis, settlement line, price at call, live price,
+state, pending reason, outcome, outcome line, tap counts, the viewer's side).
+Joined on market id + leg id. The page computes every stat; there is no stats
+endpoint. `midterms-mock.js` stands in until then; `#preview=some` and
+`#preview=all` show the race and page states.
+
+**Layout.**
+
+| Zone | Phone (390px) | Desktop (1400px) |
+|---|---|---|
+| Headline stats | One row: Called · Resolved · Right · Hit rate | Left column, sticky |
+| Map | One tile map with a Senate / Governors toggle | Both maps stacked under the stats |
+| Five-star line | "N five-star calls · M right" | Under the maps |
+| Featured ten | Cards, swipe sideways | Grid of three, right column |
+| Group tabs | Sticky: Balance of Power · Senate · Governors | Right column, sticky |
+| Group stats | One line under the tabs | Same |
+| Contested | Rows | Rows |
+| Safe | Collapsed: "23 safe seats" opens the rows (remembered per viewer) | Same |
+
+Inside a group: featured rows first, then contested by price closest to 50, then
+safe. Featured races appear twice: as a card and as a row in their group.
+
+**Stats.** Called = races with a call. Resolved = resolved right or wrong.
+Right = resolved right. Hit rate = right ÷ resolved, void excluded. Resolved,
+Right and Hit rate read a dash until one race resolves. Five-star calls: the
+count, then how many resolved right. The same four per group. No money lines
+anywhere.
+
+**Maps.** One square tile per state. A seat in play is filled with the party of
+his pick (D blue, R red, I off-white: the one palette exception, on this page);
+a NO takes the runner-up's party. Seats not up stay neutral. Void is a dashed
+outline. Resolved seats keep the colour and gain a small ✓ or ✗. A tile opens
+its race in its group.
+
+**His pick, never a double negative.**
+
+| Call | Shows |
+|---|---|
+| YES | The called candidate or party |
+| NO, two-candidate race | The runner-up |
+| NO, multi-candidate race (AK, CA, ID, MI, RI) | "Not" + the called candidate |
+| NO on Balance of Power | "Not a Democratic sweep" |
+| NO on Senate or House control | The other party |
+
+**Card** (the featured ten, and any opened row): race and group, the state tag,
+his pick with party chip, stars, "N% at call · M% now" (read for his side;
+"settled" 100 / 0 once resolved; "last" price when void), Agree / Disagree with
+the tally as built. Tap it to open the thesis and the settlement line (the
+outcome line once resolved; the void line when void).
+
+**Row**: race · pick with chip · stars · live price · state tag · tally, one line
+on desktop, two short lines on a phone. Tap it to open the card in place on a
+phone, beside the list on desktop (with a close X).
+
+**States.**
+
+| State | Tag | Taps | Price | Opened card |
+|---|---|---|---|---|
+| Live | none | open | live | thesis, settlement line |
+| Pending, closed | Pending | locked | live | thesis, settlement line |
+| Pending, price at 99 / 1 | Pending | locked | live | thesis, settlement line |
+| Pending, disputed | Pending · disputed | locked | live | thesis, settlement line |
+| Resolved right | Right | locked | settled 100 / 0 | thesis, outcome line |
+| Resolved wrong | Wrong | locked | settled 100 / 0 | thesis, outcome line |
+| Void | Void | locked | last price | thesis, void line; out of every count |
+
+Pending races stay in their group. Taps as built: one per call, final, the
+already notice, Tap Confirmed (its {label} is his pick), "Taps closed.
+Resolution next." while pending, sign-in when signed out.
+
 ## 11. Variables
 
 Added across this drop: `label`, `call_state`, `listed_leg_date`, `agree_pct`,
@@ -199,7 +282,8 @@ Added across this drop: `label`, `call_state`, `listed_leg_date`, `agree_pct`,
 `notice.already_disagree`, `market.side`,
 `market.side_upper`, `market.state` (called / revised / changed / pending /
 resolved), `market.time_line`, `market.conviction`, `show_conviction`,
-`market.outcome_tag`, `market.resolution_text`, `market.outcome_note`.
+`market.outcome_tag`, `market.resolution_text`, `market.outcome_note`,
+`midterms.races_json`, `midterms.calls_json`.
 `market.outcome` takes `right` / `wrong` / `void` / `pending`;
 `market.filter_state` takes `called` / `resolved`.
 
@@ -235,3 +319,7 @@ Descriptions in `TEMPLATE_VARS.md`; the generated table in `HANDOFF.md` §10.
 - How it Works opens from the header and the menu every time; onboarding only on
   a first visit.
 - No "vote", "take", "credits" or "trades" anywhere in the hero.
+- Midterms: 74 races, 10 cards, each race once in its group; every race and
+  page state renders at 390px and 1400px with no overflow; no double negatives;
+  the map colours match the picks (a NO shows the runner-up's party); hit rate
+  excludes void and hides until a race resolves; no money line anywhere.

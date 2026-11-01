@@ -13,6 +13,14 @@ sections 5–7 are the contracts your side has to honour.
 
 ## 1. What changed since the last drop
 
+**Midterms page (Oct 31 spec, built Oct 31).** A new page, `site/midterms.html`, linked as "Midterms" first in the header nav and after How it Works in the mobile menu.
+- **Data**: fill `{{midterms.races_json}}` (the race list) and `{{midterms.calls_json}}` (the live and History endpoints, listed set) — JSON arrays inside two `<script type="application/json">` tags; shapes in `TEMPLATE_VARS.md`. The page joins them on `market_id` + `leg_id` and computes every stat (there is no stats endpoint). Prices come as the called leg's YES price; the page flips them for a NO call. Delete `midterms-mock.js` and its tag once the blobs are filled.
+- **Layout**: desktop two columns — left sticky: headline stats, Senate and Governors tile maps, five-star line; right: the featured ten as a grid of three, then sticky group tabs, group stats and rows. Phones: one column, one map with a toggle, featured cards swipe.
+- **Rules the page applies**: order inside a group (featured, contested by price closest to 50, safe collapsed and remembered per viewer); hit rate = right ÷ resolved, void excluded, a dash until one resolves; his pick never a double negative (two-candidate NO → runner-up, multi-candidate NO in AK / CA / ID / MI / RI → "Not" + called, Balance of Power NO → "Not a Democratic sweep", control NO → the other party); map tiles take his pick's party (a NO takes the runner-up's), void dashed, resolved ✓ / ✗.
+- **Taps**: as built — one per call, final, the already notice and Tap Confirmed (its `{label}` is his pick, its price his side's price at the call); locked from pending on; signed out dispatches `prophet:signin` with `{then: 'agree', slug: market_id}`; `window.prophetMidterms.land(market_id, side)` lands a tap after sign-in.
+- **Preview**: `midterms.html#preview=some` and `#preview=all` show the race and page states from the mock.
+- Every visible string on the page is placeholder copy.
+
 **Taps are final (Oct 26).**
 - One side per user per call. After the tap the chosen button stays bright and the other dims; tapping either again opens the "already" notice — "You agreed already." / "You disagreed already." (`{{notice.already_agree}}`, `{{notice.already_disagree}}`, `data-notice="already"`). No switching, no deselect. Reject a second tap server-side too. A changed call sends `user_side` empty, so the user can tap again.
 
@@ -191,8 +199,11 @@ to the real domain.**
 | `robots.txt` | Search crawlers disallowed, preview bots allowed. Rewrite at launch. |
 | `index.html` (repo root) | Redirect to `site/index.html` so the bare Pages URL is not a 404. Delete once `site/` is the document root. |
 | `tools-stamp.py` | Rewrites the `?v=<hash>` on `app.js` / `styles.css` in every page from the file's content. Run after editing either. Delete it and the query strings once your server sets cache headers. |
-| `site/index.html` | Home: carousel, thesis block, takes, prompt bar, all modals. |
+| `site/index.html` | Home: carousel, thesis box with its drop-down, Agree / Disagree, Tap Confirmed and notices. |
 | `site/prophet.html` | $PROPHET: stat strip, chart, swap, live trades, three wallets in one row. |
+| `site/midterms.html` | Midterms: 74 races, headline and group stats, two tile maps, the featured ten, group rows. Renders from two JSON blobs. |
+| `site/midterms-mock.js` | Mock race list and calls for the Midterms page, plus `#preview=some` / `#preview=all` to show the race and page states. **Delete** (and its `<script>` tag) once you fill the blobs. |
+| `site/partials/how-it-works.html` | **Canonical** How it Works click-through. |
 | `site/partials/header.html` | **Canonical** header. |
 | `site/partials/onboarding.html` | **Canonical** onboarding modal. |
 | `site/partials/below-fold.html` | **Canonical** How it Works, Tokenomics, Roadmap. |
@@ -349,20 +360,20 @@ Other globals: `window.prophetOnboarding.open()`, `window.prophetHowItWorks.open
 
 ## 10. Variable reference
 
-73 variables actually present in the files right now, with where each appears.
+75 variables actually present in the files right now, with where each appears.
 
 | Variable | Where | Holds |
 |---|---|---|
 | `{{agree_pct}}` | Home | Agree / Disagree under the thesis: the user's side (`agree` / `disagree` / empty); once set, that button stays bright, the other dims, and a tap on either opens the already notice — taps are final; from three taps the split under the buttons reads "71% agree · 38 taps" — the server's figure, unchanged by the user's own tap — below that only "You agree" / "You disagree"; `market_closed` `true` disables both buttons and shows "Taps closed. Resolution next." Signed-in only: a signed-out tap fires `prophet:signin` with `{then: 'agree', slug}` |
-| `{{buy_url}}` | $PROPHET; Home; below-fold | Buy $PROPHET link (pump.fun) |
+| `{{buy_url}}` | $PROPHET; Home; Midterms; below-fold | Buy $PROPHET link (pump.fun) |
 | `{{call_state}}` | Home | `live` / `resolved` / `void` / `closed`. Void shows "Market closed by Polymarket before resolution."; closed (pending) shows the "Pending" marker and nothing top right. When `resolution_text` is empty on a void call the UI falls back to "Market closed by Polymarket before resolution." |
-| `{{contract_address}}` | $PROPHET; Home; header | $PROPHET contract address; the header pill shows first 6 … last 6 and copies the full value |
-| `{{docs_url}}` | $PROPHET; Home; header | External link to documentation site |
-| `{{jupiter_url}}` | $PROPHET; Home; footer; header | $PROPHET on Jupiter (footer token link) |
+| `{{contract_address}}` | $PROPHET; Home; Midterms; header | $PROPHET contract address; the header pill shows first 6 … last 6 and copies the full value |
+| `{{docs_url}}` | $PROPHET; Home; Midterms; header | External link to documentation site |
+| `{{jupiter_url}}` | $PROPHET; Home; Midterms; footer; header | $PROPHET on Jupiter (footer token link) |
 | `{{label}}` | Home | `buy_yes` / `buy_no`, carried on the card as `data-label`. Never inside the thesis text |
-| `{{linkedin_url}}` | $PROPHET; Home; footer; header | Link to the project's LinkedIn page |
+| `{{linkedin_url}}` | $PROPHET; Home; Midterms; footer; header | Link to the project's LinkedIn page |
 | `{{listed_leg_date}}` | Home | Ladder markets only: the leg's date (e.g. `Oct 20`), small and gray beside the question on the card face. Empty otherwise. When a leg rolls, the card returns to not evaluated with the next date and the old leg goes to History as resolved |
-| `{{logout_url}}` | $PROPHET; Home; header | The Logout link in the header and menu; render the link only when `{{viewer.signed_in}}` is true. While unfilled, the click fires a `prophet:logout` event and shows the Logged out notice |
+| `{{logout_url}}` | $PROPHET; Home; Midterms; header | The Logout link in the header and menu; render the link only when `{{viewer.signed_in}}` is true. While unfilled, the click fires a `prophet:logout` event and shows the Logged out notice |
 | `{{market.called_pct}}` | Home | Odds when the call was made, e.g. `84%`. Odds at the call, carried as `data-called-pct` for the Tap Confirmed price ("Buy YES at 84"); not printed on the card |
 | `{{market.conviction}}` | Home | Conviction 1–5, carried as `data-conviction`; five stars first in the meta row (bottom-left), the first n filled in the call's colour (green for Buy YES, red for Buy NO), the rest faint in the same colour. `show_conviction` on the carousel root hides them when it is `false`; anything else shows them |
 | `{{market.ends_in}}` | Home | Relative time until the market ends (e.g. "12d", "3mo"), shown after a clock icon |
@@ -385,23 +396,25 @@ Other globals: `window.prophetOnboarding.open()`, `window.prophetHowItWorks.open
 | `{{market.volume}}` | Home | Polymarket volume, short form (e.g. "$4.1M"), shown after a bar-chart icon |
 | `{{market.yes_pct}}` | Home | Current YES percentage (e.g. "72%"); once resolved, the settled 100% / 0% |
 | `{{market_closed}}` | Home | Agree / Disagree under the thesis: the user's side (`agree` / `disagree` / empty); once set, that button stays bright, the other dims, and a tap on either opens the already notice — taps are final; from three taps the split under the buttons reads "71% agree · 38 taps" — the server's figure, unchanged by the user's own tap — below that only "You agree" / "You disagree"; `market_closed` `true` disables both buttons and shows "Taps closed. Resolution next." Signed-in only: a signed-out tap fires `prophet:signin` with `{then: 'agree', slug}` |
-| `{{notice.already_agree}}` | Home | The line in the small notice that opens when the user taps either button on a call they already took a side on. Fallback copy: "You agreed already." / "You disagreed already." |
-| `{{notice.already_disagree}}` | Home | The line in the small notice that opens when the user taps either button on a call they already took a side on. Fallback copy: "You agreed already." / "You disagreed already." |
+| `{{midterms.calls_json}}` | Midterms | The live and History endpoints for the listed set, as a JSON array inside `<script type="application/json" data-midterms-calls>`. Each item: `market_id`, `leg_id`, `side` (`yes` / `no`), `stars` (1–5), `thesis`, `settlement_line`, `price_at_call` and `live_price` (the called leg's YES price, 0–100; the page flips them for a NO), `state` (`live` / `pending` / `resolved` / `void`), `pending_reason` (`closed` / `price` / `disputed`), `outcome` (`right` / `wrong`), `outcome_line`, `taps_agree`, `taps_disagree`, `user_side` (`agree` / `disagree` / empty, for the viewer). Joined to the race list on `market_id` + `leg_id`; the page computes every stat |
+| `{{midterms.races_json}}` | Midterms | The race list as a JSON array, inside `<script type="application/json" data-midterms-races>`. Each item: `event_id`, `leg_id`, `market_id`, `group` (`balance` / `senate` / `governors`), `kind` (`race` / `control` / `bop`), `state` (two-letter code; empty for the three control markets), `race` (display name, "Kansas Senate"), `leg` (the called leg's name), `party` (`D` / `R` / `I`), `runner_up`, `runner_up_party`, `layer` (`featured` / `contested` / `safe`), `featured` (true / false) |
+| `{{notice.already_agree}}` | Home; Midterms | The line in the small notice that opens when the user taps either button on a call they already took a side on. Fallback copy: "You agreed already." / "You disagreed already." |
+| `{{notice.already_disagree}}` | Home; Midterms | The line in the small notice that opens when the user taps either button on a call they already took a side on. Fallback copy: "You agreed already." / "You disagreed already." |
 | `{{pool_last_week}}` | $PROPHET | Last week's reward pool; the line reads "paid to the community" |
-| `{{pumpfun_url}}` | $PROPHET; Home; footer; header | $PROPHET on pump.fun (footer token link) |
+| `{{pumpfun_url}}` | $PROPHET; Home; Midterms; footer; header | $PROPHET on pump.fun (footer token link) |
 | `{{show_conviction}}` | Home | Conviction 1–5, carried as `data-conviction`; five stars first in the meta row (bottom-left), the first n filled in the call's colour (green for Buy YES, red for Buy NO), the rest faint in the same colour. `show_conviction` on the carousel root hides them when it is `false`; anything else shows them |
-| `{{solscan_url}}` | $PROPHET; Home; footer; header | $PROPHET on Solscan (footer token link) |
+| `{{solscan_url}}` | $PROPHET; Home; Midterms; footer; header | $PROPHET on Solscan (footer token link) |
 | `{{swap_impact}}` | $PROPHET | Swap meta line, left: slip and price impact |
 | `{{swap_slippage}}` | $PROPHET | Swap meta line, left: slip and price impact |
 | `{{swap_sol_balance}}` | $PROPHET | The viewer's SOL balance, right of the swap meta line (e.g. "2.41 SOL") |
 | `{{tap_count}}` | Home | Agree / Disagree under the thesis: the user's side (`agree` / `disagree` / empty); once set, that button stays bright, the other dims, and a tap on either opens the already notice — taps are final; from three taps the split under the buttons reads "71% agree · 38 taps" — the server's figure, unchanged by the user's own tap — below that only "You agree" / "You disagree"; `market_closed` `true` disables both buttons and shows "Taps closed. Resolution next." Signed-in only: a signed-out tap fires `prophet:signin` with `{then: 'agree', slug}` |
-| `{{tap_modal.confirm_agree}}` | Home | The confirmation line; `{label}` (Buy YES green / Buy NO red), `{verdict}` (right / wrong, plain) and `{price}` are filled from the card and the side. Approved copy while unfilled: "You're calling him {verdict}. {label} at {price}. Let's see if you're both right." / "You're calling him {verdict}. {label} at {price}, you say that's {verdict}." |
-| `{{tap_modal.confirm_disagree}}` | Home | The confirmation line; `{label}` (Buy YES green / Buy NO red), `{verdict}` (right / wrong, plain) and `{price}` are filled from the card and the side. Approved copy while unfilled: "You're calling him {verdict}. {label} at {price}. Let's see if you're both right." / "You're calling him {verdict}. {label} at {price}, you say that's {verdict}." |
-| `{{tap_modal.scoring_line}}` | Home | Approved copy while unfilled: "Scored when the market resolves. Right or wrong, it's on your record and you'll earn XP." |
-| `{{tg_url}}` | $PROPHET; Home; footer; header | Link to the project's Telegram channel |
-| `{{tl_linkedin_url}}` | $PROPHET; Home; footer; header | TradeLeague on LinkedIn (footer) |
-| `{{tl_tg_url}}` | $PROPHET; Home; footer; header | TradeLeague on Telegram (footer) |
-| `{{tl_x_url}}` | $PROPHET; Home; footer; header | TradeLeague on X (footer) |
+| `{{tap_modal.confirm_agree}}` | Home; Midterms | The confirmation line; `{label}` (Buy YES green / Buy NO red), `{verdict}` (right / wrong, plain) and `{price}` are filled from the card and the side. Approved copy while unfilled: "You're calling him {verdict}. {label} at {price}. Let's see if you're both right." / "You're calling him {verdict}. {label} at {price}, you say that's {verdict}." |
+| `{{tap_modal.confirm_disagree}}` | Home; Midterms | The confirmation line; `{label}` (Buy YES green / Buy NO red), `{verdict}` (right / wrong, plain) and `{price}` are filled from the card and the side. Approved copy while unfilled: "You're calling him {verdict}. {label} at {price}. Let's see if you're both right." / "You're calling him {verdict}. {label} at {price}, you say that's {verdict}." |
+| `{{tap_modal.scoring_line}}` | Home; Midterms | Approved copy while unfilled: "Scored when the market resolves. Right or wrong, it's on your record and you'll earn XP." |
+| `{{tg_url}}` | $PROPHET; Home; Midterms; footer; header | Link to the project's Telegram channel |
+| `{{tl_linkedin_url}}` | $PROPHET; Home; Midterms; footer; header | TradeLeague on LinkedIn (footer) |
+| `{{tl_tg_url}}` | $PROPHET; Home; Midterms; footer; header | TradeLeague on Telegram (footer) |
+| `{{tl_x_url}}` | $PROPHET; Home; Midterms; footer; header | TradeLeague on X (footer) |
 | `{{token.chart_series}}` | $PROPHET | JSON array of prices, oldest first; app.js draws the green area chart, an x-axis of relative times, and the live price tagged beside the last point |
 | `{{token.chart_ticks}}` | $PROPHET | JSON array of x-axis labels for the selected range: clock times on 5M–1D, dates on 1W and longer |
 | `{{token.fees_earned}}` | $PROPHET | Fees earned, in dollars, shown green |
@@ -416,13 +429,13 @@ Other globals: `window.prophetOnboarding.open()`, `window.prophetHowItWorks.open
 | `{{token.volume_change}}` | $PROPHET | Volume and its 24h change |
 | `{{trade.amount}}` | $PROPHET | Live-trades strip (`<!-- repeat: trade -->`): `buy` / `sell` and the amount |
 | `{{trade.side}}` | $PROPHET | Live-trades strip (`<!-- repeat: trade -->`): `buy` / `sell` and the amount |
-| `{{tradeleague_url}}` | $PROPHET; Home; footer | Link for the "Automated by TradeLeague" footer lockup |
+| `{{tradeleague_url}}` | $PROPHET; Home; Midterms; footer | Link for the "Automated by TradeLeague" footer lockup |
 | `{{user_side}}` | Home | Agree / Disagree under the thesis: the user's side (`agree` / `disagree` / empty); once set, that button stays bright, the other dims, and a tap on either opens the already notice — taps are final; from three taps the split under the buttons reads "71% agree · 38 taps" — the server's figure, unchanged by the user's own tap — below that only "You agree" / "You disagree"; `market_closed` `true` disables both buttons and shows "Taps closed. Resolution next." Signed-in only: a signed-out tap fires `prophet:signin` with `{then: 'agree', slug}` |
-| `{{viewer.signed_in}}` | $PROPHET; Home; header | `true` / `false`, on the thesis block. When false an Agree / Disagree tap fires `prophet:signin` instead |
+| `{{viewer.signed_in}}` | $PROPHET; Home; Midterms; header | `true` / `false`, on the thesis block. When false an Agree / Disagree tap fires `prophet:signin` instead |
 | `{{wallet_burn_url}}` | $PROPHET | Explorer links for the three public wallets (Trading Wallet, Rewards Pool, Buy-and-Burn); shown as labels, never as addresses |
 | `{{wallet_burn_value}}` | $PROPHET | Tokens burned, red (e.g. "8.4M"); the "$PROPHET" ticker after it stays gray, then a red flame icon |
 | `{{wallet_rewards_url}}` | $PROPHET | Explorer links for the three public wallets (Trading Wallet, Rewards Pool, Buy-and-Burn); shown as labels, never as addresses |
 | `{{wallet_rewards_value}}` | $PROPHET | Live balances, green |
 | `{{wallet_war_chest_url}}` | $PROPHET | Explorer links for the three public wallets (Trading Wallet, Rewards Pool, Buy-and-Burn); shown as labels, never as addresses |
 | `{{wallet_war_chest_value}}` | $PROPHET | Live balances, green |
-| `{{x_url}}` | $PROPHET; Home; footer; header | Link to the project's X (Twitter) account |
+| `{{x_url}}` | $PROPHET; Home; Midterms; footer; header | Link to the project's X (Twitter) account |

@@ -13,10 +13,12 @@ def h(name):
     return hashlib.md5((site / name).read_bytes()).hexdigest()[:8]
 
 js, css = h('app.js'), h('styles.css')
+mock = h('midterms-mock.js') if (site / 'midterms-mock.js').exists() else None
 # Globbed, not listed, so adding or removing a page never breaks the stamp.
 for p in sorted(site.glob('*.html')):
     s = p.read_text()
     s = re.sub(r'(<script src="app\.js)(\?v=[0-9a-f]+)?(")', r'\g<1>?v=' + js + r'\3', s)
     s = re.sub(r'(<link rel="stylesheet" href="styles\.css)(\?v=[0-9a-f]+)?(")', r'\g<1>?v=' + css + r'\3', s)
+    if mock: s = re.sub(r'(<script src="midterms-mock\.js)(\?v=[0-9a-f]+)?(")', r'\g<1>?v=' + mock + r'\3', s)
     p.write_text(s)
 print('app.js v=%s   styles.css v=%s' % (js, css))

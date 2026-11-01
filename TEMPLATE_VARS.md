@@ -130,3 +130,11 @@ MVP and kept only so they come back with the page. `{{explainer_record}}`,
 |---|---|
 | `{{tap_modal.confirm_agree}}`, `{{tap_modal.confirm_disagree}}` | The confirmation line; `{label}` (Buy YES green / Buy NO red), `{verdict}` (right / wrong, plain) and `{price}` are filled from the card and the side. Approved copy while unfilled: "You're calling him {verdict}. {label} at {price}. Let's see if you're both right." / "You're calling him {verdict}. {label} at {price}, you say that's {verdict}." |
 | `{{tap_modal.scoring_line}}` | Approved copy while unfilled: "Scored when the market resolves. Right or wrong, it's on your record and you'll earn XP." |
+
+### Midterms page
+
+| Variable | Meaning |
+|---|---|
+| `{{midterms.races_json}}` | The race list as a JSON array, inside `<script type="application/json" data-midterms-races>`. Each item: `event_id`, `leg_id`, `market_id`, `group` (`balance` / `senate` / `governors`), `kind` (`race` / `control` / `bop`), `state` (two-letter code; empty for the three control markets), `race` (display name, "Kansas Senate"), `leg` (the called leg's name), `party` (`D` / `R` / `I`), `runner_up`, `runner_up_party`, `layer` (`featured` / `contested` / `safe`), `featured` (true / false) |
+| `{{midterms.calls_json}}` | The live and History endpoints for the listed set, as a JSON array inside `<script type="application/json" data-midterms-calls>`. Each item: `market_id`, `leg_id`, `side` (`yes` / `no`), `stars` (1–5), `thesis`, `settlement_line`, `price_at_call` and `live_price` (the called leg's YES price, 0–100; the page flips them for a NO), `state` (`live` / `pending` / `resolved` / `void`), `pending_reason` (`closed` / `price` / `disputed`), `outcome` (`right` / `wrong`), `outcome_line`, `taps_agree`, `taps_disagree`, `user_side` (`agree` / `disagree` / empty, for the viewer). Joined to the race list on `market_id` + `leg_id`; the page computes every stat |
+

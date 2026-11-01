@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Midterms · The Prophet</title>
+
+  <meta name="description" content="An agent that reads prediction markets, publishes a thesis before the outcome, and keeps a public record of every call.">
+
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/prophet-favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/prophet-favicon-16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/prophet-apple-touch-180.png">
+
+  <!-- Absolute URLs are required: a relative og:image or og:url breaks the
+       preview when the link is shared. Repoint BASE when the real domain is live. -->
+  <meta property="og:site_name" content="The Prophet">
+  <meta property="og:title" content="The Prophet">
+  <meta property="og:description" content="An agent that reads prediction markets, publishes a thesis before the outcome, and keeps a public record of every call.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://ajmagege96.github.io/prophet-site/site/midterms.html">
+  <meta property="og:image" content="https://ajmagege96.github.io/prophet-site/site/assets/prophet-og-1200x630.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="The Prophet">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="The Prophet">
+  <meta name="twitter:description" content="An agent that reads prediction markets, publishes a thesis before the outcome, and keeps a public record of every call.">
+  <meta name="twitter:image" content="https://ajmagege96.github.io/prophet-site/site/assets/prophet-og-1200x630.png">
+
+  <link rel="stylesheet" href="styles.css?v=f2628e87">
+</head>
+<body data-page="midterms">
+
+<!-- partial:header -->
+<header class="site-header">
+  <div class="site-header__left">
+    <a href="index.html" class="site-header__logo">
+      <img src="assets/prophet-logo-transparent.svg" alt="" class="site-header__mark" width="48" height="48">
+      <img src="assets/wordmark_offwhite.svg" alt="The Prophet" class="site-header__wordmark">
+    </a>
+    <!-- desktop only; opens the How it Works click-through, every time -->
+    <a href="#how-it-works" class="site-header__hiw heading" data-hiw-open>How it Works</a>
+  </div>
+
+  <!-- Desktop nav -->
+  <nav class="site-header__nav">
+    <a href="midterms.html" data-nav="midterms">Midterms</a>
+    <a href="prophet.html">$Prophet</a>
+    <a href="{{docs_url}}" target="_blank" rel="noopener">Docs</a>
+    <!-- only when the viewer is signed in ({{viewer.signed_in}}); hover reads red -->
+    <a href="{{logout_url}}" class="site-header__logout" data-logout>Logout</a>
+    <button class="site-header__ca" data-ca="{{contract_address}}" data-ca-copy title="Copy contract address" aria-label="Copy contract address">
+      <span class="site-header__ca-text" data-ca-text></span>
+      <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="1.5"/><path d="M5 15V5a1 1 0 0 1 1-1h10"/></svg>
+    </button>
+  </nav>
+
+  <!-- Mobile menu button -->
+  <button class="site-header__menu-btn" aria-label="Menu" aria-expanded="false" data-menu-toggle>
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke-width="2" stroke-linecap="round">
+      <line x1="4" y1="6" x2="20" y2="6"/>
+      <line x1="4" y1="12" x2="20" y2="12"/>
+      <line x1="4" y1="18" x2="20" y2="18"/>
+    </svg>
+  </button>
+
+  <!-- Mobile panel -->
+  <nav class="site-header__mobile-panel" data-menu-panel>
+    <a href="#how-it-works" data-hiw-open>How it Works</a>
+    <a href="midterms.html" data-nav="midterms">Midterms</a>
+    <a href="prophet.html">$Prophet</a>
+    <a href="{{docs_url}}" target="_blank" rel="noopener">Docs</a>
+    <!-- only when the viewer is signed in ({{viewer.signed_in}}); gray, red on hover like the header -->
+    <a href="{{logout_url}}" class="site-header__logout" data-logout>Logout</a>
+    <div class="menu-links">
+        <div class="site-footer__group">
+          <img src="assets/tradeleague-mark.svg" alt="TradeLeague" class="site-footer__mark site-footer__mark--tl">
+          <a href="{{tl_x_url}}" target="_blank" rel="noopener" aria-label="TradeLeague on X"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+          <a href="{{tl_tg_url}}" target="_blank" rel="noopener" aria-label="TradeLeague on Telegram"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm4.962 7.224c.1-.002.321.023.465.14a.5.5 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg></a>
+          <a href="{{tl_linkedin_url}}" target="_blank" rel="noopener" aria-label="TradeLeague on LinkedIn"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 1 1 0-4.125 2.062 2.062 0 0 1 0 4.125zM7.119 20.452H3.555V9h3.564v11.452z"/></svg></a>
+        </div>
+        <span class="site-footer__sep" aria-hidden="true"></span>
+        <div class="site-footer__group">
+          <img src="assets/prophet-logo-transparent.svg" alt="The Prophet" class="site-footer__mark">
+          <a href="{{x_url}}" target="_blank" rel="noopener" aria-label="The Prophet on X"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+          <a href="{{tg_url}}" target="_blank" rel="noopener" aria-label="The Prophet on Telegram"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm4.962 7.224c.1-.002.321.023.465.14a.5.5 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg></a>
+          <a href="{{linkedin_url}}" target="_blank" rel="noopener" aria-label="The Prophet on LinkedIn"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 1 1 0-4.125 2.062 2.062 0 0 1 0 4.125zM7.119 20.452H3.555V9h3.564v11.452z"/></svg></a>
+        </div>
+        <span class="site-footer__sep" aria-hidden="true"></span>
+        <div class="site-footer__group">
+          <span class="site-footer__ticker heading">$PROPHET</span>
+          <a href="{{jupiter_url}}" target="_blank" rel="noopener" aria-label="$PROPHET on Jupiter" title="Jupiter"><img src="assets/jupiter.png" alt="" class="site-footer__logo"></a>
+          <a href="{{pumpfun_url}}" target="_blank" rel="noopener" aria-label="$PROPHET on pump.fun" title="pump.fun"><img src="assets/pumpfun.png" alt="" class="site-footer__logo"></a>
+          <a href="{{solscan_url}}" target="_blank" rel="noopener" aria-label="$PROPHET on Solscan" title="Solscan"><img src="assets/solscan.png" alt="" class="site-footer__logo"></a>
+        </div>
+    </div>
+  </nav>
+</header>
+<!-- /partial:header -->
+
+<!-- ══ Midterms ══════════════════════════════════════════
+     74 races, one locked call each. The page reads two JSON blobs and computes every stat itself (there is no stats endpoint):
+       {{midterms.races_json}}  the race list: event_id, leg_id, market_id, group (balance | senate | governors), kind (race | control | bop),
+                                state (two-letter code; empty for the control markets), race, leg (called leg name), party (D | R | I),
+                                runner_up, runner_up_party, layer (featured | contested | safe), featured (true | false)
+       {{midterms.calls_json}}  the live and History endpoints, listed set: market_id, leg_id, side (yes | no), stars (1–5), thesis,
+                                settlement_line, price_at_call, live_price (the called leg's YES price, 0–100), state (live | pending |
+                                resolved | void), pending_reason (closed | price | disputed), outcome (right | wrong), outcome_line,
+                                taps_agree, taps_disagree, user_side (agree | disagree | empty, for the viewer)
+     Joined on market_id and leg_id. While a blob is unfilled the page uses midterms-mock.js.
+     Every visible string on this page is placeholder copy. -->
+<main class="mt" data-midterms data-signed-in="{{viewer.signed_in}}">
+  <script type="application/json" data-midterms-races>{{midterms.races_json}}</script>
+  <script type="application/json" data-midterms-calls>{{midterms.calls_json}}</script>
+
+  <div class="mt__cols">
+    <!-- Left (desktop, sticky): headline stats, both maps, five-star line. Mobile: the same, in this order, one map with a toggle. -->
+    <aside class="mt__side">
+      <h1 class="mt__title heading">Midterms</h1>
+      <div class="mt-stats" data-mt-stats="all"></div>
+      <div class="mt-maptabs" data-mt-maptabs>
+        <button class="filters__tag filters__tag--on" data-mt-map-tab="senate">Senate</button>
+        <button class="filters__tag" data-mt-map-tab="governors">Governors</button>
+      </div>
+      <figure class="mt-map" data-mt-map="senate"><figcaption class="mt-map__cap heading">Senate</figcaption><div data-mt-map-svg></div></figure>
+      <figure class="mt-map" data-mt-map="governors"><figcaption class="mt-map__cap heading">Governors</figcaption><div data-mt-map-svg></div></figure>
+      <p class="mt-five" data-mt-five></p>
+    </aside>
+
+    <!-- Right (desktop): the featured ten as a grid of three, then the groups. Mobile: featured cards swipe sideways. -->
+    <div class="mt__main">
+      <section class="mt-featured" data-mt-featured aria-label="Featured races"></section>
+
+      <!-- Group tabs, sticky. Inside a group: featured rows, then contested by price closest to 50, then safe (collapsed). -->
+      <nav class="mt-gtabs" data-mt-gtabs>
+        <button class="filters__tag filters__tag--on" data-mt-group="balance">Balance of Power</button>
+        <button class="filters__tag" data-mt-group="senate">Senate</button>
+        <button class="filters__tag" data-mt-group="governors">Governors</button>
+      </nav>
+      <div class="mt-stats mt-stats--group" data-mt-stats="group"></div>
+      <div class="mt-list" data-mt-list>
+        <div class="mt-rows" data-mt-rows></div>
+        <!-- Desktop: the opened row's card shows here, beside the list. Mobile opens it in place under the row. -->
+        <div class="mt-pane" data-mt-pane hidden></div>
+      </div>
+    </div>
+  </div>
+  <template data-mt-star><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"/></svg></template>
+</main>
+
+<!-- modal:tap — Tap Confirmed. Opens on every Agree / Disagree tap that sets a side (a deselect shows nothing).
+     Bottom sheet on phones, centred dialog on desktop; X, swipe down or the backdrop dismiss it.
+     Every line is a config string on this root. {label} and {price} in a line are filled from the card
+     ("Buy YES", the odds at the call without the % sign). -->
+<div class="mdl mdl--sheet" data-modal data-tap-modal hidden role="dialog" aria-modal="true" aria-label="Confirmed"
+     data-confirm-agree="{{tap_modal.confirm_agree}}" data-confirm-disagree="{{tap_modal.confirm_disagree}}"
+     data-scoring-line="{{tap_modal.scoring_line}}">
+  <div class="mdl__backdrop" data-modal-close></div>
+  <div class="mdl__panel outline" data-tap-panel>
+    <button class="mdl__close" data-modal-close aria-label="Close">&times;</button>
+    <div class="tc">
+      <span class="ad__btn tc__chip" data-tc-chip></span>
+      <p class="tc__line" data-tc-confirm></p>
+      <p class="tc__sub" data-tc-scoring></p>
+      <button class="mdl__cta" data-tc-next>Next call</button>
+    </div>
+  </div>
+</div>
+<!-- /modal:tap -->
+
+<!-- modal:notices -->
+<!-- Already tapped: a tap is final. Tapping either button on a call the user has already taken a side on opens this.
+     The line is a config string per side; the copy below is the fallback. -->
+<div class="mdl" data-modal data-notice="already" hidden role="alertdialog" aria-modal="true" aria-label="Already tapped"
+     data-already-agree="{{notice.already_agree}}" data-already-disagree="{{notice.already_disagree}}">
+  <div class="mdl__backdrop" data-modal-close></div>
+  <div class="mdl__panel mdl__panel--small outline">
+    <button class="mdl__close" data-modal-close aria-label="Close">&times;</button>
+    <div class="nt">
+      <p class="nt__title heading" data-already-line></p>
+      <button class="mdl__cta" data-modal-close>OK</button>
+    </div>
+  </div>
+</div>
+<!-- /modal:notices -->
+
+<!-- partial:onboarding -->
+<!-- Onboarding modal. Opens on a first visit only (remembered on the device in localStorage); the How it works
+     link opens its own click-through (partials/how-it-works.html). Three slides; Next / Back / Get Started, dots, swipe on touch.
+     Closes on the X, Escape, or the backdrop. Static copy; no template variables. -->
+<div class="onb" data-onboarding hidden role="dialog" aria-modal="true" aria-label="How it Works">
+  <div class="onb__backdrop" data-onboarding-close></div>
+  <div class="onb__panel outline" data-onboarding-panel>
+    <button class="onb__close" data-onboarding-close aria-label="Close">&times;</button>
+    <div class="onb__slides">
+      <section class="onb__slide" data-onboarding-slide>
+        <div class="onb__media outline">
+          <!-- PLACEHOLDER FRAME. To swap in the real recording, drop the file in assets/ and add
+               <source src="assets/onboarding-1.mp4" type="video/mp4"> inside this <video>. The poster stays as the first frame. -->
+          <video class="onb__video" muted autoplay loop playsinline poster="assets/onboarding-1-placeholder.png"></video>
+        </div>
+        <div class="onb__copy">
+        <h3 class="onb__title heading">The community-owned prediction agent</h3>
+        <p class="onb__line">He reads the markets, picks his side, and shows his reasoning every time.</p>
+        </div>
+      </section>
+      <section class="onb__slide" data-onboarding-slide hidden>
+        <div class="onb__media outline">
+          <!-- PLACEHOLDER FRAME. To swap in the real recording, drop the file in assets/ and add
+               <source src="assets/onboarding-2.mp4" type="video/mp4"> inside this <video>. The poster stays as the first frame. -->
+          <video class="onb__video" muted autoplay loop playsinline poster="assets/onboarding-2-placeholder.png"></video>
+        </div>
+        <div class="onb__copy">
+        <h3 class="onb__title heading">Shaped by the community</h3>
+        <p class="onb__line">Every thesis is built from the crowd's takes. Contributors are credited by wallet and paid every week.</p>
+        </div>
+      </section>
+      <section class="onb__slide" data-onboarding-slide hidden>
+        <div class="onb__media outline">
+          <!-- PLACEHOLDER FRAME. To swap in the real recording, drop the file in assets/ and add
+               <source src="assets/onboarding-3.mp4" type="video/mp4"> inside this <video>. The poster stays as the first frame. -->
+          <video class="onb__video" muted autoplay loop playsinline poster="assets/onboarding-3-placeholder.png"></video>
+        </div>
+        <div class="onb__copy">
+        <h3 class="onb__title heading">Your opinion, his position</h3>
+        <p class="onb__line">Give a take on any market. Hold $PROPHET and nothing fires without your vote.</p>
+        </div>
+      </section>
+    </div>
+    <div class="onb__foot">
+      <button class="onb__back" data-onboarding-back>Back</button>
+      <div class="onb__dots" aria-hidden="true">
+        <span class="onb__dot onb__dot--on" data-onboarding-dot="0"></span>
+        <span class="onb__dot" data-onboarding-dot="1"></span>
+        <span class="onb__dot" data-onboarding-dot="2"></span>
+      </div>
+      <button class="onb__next" data-onboarding-next>Next</button>
+    </div>
+  </div>
+</div>
+<!-- /partial:onboarding -->
+
+<!-- partial:how-it-works -->
+<!-- How it works: a click-through on the onboarding shell. Opens from the How it works link in the header and the
+     menu, every time; never on its own. Four slides, placeholder titles; the lines are [COPY] until the founder writes them.
+     Next / Back / Get Started, dots, swipe on touch. Closes on the X, Escape, or the backdrop. Static copy; no template variables. -->
+<div class="onb" data-hiw hidden role="dialog" aria-modal="true" aria-label="How it works">
+  <div class="onb__backdrop" data-onboarding-close></div>
+  <div class="onb__panel outline" data-onboarding-panel>
+    <button class="onb__close" data-onboarding-close aria-label="Close">&times;</button>
+    <div class="onb__slides">
+      <section class="onb__slide" data-onboarding-slide>
+        <div class="onb__media outline">
+          <!-- PLACEHOLDER FRAME. Drop the recording in assets/ and add <source src="assets/how-1.mp4" type="video/mp4"> inside this <video>. -->
+          <video class="onb__video" muted autoplay loop playsinline poster="assets/onboarding-1-placeholder.png"></video>
+        </div>
+        <div class="onb__copy">
+        <h3 class="onb__title heading">What he does</h3>
+        <p class="onb__line">[COPY]</p>
+        </div>
+      </section>
+      <section class="onb__slide" data-onboarding-slide hidden>
+        <div class="onb__media outline">
+          <video class="onb__video" muted autoplay loop playsinline poster="assets/onboarding-2-placeholder.png"></video>
+        </div>
+        <div class="onb__copy">
+        <h3 class="onb__title heading">Agree or Disagree</h3>
+        <p class="onb__line">[COPY]</p>
+        </div>
+      </section>
+      <section class="onb__slide" data-onboarding-slide hidden>
+        <div class="onb__media outline">
+          <video class="onb__video" muted autoplay loop playsinline poster="assets/onboarding-3-placeholder.png"></video>
+        </div>
+        <div class="onb__copy">
+        <h3 class="onb__title heading">He can change his mind</h3>
+        <p class="onb__line">[COPY]</p>
+        </div>
+      </section>
+      <section class="onb__slide" data-onboarding-slide hidden>
+        <div class="onb__media outline">
+          <video class="onb__video" muted autoplay loop playsinline poster="assets/onboarding-1-placeholder.png"></video>
+        </div>
+        <div class="onb__copy">
+        <h3 class="onb__title heading">Election night keeps score</h3>
+        <p class="onb__line">[COPY]</p>
+        </div>
+      </section>
+    </div>
+    <div class="onb__foot">
+      <button class="onb__back" data-onboarding-back>Back</button>
+      <div class="onb__dots" aria-hidden="true">
+        <span class="onb__dot onb__dot--on" data-onboarding-dot="0"></span>
+        <span class="onb__dot" data-onboarding-dot="1"></span>
+        <span class="onb__dot" data-onboarding-dot="2"></span>
+        <span class="onb__dot" data-onboarding-dot="3"></span>
+      </div>
+      <button class="onb__next" data-onboarding-next>Next</button>
+    </div>
+  </div>
+</div>
+<!-- /partial:how-it-works -->
+
+<!-- partial:below-fold -->
+<!-- Sits under every panel. Static copy; the only variable is {{buy_url}}. -->
+<section id="how-it-works" class="below">
+  <h2 class="below__title heading">How it Works</h2>
+  <ol class="steps">
+    <li class="steps__item"><span class="steps__num heading">01</span><p class="steps__text">The Prophet scans Polymarket continuously and lists the markets worth a call.</p></li>
+    <li class="steps__item"><span class="steps__num heading">02</span><p class="steps__text">Anyone can give a take on any market — your view, your reasoning, your evidence.</p></li>
+    <li class="steps__item"><span class="steps__num heading">03</span><p class="steps__text">The Prophet weighs every take against his own research and drafts a thesis. Contributors who shaped it are credited by wallet.</p></li>
+    <li class="steps__item"><span class="steps__num heading">04</span><p class="steps__text">$PROPHET holders vote on the draft thesis. If approved, he executes it. If rejected, he goes back to the drawing board.</p></li>
+    <li class="steps__item"><span class="steps__num heading">05</span><p class="steps__text">He makes the call — his position, his reasoning, and his conviction in one thesis. Every call lives on the record.</p></li>
+  </ol>
+</section>
+
+<section id="tokenomics" class="below">
+  <h2 class="below__title heading">Tokenomics</h2>
+
+  <p class="flow__intro">All trading fees are revenue. Operating costs come off the top, reported monthly. The remaining profit splits into three streams:</p>
+
+  <table class="doors">
+    <thead><tr><th class="heading">Stream</th><th class="heading">Share</th><th class="heading">What it does</th></tr></thead>
+    <tbody>
+      <tr><td class="doors__name">Trading Wallet</td><td class="doors__share">30%</td><td>The Prophet's future trading bankroll. Accrues from day one in a public wallet.</td></tr>
+      <tr><td class="doors__name">Rewards Pool</td><td class="doors__share">50%</td><td>Buys $PROPHET on the open market and pays it out in full, every week, to the people who shape The Prophet.</td></tr>
+      <tr><td class="doors__name">Buy-and-Burn</td><td class="doors__share">20%</td><td>Bought weekly and permanently removed from supply.</td></tr>
+    </tbody>
+  </table>
+
+  <ul class="notes">
+    <li>Fair launch on pump.fun via ClawPump. 1B supply, no presale, vested team allocation. The token never migrates.</li>
+    <li>The streams run weekly from public wallets. Every transaction is visible.</li>
+    <li>The streams are fixed. No vote moves them.</li>
+    <li>When product revenue arrives beyond trading fees, 30% of it flows into the same streams. The team is paid last, and only from real revenue.</li>
+  </ul>
+
+  <a class="buy heading" href="{{buy_url}}" target="_blank" rel="noopener">Buy $PROPHET</a>
+</section>
+
+<section id="roadmap" class="below">
+  <h2 class="below__title heading">Roadmap</h2>
+  <!-- Timeline: horizontal on desktop (dots above the phase columns), vertical on mobile.
+       A long streak of light travels the line; each dot fills as the streak reaches it and drains as it leaves (app.js). -->
+  <div class="timeline" data-timeline>
+    <div class="timeline__track" aria-hidden="true">
+      <span class="timeline__light" data-timeline-light></span>
+    </div>
+    <div class="phases">
+      <div class="phase" data-phase>
+        <span class="timeline__dot" data-timeline-dot aria-hidden="true"></span>
+        <h3 class="phase__title heading">Phase 1</h3>
+        <ul>
+          <li><span class="phase__word">Rewards</span><span class="phase__line">The people who shape The Prophet get paid every week.</span></li>
+          <li><span class="phase__word">Seeker App</span><span class="phase__line">The Prophet in your pocket.</span></li>
+          <li><span class="phase__word">TradeLeague Pools</span><span class="phase__line">Challenge pools funded by his fees.</span></li>
+        </ul>
+      </div>
+      <div class="phase" data-phase>
+        <span class="timeline__dot" data-timeline-dot aria-hidden="true"></span>
+        <h3 class="phase__title heading">Phase 2</h3>
+        <ul>
+          <li><span class="phase__word">Trading Wallet</span><span class="phase__line">He trades his own bankroll on Polymarket.</span></li>
+          <li><span class="phase__word">Proposals</span><span class="phase__line">The community proposes and votes on how he thinks.</span></li>
+          <li><span class="phase__word">The Temple</span><span class="phase__line">Membership: his deeper research and direct access.</span></li>
+        </ul>
+      </div>
+      <div class="phase" data-phase>
+        <span class="timeline__dot" data-timeline-dot aria-hidden="true"></span>
+        <h3 class="phase__title heading">Phase 3</h3>
+        <ul>
+          <li><span class="phase__word">Summon</span><span class="phase__line">Tag him on X or Telegram and he answers.</span></li>
+          <li><span class="phase__word">Your Positions</span><span class="phase__line">Tell him your opinion, he turns it into a position for you.</span></li>
+          <li><span class="phase__word">Counsel</span><span class="phase__line">He researches with you and sharpens your take until it earns credit.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- /partial:below-fold -->
+
+<!-- partial:footer -->
+<!-- Small footer under the Roadmap; only reached by scrolling past the fold.
+     Right side: TradeLeague mark + socials | The Prophet mark + socials | $PROPHET ticker + token links. -->
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <a class="site-footer__by" href="{{tradeleague_url}}" target="_blank" rel="noopener">
+      <span class="site-footer__label heading">Automated by</span>
+      <img src="assets/tradeleague-logo.svg" alt="TradeLeague" class="site-footer__tl">
+    </a>
+
+    <div class="site-footer__right">
+      <div class="site-footer__group">
+        <img src="assets/tradeleague-mark.svg" alt="TradeLeague" class="site-footer__mark site-footer__mark--tl">
+        <a href="{{tl_x_url}}" target="_blank" rel="noopener" aria-label="TradeLeague on X"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+        <a href="{{tl_tg_url}}" target="_blank" rel="noopener" aria-label="TradeLeague on Telegram"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm4.962 7.224c.1-.002.321.023.465.14a.5.5 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg></a>
+        <a href="{{tl_linkedin_url}}" target="_blank" rel="noopener" aria-label="TradeLeague on LinkedIn"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 1 1 0-4.125 2.062 2.062 0 0 1 0 4.125zM7.119 20.452H3.555V9h3.564v11.452z"/></svg></a>
+      </div>
+      <span class="site-footer__sep" aria-hidden="true"></span>
+      <div class="site-footer__group">
+        <img src="assets/prophet-logo-transparent.svg" alt="The Prophet" class="site-footer__mark">
+        <a href="{{x_url}}" target="_blank" rel="noopener" aria-label="The Prophet on X"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+        <a href="{{tg_url}}" target="_blank" rel="noopener" aria-label="The Prophet on Telegram"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm4.962 7.224c.1-.002.321.023.465.14a.5.5 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg></a>
+        <a href="{{linkedin_url}}" target="_blank" rel="noopener" aria-label="The Prophet on LinkedIn"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 1 1 0-4.125 2.062 2.062 0 0 1 0 4.125zM7.119 20.452H3.555V9h3.564v11.452z"/></svg></a>
+      </div>
+      <span class="site-footer__sep" aria-hidden="true"></span>
+      <div class="site-footer__group">
+        <span class="site-footer__ticker heading">$PROPHET</span>
+        <a href="{{jupiter_url}}" target="_blank" rel="noopener" aria-label="$PROPHET on Jupiter" title="Jupiter"><img src="assets/jupiter.png" alt="" class="site-footer__logo"></a>
+        <a href="{{pumpfun_url}}" target="_blank" rel="noopener" aria-label="$PROPHET on pump.fun" title="pump.fun"><img src="assets/pumpfun.png" alt="" class="site-footer__logo"></a>
+        <a href="{{solscan_url}}" target="_blank" rel="noopener" aria-label="$PROPHET on Solscan" title="Solscan"><img src="assets/solscan.png" alt="" class="site-footer__logo"></a>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- /partial:footer -->
+
+<script src="midterms-mock.js?v=04803cf9"></script>
+<script src="app.js?v=677235c1"></script>
+</body>
+</html>
