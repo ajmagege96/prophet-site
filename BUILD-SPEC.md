@@ -268,7 +268,7 @@ endpoint. `midterms-mock.js` stands in until then; `#preview=some` and
 | Map | One tile map, first | Both maps stacked under the stats |
 | Headline stats | One row under the map: Called · Resolved · Right · Hit rate | Left column under the title, sticky |
 | Markets bar | Sticky: set dropdown left, cards / list icon toggle right | Right column, sticky, level with the title |
-| Markets | Cards stacked, or rows (three short lines) | Cards in a grid, or rows (one line) |
+| Markets | Cards two across (compact: race, odds under it, pick, stars · volume · tag, buttons; an opened card spans both columns), or rows (three short lines) | Cards in a grid, or rows (one line) |
 | Selected market | A drop-down chevron on every card and row; opened (or tapped), the market shows as the desktop pane's card in place, in cards or list | Always one selected; its full card in a sticky pane beside the markets |
 
 The dropdown (no label) sets what shows: **All** (the default) · Balance of

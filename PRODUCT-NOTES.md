@@ -140,6 +140,7 @@ is the fallback).
   has a drop-down; opened, it shows the desktop pane's card in place (thesis
   box with its Resolution drop-down included), in cards or list view. Phone
   rows: race · odds / pick · stars / tally left, Agree and Disagree right.
+  Phone cards view: two compact cards across, like the desktop card.
 - Maps: a seat takes the party of his pick (a NO takes the runner-up's);
   seats not up stay neutral; void dashed; resolved seats get a green check / red X.
 - His pick, never a double negative: YES → the called candidate or party; NO

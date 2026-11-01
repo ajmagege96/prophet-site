@@ -13,6 +13,8 @@ sections 5–7 are the contracts your side has to honour.
 
 ## 1. What changed since the last drop
 
+**Midterms phone cards, Nov 1.** Cards view on a phone is two compact cards across (race, the odds under it, pick, stars · volume · tag, Agree / Disagree, tally), so it no longer looks like the list. An opened card spans both columns and the next card fills the gap.
+
 **Midterms on phones, Nov 1.** Below 1024px every card and row carries a drop-down chevron; opened (or tapped), the market renders as the desktop pane's card in place, in cards or list view, with the thesis box and its Resolution drop-down. Phone rows have more room: race · odds · chevron, then pick · stars, then the tally on the left and Agree / Disagree (or the tag) on the right.
 
 **Midterms rows, Nov 1.** The state tag moved into the Agree / Disagree column: live rows show the buttons, closed rows (pending / resolved / void) show Pending / Right / Wrong / Void in their place. The separate tag column is gone; on a phone the row is race · odds, pick · stars, buttons-or-tag · tally.
