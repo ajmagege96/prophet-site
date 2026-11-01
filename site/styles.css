@@ -1098,9 +1098,14 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
    Party colours are the one exception to the palette: D blue, R red, I off-white, as every election map reads. */
 :root { --party-d: #4C7BF4; --party-r: #e53935; --party-i: #F2F0E6; }
 .mt { max-width: 1400px; margin: 0 auto; padding: 20px 16px 40px; }
-.mt__title { font-size: 18px; letter-spacing: 0.14em; margin: 0 0 14px; }
+.mt__title { font-size: 18px; letter-spacing: 0.14em; margin: 0; }
+/* the title row and the markets bar share one height, so on desktop they sit level */
+.mt__head, .mt-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; padding: 10px 0; box-sizing: border-box; }
+.mt-select--map select { padding-top: 6px; padding-bottom: 6px; }
 .mt__cols { display: flex; flex-direction: column; gap: 20px; }
 .mt__side { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.mt__side .mt-stats { order: 2; }   /* phone: the map first, the stats under it */
+.mt__side .mt-map { order: 1; }
 .mt__main { min-width: 0; display: flex; flex-direction: column; gap: 14px; }
 
 .mt-stats { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--outline); border-bottom: 1px solid var(--outline); }
@@ -1108,11 +1113,7 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
 .mt-stat:first-child { border-left: 0; padding-left: 0; }
 .mt-stat__label { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.55; }
 .mt-stat__value { font-size: 20px; font-variant-numeric: tabular-nums; }
-.mt-stats--group { border-top: 0; }
-.mt-stats--group .mt-stat { padding-top: 8px; padding-bottom: 8px; }
-.mt-stats--group .mt-stat__value { font-size: 15px; }
 
-.mt-maptabs { display: flex; gap: 8px; }
 .mt-map { margin: 0; }
 .mt-map__cap { display: none; font-size: 11px; letter-spacing: 0.12em; opacity: 0.8; margin-bottom: 6px; }
 .mt-map__svg { display: block; width: 100%; height: auto; }
@@ -1141,7 +1142,7 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
 .mt-stars .carousel__star--on .ico { opacity: 1; }
 
 /* The bar over the markets: the set on the left, Cards / List on the right; sticky under the header */
-.mt-bar { position: sticky; top: 56px; z-index: 5; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; background: var(--navy); }
+.mt-bar { position: sticky; top: 56px; z-index: 5; background: var(--navy); }
 .mt-select { position: relative; display: inline-flex; align-items: center; gap: 8px; }
 .mt-select select { appearance: none; -webkit-appearance: none; font: inherit; font-family: var(--font-display); font-weight: 500; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--offwhite); background: var(--navy); border: 1px solid rgba(242, 240, 230, 0.6); border-radius: 4px; padding: 7px 32px 7px 10px; cursor: pointer; }
 .mt-select select:focus-visible { outline: 1px solid var(--green); outline-offset: 2px; }
@@ -1172,7 +1173,11 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
 .mt-pick__name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .mt-card__meta { display: flex; align-items: center; gap: 12px; font-size: 12px; }
 .mt-price { display: inline-flex; align-items: center; gap: 4px; opacity: 0.6; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.mt-price .ico { width: 12px; height: 12px; fill: currentColor; flex: 0 0 auto; }   /* the home cards' volume icon */
 .mt-card__body { display: flex; flex-direction: column; gap: 6px; border-top: 1px solid var(--outline); padding-top: 9px; }
+.mt-thesis { display: flex; flex-direction: column; gap: 6px; cursor: default; }
+.mt-thesis p { margin: 0; }
+.mt-thesis .tsec { margin-top: 4px; }
 .mt-ad { margin: 2px 0 0; gap: 6px; }
 .mt-ad .ad__btn { min-height: 34px; padding: 0 16px; font-size: 12px; }
 .mt-ad .thesis__split { font-size: 12px; }
@@ -1204,7 +1209,8 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
   .mt { padding: 28px 48px 56px; }
   .mt__cols { flex-direction: row; align-items: flex-start; gap: 28px; }
   .mt__side { flex: 0 0 320px; position: sticky; top: 84px; }
-  .mt-maptabs { display: none; }
+  .mt-select--map { display: none; }   /* both maps show on desktop */
+  .mt__side .mt-stats, .mt__side .mt-map { order: 0; }
   .mt-map__cap { display: block; }
   .mt[data-mt-mapshow] [data-mt-map] { display: block; }
   .mt__main { flex: 1 1 auto; }

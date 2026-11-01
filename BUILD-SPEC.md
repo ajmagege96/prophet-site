@@ -265,16 +265,16 @@ endpoint. `midterms-mock.js` stands in until then; `#preview=some` and
 
 | Zone | Phone (390px) | Desktop (1400px) |
 |---|---|---|
-| Headline stats | One row: Called · Resolved · Right · Hit rate | Left column, sticky |
-| Map | One tile map with a Senate / Governors toggle | Both maps stacked under the stats |
-| Markets bar | Sticky: set dropdown left, cards / list icon toggle right | Right column, sticky |
-| Set stats | One line under the bar | Same |
+| Title row | "Midterms" left, a Senate / Governors map dropdown right | "Midterms" alone, level with the markets bar |
+| Map | One tile map, first | Both maps stacked under the stats |
+| Headline stats | One row under the map: Called · Resolved · Correct · Hit rate | Left column under the title, sticky |
+| Markets bar | Sticky: set dropdown left, cards / list icon toggle right | Right column, sticky, level with the title |
 | Markets | Cards stacked, or rows (three short lines) | Cards in a grid, or rows (one line) |
 | Selected market | Tapping opens its thesis in place | Always one selected; its full card in a sticky pane beside the markets |
 
 The dropdown (no label) sets what shows: **All** (the default) · Balance of
-Power · Senate · Governors. The view toggle is two icons, a grid (cards) and
-lines (list), no words, remembered per viewer. Every set is the full list,
+Power · Senate · Governors. The view toggle is two icons, two stacked cards
+(cards) and three lines (list), no words, remembered per viewer. Every set is the full list,
 nothing collapsed. The top markets lead each set; until the server's ranking
 lands the page orders featured, then contested by price closest to 50, then
 safe. A click anywhere on a card or row selects it. The selected market reads
@@ -282,9 +282,9 @@ like the home's: brighter white outline, flashing green every 3s (0.9s build
 and release) on the card, the row and the pane card.
 
 **Stats.** Called = races with a call. Resolved = resolved right or wrong.
-Right = resolved right. Hit rate = right ÷ resolved, void excluded. Resolved,
-Right and Hit rate read a dash until one race resolves. The same four per
-group. No five-star line. No money lines
+Correct = resolved right. Hit rate = correct ÷ resolved, void excluded.
+Resolved, Correct and Hit rate read a dash until one race resolves. These four
+are the only stats on the page (no per-set stats). No five-star line. No money lines
 anywhere.
 
 **Maps.** One square tile per state. A seat in play is filled with the party of
@@ -306,10 +306,12 @@ its race in its group.
 **Card**: race and group top left; the market odds top right as on the home
 cards, "57% YES" for the pick the card names (settled 100 / 0 once resolved);
 his pick with party chip; the meta line: stars · "N% at call" (his side) ·
-volume, the state tag bottom right. No chevron, no time remaining. Agree /
-Disagree with the tally as built. Opened on a phone, or in the desktop pane, it adds the
-thesis and the settlement line (the outcome line once resolved; the void line
-when void).
+bar-chart icon + volume (as the home cards), the state tag bottom right. No
+chevron on the card, no time remaining. Agree / Disagree with the tally as
+built. Opened on a phone, or in the desktop pane, it adds a thesis box as on
+the home page: THESIS and the thesis, one chevron dropping down RESOLUTION
+under a hairline, closed by default (the settlement line; the outcome line once
+resolved; the void line when void).
 
 **Row**: race over his pick with chip · stars · market odds "57% YES" · state tag · Agree /
 Disagree · tally; one line on desktop, three short lines on a phone. Tap it to

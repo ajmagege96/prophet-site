@@ -1287,7 +1287,7 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
       if (set[i].status === 'resolved') { resolved++; if (set[i].outcome === 'right') right++; }
     }
     var dash = '—';
-    return [['Called', called], ['Resolved', resolved ? resolved : dash], ['Right', resolved ? right : dash],
+    return [['Called', called], ['Resolved', resolved ? resolved : dash], ['Correct', resolved ? right : dash],
             ['Hit rate', resolved ? Math.round(right * 100 / resolved) + '%' : dash]];
   }
   function statsHTML(set) {
@@ -1329,10 +1329,16 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
       (t ? '<span class="thesis__split">' + t + '</span>' : '') +
       (r.status === 'pending' ? '<span class="ad__closed">Taps closed. Resolution next.</span>' : '') + '</div>';
   }
+  /* as the home thesis box: THESIS and the thesis, one chevron dropping down RESOLUTION under a hairline, closed by default */
+  var CHEV = '<svg class="tsec__chev" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>';
+  var moreIds = {};
   function bodyHTML(r) {
     var line = r.status === 'resolved' ? r.outcomeLine : r.status === 'void' ? VOID_LINE : r.settle;
-    var lineCls = r.status === 'resolved' ? 'thesis__note' : 'thesis__fact';
-    return '<p class="thesis__text">' + esc(r.thesis) + '</p>' + (line ? '<p class="' + lineCls + '">' + esc(line) + '</p>' : '');
+    var lineCls = r.status === 'resolved' ? 'thesis__note' : 'thesis__fact', m = !!moreIds[r.id] && !!line;
+    return '<div class="mt-thesis' + (m ? ' thesis--more' : '') + (line ? '' : ' thesis--nomore') + '">' +
+      '<button class="tsec__head" data-mt-more="' + r.id + '" aria-expanded="' + m + '"><span class="thesis__label heading">Thesis</span>' + CHEV + '</button>' +
+      '<p class="thesis__text">' + esc(r.thesis) + '</p>' +
+      (line ? '<div class="tsec"' + (m ? '' : ' hidden') + '><span class="thesis__label heading">Resolution</span><p class="' + lineCls + '">' + esc(line) + '</p></div>' : '') + '</div>';
   }
   /* full: the pane's card, body always shown; otherwise the body opens in place (phone). The whole card selects. */
   function cardHTML(r, opts) {
@@ -1379,7 +1385,6 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
     var o = ordered(set), box = root.querySelector('[data-mt-markets]'), desk = isDesk();
     var vis = visible();
     if (desk && (!selId || vis.indexOf(find(selId)) < 0)) selId = vis.length ? vis[0].id : '';
-    root.querySelector('[data-mt-stats="group"]').innerHTML = statsHTML(o.all);
     var item = function (r) {
       return view === 'cards' ? cardHTML(r, { sel: desk ? r.id === selId : !!openIds[r.id], open: !desk && openIds[r.id] })
                               : rowHTML(r, { sel: desk ? r.id === selId : !!openIds[r.id], open: !desk && openIds[r.id] });
@@ -1406,7 +1411,7 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
   function renderAll() { renderSide(); renderMarkets(); }
   function refreshRace() { renderMarkets(); }   /* a tap repaints the markets and the pane */
   function selectRace(id, scroll) {
-    if (isDesk()) selId = id; else openIds[id] = !openIds[id];
+    if (isDesk()) { if (selId !== id) moreIds = {}; selId = id; } else openIds[id] = !openIds[id];
     renderMarkets();
     if (scroll) { var el = root.querySelector('[data-mt-card="' + id + '"], [data-mt-row="' + id + '"]'); if (el && el.scrollIntoView) el.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
   }
@@ -1414,13 +1419,12 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
   /* ── interactions ── */
   root.addEventListener('change', function (e) {
     if (e.target.matches('[data-mt-set]')) { set = e.target.value; openIds = {}; selId = ''; renderMarkets(); }
+    if (e.target.matches('[data-mt-map-select]')) root.setAttribute('data-mt-mapshow', e.target.value);
   });
   root.addEventListener('click', function (e) {
     var t;
-    if ((t = e.target.closest('[data-mt-map-tab]'))) {
-      var m = t.getAttribute('data-mt-map-tab'); root.setAttribute('data-mt-mapshow', m);
-      var mt = root.querySelectorAll('[data-mt-map-tab]'); for (var i = 0; i < mt.length; i++) mt[i].classList.toggle('filters__tag--on', mt[i] === t);
-      return;
+    if ((t = e.target.closest('[data-mt-more]'))) {   /* the thesis chevron: Resolution opens and closes, nothing else */
+      var mid = t.getAttribute('data-mt-more'); moreIds[mid] = !moreIds[mid]; renderMarkets(); return;
     }
     if ((t = e.target.closest('[data-mt-view]'))) { view = t.getAttribute('data-mt-view'); try { localStorage.setItem(VIEW_KEY, view); } catch (x) {} renderMarkets(); return; }
     if ((t = e.target.closest('[data-mt-tap]'))) { onTap(t); return; }

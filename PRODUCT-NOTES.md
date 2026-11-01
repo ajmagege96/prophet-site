@@ -119,13 +119,13 @@ is the fallback).
     resolved | void), pending_reason (closed | price | disputed), outcome
     (right | wrong), outcome_line, taps_agree, taps_disagree, user_side.
   Joined on market_id + leg_id.
-- Stats (headline and per group): Called = races with a call; Resolved =
-  resolved right or wrong; Right = resolved right; Hit rate = right ÷ resolved,
+- Stats (headline only, left column; no per-set stats): Called = races with a call; Resolved =
+  resolved right or wrong; Correct = resolved right; Hit rate = correct ÷ resolved,
   void excluded, a dash until one resolves. No five-star line. No money
   lines anywhere.
 - Markets area: a sticky bar with a dropdown (All, the default · Balance of
   Power · Senate · Governors) and a cards / list icon toggle (remembered per
-  viewer). Under it, that set's four stats, then the full set. Nothing
+  viewer); a dropdown at every width. Under it the full set. Nothing
   collapsed; no safe-seats section.
 - **Needs logic: top-markets ordering.** The top markets lead every list (All,
   Balance of Power, Senate, Governors); there is no separate Top markets view.
@@ -144,7 +144,8 @@ is the fallback).
 - Card: race and group; market odds top right, "57% YES" for the pick the card
   names (settled 100 / 0 once resolved); pick with party chip; stars · "N% at
   call" (his side) · volume, state tag bottom right. No time remaining. Agree /
-  Disagree with the tally. Opened, it adds the thesis and the settlement line,
+  Disagree with the tally. Opened, it adds a thesis box like the home's: the
+  thesis, and a chevron dropping down Resolution: the settlement line,
   the outcome line once resolved, the void line when void. Needs volume per
   race in the calls feed.
 - Row: race · pick · stars · market odds · tag · Agree / Disagree · tally. A
