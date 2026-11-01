@@ -13,6 +13,8 @@ sections 5–7 are the contracts your side has to honour.
 
 ## 1. What changed since the last drop
 
+**Midterms phone cards, Nov 1 (later).** The odds sit top right on phone cards, like desktop; the drop-down arrow is off the closed card (a tap opens it; the opened card keeps its arrow). Closed cards keep the live card's spacing: an empty row the buttons' height, so the tally lines up with its neighbours.
+
 **Midterms closed cards, Nov 1.** Pending, resolved and void cards drop the volume; the tag sits on the stars line. Cards are tighter (less padding and gap), on phones most of all.
 
 **Midterms phone cards, Nov 1.** Cards view on a phone is two compact cards across (race, the odds under it, pick, stars · volume · tag, Agree / Disagree, tally), so it no longer looks like the list. An opened card spans both columns and the next card fills the gap.

@@ -268,7 +268,7 @@ endpoint. `midterms-mock.js` stands in until then; `#preview=some` and
 | Map | One tile map, first | Both maps stacked under the stats |
 | Headline stats | One row under the map: Called · Resolved · Right · Hit rate | Left column under the title, sticky |
 | Markets bar | Sticky: set dropdown left, cards / list icon toggle right | Right column, sticky, level with the title |
-| Markets | Cards two across (compact: race, odds under it, pick, stars · volume · tag, buttons; an opened card spans both columns), or rows (three short lines) | Cards in a grid, or rows (one line) |
+| Markets | Cards two across (compact: race top left, odds top right, no arrow (a tap opens it), pick, stars · volume · tag, buttons; an opened card spans both columns), or rows (three short lines) | Cards in a grid, or rows (one line) |
 | Selected market | A drop-down chevron on every card and row; opened (or tapped), the market shows as the desktop pane's card in place, in cards or list | Always one selected; its full card in a sticky pane beside the markets |
 
 The dropdown (no label) sets what shows: **All** (the default) · Balance of
@@ -306,7 +306,9 @@ its race in its group.
 cards, "57% YES" for the pick the card names (settled 100 / 0 once resolved);
 his pick with party chip; the meta line: stars · bar-chart icon + volume (as
 the home cards), the state tag at the right of the same line (in the pane too).
-Once a race is pending, resolved or void the volume drops: stars and the tag. No
+Once a race is pending, resolved or void the volume drops: stars and the tag.
+A closed card keeps the live card's spacing: an empty row the buttons' height
+holds the tally where it would sit. No
 "% at call". No
 chevron on the card, no time remaining. Agree / Disagree with the tally as
 built. Opened on a phone, or in the desktop pane, it adds a thesis box as on

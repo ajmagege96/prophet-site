@@ -1181,6 +1181,8 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
 .mt-thesis .tsec { margin-top: 4px; }
 .mt-ad { margin: 2px 0 0; gap: 6px; }
 .mt-ad .ad__btn { min-height: 34px; padding: 0 16px; font-size: 12px; }
+.mt-ad__ghost { height: 34px; visibility: hidden; }
+.mt-markets__cards .mt-card:not(.mt-card--open) .mt-ad { margin-top: auto; }   /* buttons and tally sit on one line across a row */
 .mt-ad .thesis__split { font-size: 12px; }
 
 /* A row: race over pick, stars, live price, tag, Agree / Disagree, tally */
@@ -1310,9 +1312,11 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
   .mt-markets__cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; grid-auto-flow: row dense; }   /* an opened card leaves no hole */
   .mt-markets__cards > .mt-card--open { grid-column: 1 / -1; }
   .mt-markets__cards > .mt-card:not(.mt-card--open) { padding: 9px 10px; gap: 5px; }
-  .mt-card:not(.mt-card--open) .mt-card__top { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "race more" "odds odds"; align-items: center; row-gap: 2px; }
-  .mt-card:not(.mt-card--open) .mt-card__race { grid-area: race; font-size: 9px; letter-spacing: 0.06em; }
-  .mt-card:not(.mt-card--open) .mt-odds { grid-area: odds; justify-self: start; margin-left: 0; font-size: 20px; gap: 3px; }
+  /* race top left (two lines if it needs them), odds top right; no drop-down arrow on the closed card, a tap opens it */
+  .mt-card:not(.mt-card--open) .mt-card__top { align-items: flex-start; gap: 6px; }
+  .mt-card:not(.mt-card--open) .mt-card__race { font-size: 9px; letter-spacing: 0.06em; line-height: 1.3; white-space: normal; padding-top: 2px; }
+  .mt-card:not(.mt-card--open) .mt-odds { font-size: 18px; gap: 3px; }
+  .mt-markets__cards .mt-card:not(.mt-card--open) .mt-more { display: none; }
   .mt-card:not(.mt-card--open) .mt-odds small { font-size: 8px; }
   .mt-card:not(.mt-card--open) .mt-pick { font-size: 15px; gap: 5px; align-items: flex-start; }
   .mt-card:not(.mt-card--open) .mt-pick__name { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
@@ -1321,6 +1325,7 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
   .mt-card:not(.mt-card--open) .mt-stars .ico { width: 9px; height: 9px; }
   .mt-card:not(.mt-card--open) .mt-ad .ad__row { width: 100%; gap: 6px; }
   .mt-card:not(.mt-card--open) .mt-ad { margin-top: 2px; gap: 4px; }
+  .mt-card:not(.mt-card--open) .mt-ad__ghost { height: 30px; }
   .mt-card:not(.mt-card--open) .mt-ad .ad__btn { flex: 1 1 0; min-width: 0; min-height: 30px; padding: 0 4px; font-size: 10px; letter-spacing: 0.04em; }
   .mt-card:not(.mt-card--open) .mt-ad .thesis__split { font-size: 10px; }
   /* phone row: race · odds · drop-down / pick · stars / tally · Agree and Disagree on the right */

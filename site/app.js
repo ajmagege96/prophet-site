@@ -1327,7 +1327,8 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
   /* pending, resolved and void markets carry no Agree / Disagree, only the tally */
   function adHTML(r) {
     var t = tally(r);
-    return '<div class="ad mt-ad">' + (locked(r) ? '' : '<div class="ad__row">' + btnHTML(r, 'agree', 'Agree') + btnHTML(r, 'disagree', 'Disagree') + '</div>') +
+    /* closed: an empty row the buttons' height, so the card keeps the live card's spacing */
+    return '<div class="ad mt-ad">' + (locked(r) ? '<div class="ad__row mt-ad__ghost" aria-hidden="true"></div>' : '<div class="ad__row">' + btnHTML(r, 'agree', 'Agree') + btnHTML(r, 'disagree', 'Disagree') + '</div>') +
       (t ? '<span class="thesis__split">' + t + '</span>' : '') + '</div>';
   }
   /* as the home thesis box: THESIS and the thesis, one chevron dropping down RESOLUTION under a hairline, closed by default */
