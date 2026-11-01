@@ -121,13 +121,17 @@ is the fallback).
   Joined on market_id + leg_id.
 - Stats (headline and per group): Called = races with a call; Resolved =
   resolved right or wrong; Right = resolved right; Hit rate = right ÷ resolved,
-  void excluded, a dash until one resolves. Five-star line: count, then how
-  many right. No money lines anywhere.
-- Markets area: a sticky bar with a dropdown (Top markets = the featured ten,
-  the default · Balance of Power · Senate · Governors) and a Cards / List
-  toggle (remembered per viewer). Under it, that set's four stats, then the set.
-- Order in a group: featured, then contested by price closest to 50, then safe
-  (collapsed behind a count, remembered per viewer).
+  void excluded, a dash until one resolves. No five-star line. No money
+  lines anywhere.
+- Markets area: a sticky bar with a dropdown (All, the default · Balance of
+  Power · Senate · Governors) and a cards / list icon toggle (remembered per
+  viewer). Under it, that set's four stats, then the full set. Nothing
+  collapsed; no safe-seats section.
+- **Needs logic: top-markets ordering.** The top markets lead every list (All,
+  Balance of Power, Senate, Governors); there is no separate Top markets view.
+  We need a ranking that orders each list, most interesting first, and the
+  server to send it (e.g. a rank per race). Until then the page orders
+  featured, then contested by price closest to 50, then safe.
 - Desktop: one market is always selected and its full card (thesis included)
   stands in a pane beside the markets. Phone: tapping a market opens its thesis
   in place.
@@ -137,17 +141,19 @@ is the fallback).
   two-candidate → the runner-up; NO multi-candidate (AK, CA, ID, MI, RI) →
   "Not" + the called candidate; NO on Balance of Power → "Not a Democratic
   sweep"; NO on Senate / House control → the other party.
-- Card: race and group, state tag, pick with party chip, stars, "N% at call ·
-  M% now" for his side (settled 100 / 0 once resolved, last price when void),
-  Agree / Disagree with the tally. Opened, it adds the thesis and the
-  settlement line, the outcome line once resolved, the void line when void.
-- Row: race · pick · stars · live price · tag · Agree / Disagree · tally.
+- Card: race and group; market odds top right, "57% YES" for the pick the card
+  names (settled 100 / 0 once resolved); pick with party chip; stars · "N% at
+  call" (his side) · volume, state tag bottom right. No time remaining. Agree /
+  Disagree with the tally. Opened, it adds the thesis and the settlement line,
+  the outcome line once resolved, the void line when void. Needs volume per
+  race in the calls feed.
+- Row: race · pick · stars · market odds · tag · Agree / Disagree · tally. A
+  click anywhere on a card or row selects it; the selected one has the home's
+  white outline and green flash.
 - Tags: Pending · Pending · disputed · Right · Wrong · Void. Taps: one per call,
   final, the already notice, Tap Confirmed; locked from pending on. Pending
   races stay in their group.
 - Every visible string on the page is placeholder copy for Awetu.
-- Open: five stars are held for outcomes knowable from a primary source, so
-  the five-star line may be thin at launch.
 
 ## Not built (founder's call)
 "Against the market" tag; "Changed his mind on {date}" note; History "called

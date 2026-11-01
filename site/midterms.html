@@ -29,7 +29,7 @@
   <meta name="twitter:description" content="An agent that reads prediction markets, publishes a thesis before the outcome, and keeps a public record of every call.">
   <meta name="twitter:image" content="https://ajmagege96.github.io/prophet-site/site/assets/prophet-og-1200x630.png">
 
-  <link rel="stylesheet" href="styles.css?v=23d7eabc">
+  <link rel="stylesheet" href="styles.css?v=3fc4810e">
 </head>
 <body data-page="midterms">
 
@@ -116,7 +116,7 @@
   <script type="application/json" data-midterms-calls>{{midterms.calls_json}}</script>
 
   <div class="mt__cols">
-    <!-- Left (desktop, sticky): headline stats, both maps, five-star line. Phone: the same, in this order, one map with a toggle. -->
+    <!-- Left (desktop, sticky): headline stats, both maps. Phone: the same, in this order, one map with a toggle. -->
     <aside class="mt__side">
       <h1 class="mt__title heading">Midterms</h1>
       <div class="mt-stats" data-mt-stats="all"></div>
@@ -126,20 +126,18 @@
       </div>
       <figure class="mt-map" data-mt-map="senate"><figcaption class="mt-map__cap heading">Senate</figcaption><div data-mt-map-svg></div></figure>
       <figure class="mt-map" data-mt-map="governors"><figcaption class="mt-map__cap heading">Governors</figcaption><div data-mt-map-svg></div></figure>
-      <p class="mt-five" data-mt-five></p>
     </aside>
 
-    <!-- Right: the markets. A sticky bar on top: the set (Top markets = the featured ten · Balance of Power · Senate · Governors)
-         on the left, Cards / List on the right (remembered per viewer). Under it the set's four stats, then its markets.
-         Inside a group: featured first, then contested by price closest to 50, then safe (collapsed behind a count).
+    <!-- Right: the markets. A sticky bar on top: the set (All, the default · Balance of Power · Senate · Governors)
+         on the left, a cards / list icon toggle on the right (remembered per viewer). Under it the set's four stats, then its markets.
+         Inside any set the top markets lead: featured first, then contested by price closest to 50, then safe, the full list.
          Desktop: one market is always selected and its full card stands in the pane beside the markets.
          Phone: tapping a market opens its thesis in place. -->
     <div class="mt__main">
       <div class="mt-bar" data-mt-bar>
         <label class="mt-select">
-          <span class="mt-select__label">Show</span>
           <select data-mt-set aria-label="Markets to show">
-            <option value="top">Top markets</option>
+            <option value="all" selected>All</option>
             <option value="balance">Balance of Power</option>
             <option value="senate">Senate</option>
             <option value="governors">Governors</option>
@@ -147,8 +145,8 @@
           <svg class="mt-select__chev" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
         </label>
         <div class="mt-view" role="group" aria-label="View">
-          <button class="filters__tag filters__tag--on" data-mt-view="cards" aria-pressed="true">Cards</button>
-          <button class="filters__tag" data-mt-view="list" aria-pressed="false">List</button>
+          <button class="mt-view__btn mt-view__btn--on" data-mt-view="cards" aria-pressed="true" aria-label="Cards" title="Cards"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="4" width="7" height="7"/><rect x="13" y="4" width="7" height="7"/><rect x="4" y="13" width="7" height="7"/><rect x="13" y="13" width="7" height="7"/></svg></button>
+          <button class="mt-view__btn" data-mt-view="list" aria-pressed="false" aria-label="List" title="List"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg></button>
         </div>
       </div>
       <div class="mt-stats mt-stats--group" data-mt-stats="group"></div>
@@ -429,7 +427,7 @@
 </footer>
 <!-- /partial:footer -->
 
-<script src="midterms-mock.js?v=04803cf9"></script>
-<script src="app.js?v=592a452f"></script>
+<script src="midterms-mock.js?v=ddbe8566"></script>
+<script src="app.js?v=f89963a4"></script>
 </body>
 </html>

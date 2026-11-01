@@ -238,7 +238,7 @@ Descriptions in `TEMPLATE_VARS.md`; the generated table in `HANDOFF.md` §10.
 - How it Works opens from the header and the menu every time; onboarding only on
   a first visit.
 - No "vote", "take", "credits" or "trades" anywhere in the hero.
-- Midterms: 74 races, 10 under Top markets, each race once in its group; both
+- Midterms: 74 races under All, each race once in its group, no collapsed section; both
   views work, rows carry Agree / Disagree, the pane follows the selection; every race and
   page state renders at 390px and 1400px with no overflow; no double negatives;
   the map colours match the picks (a NO shows the runner-up's party); hit rate
@@ -267,22 +267,24 @@ endpoint. `midterms-mock.js` stands in until then; `#preview=some` and
 |---|---|---|
 | Headline stats | One row: Called · Resolved · Right · Hit rate | Left column, sticky |
 | Map | One tile map with a Senate / Governors toggle | Both maps stacked under the stats |
-| Five-star line | "N five-star calls · M right" | Under the maps |
-| Markets bar | Sticky: set dropdown left, Cards / List right | Right column, sticky |
+| Markets bar | Sticky: set dropdown left, cards / list icon toggle right | Right column, sticky |
 | Set stats | One line under the bar | Same |
 | Markets | Cards stacked, or rows (three short lines) | Cards in a grid, or rows (one line) |
 | Selected market | Tapping opens its thesis in place | Always one selected; its full card in a sticky pane beside the markets |
-| Safe | Collapsed: "23 safe seats" opens them (remembered per viewer) | Same |
 
-The dropdown sets what shows: **Top markets** (the featured ten, the default) ·
-Balance of Power · Senate · Governors. Cards / List is remembered per viewer.
-Inside a group: featured first, then contested by price closest to 50, then
-safe. Featured races show under Top markets and again in their group.
+The dropdown (no label) sets what shows: **All** (the default) · Balance of
+Power · Senate · Governors. The view toggle is two icons, a grid (cards) and
+lines (list), no words, remembered per viewer. Every set is the full list,
+nothing collapsed. The top markets lead each set; until the server's ranking
+lands the page orders featured, then contested by price closest to 50, then
+safe. A click anywhere on a card or row selects it. The selected market reads
+like the home's: brighter white outline, flashing green every 3s (0.9s build
+and release) on the card, the row and the pane card.
 
 **Stats.** Called = races with a call. Resolved = resolved right or wrong.
 Right = resolved right. Hit rate = right ÷ resolved, void excluded. Resolved,
-Right and Hit rate read a dash until one race resolves. Five-star calls: the
-count, then how many resolved right. The same four per group. No money lines
+Right and Hit rate read a dash until one race resolves. The same four per
+group. No five-star line. No money lines
 anywhere.
 
 **Maps.** One square tile per state. A seat in play is filled with the party of
@@ -301,14 +303,15 @@ its race in its group.
 | NO on Balance of Power | "Not a Democratic sweep" |
 | NO on Senate or House control | The other party |
 
-**Card**: race and group, the state tag,
-his pick with party chip, stars, "N% at call · M% now" (read for his side;
-"settled" 100 / 0 once resolved; "last" price when void), Agree / Disagree with
-the tally as built. Opened on a phone, or in the desktop pane, it adds the
+**Card**: race and group top left; the market odds top right as on the home
+cards, "57% YES" for the pick the card names (settled 100 / 0 once resolved);
+his pick with party chip; the meta line: stars · "N% at call" (his side) ·
+volume, the state tag bottom right. No chevron, no time remaining. Agree /
+Disagree with the tally as built. Opened on a phone, or in the desktop pane, it adds the
 thesis and the settlement line (the outcome line once resolved; the void line
 when void).
 
-**Row**: race over his pick with chip · stars · live price · state tag · Agree /
+**Row**: race over his pick with chip · stars · market odds "57% YES" · state tag · Agree /
 Disagree · tally; one line on desktop, three short lines on a phone. Tap it to
 select it (desktop: the pane) or open its thesis in place (phone).
 

@@ -1238,7 +1238,7 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
       ru: r.runner_up, ruParty: r.runner_up_party, layer: r.layer, featured: !!r.featured,
       side: c.side, stars: +c.stars || 0, thesis: c.thesis || '', settle: c.settlement_line || '', atCall: +c.price_at_call,
       price: +c.live_price, status: c.state || 'live', reason: c.pending_reason || '', outcome: c.outcome || '',
-      outcomeLine: c.outcome_line || '', agree: +c.taps_agree || 0, disagree: +c.taps_disagree || 0, userSide: c.user_side || '' });
+      outcomeLine: c.outcome_line || '', volume: c.volume || '', agree: +c.taps_agree || 0, disagree: +c.taps_disagree || 0, userSide: c.user_side || '' });
   }
   var MULTI = { AK: 1, CA: 1, ID: 1, MI: 1, RI: 1 };   /* multi-candidate races: a NO reads "Not" + the called candidate */
   var PARTY_WORD = { D: 'Democratic', R: 'Republican', I: 'Independent' };
@@ -1275,11 +1275,9 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
     if (n >= 3) return Math.round(r.agree * 100 / n) + '% agree · ' + n + ' tap' + (n === 1 ? '' : 's');
     var s = side(r); return s ? 'You ' + s : (short ? '' : '');
   }
-  function priceNow(r) {
-    if (r.status === 'resolved') return sidePrice(r.price, r) + '% settled';
-    if (r.status === 'void') return sidePrice(r.price, r) + '% last';
-    return sidePrice(r.price, r) + '% now';
-  }
+  /* market odds, as on the home cards, for the pick the card names (settled 100 / 0 once resolved) */
+  function oddsHTML(r) { return '<span class="carousel__odds heading mt-odds">' + Math.round(sidePrice(r.price, r)) + '%<small>YES</small></span>'; }
+  var VOL_ICO = '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>';
 
   /* ── stats (headline and per group) ── */
   function stats(set) {
@@ -1321,7 +1319,6 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
   }
 
   /* ── market card and market row ── */
-  var CHEV = '<svg class="tsec__chev" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>';
   function btnHTML(r, k, label) {
     var s = side(r);
     return '<button class="ad__btn ad__btn--' + k + (s === k ? ' ad__btn--on' : '') + (s && s !== k ? ' ad__btn--off' : '') + '" data-mt-tap="' + k + '"' + (locked(r) ? ' disabled' : '') + '>' + label + '</button>';
@@ -1337,79 +1334,74 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
     var lineCls = r.status === 'resolved' ? 'thesis__note' : 'thesis__fact';
     return '<p class="thesis__text">' + esc(r.thesis) + '</p>' + (line ? '<p class="' + lineCls + '">' + esc(line) + '</p>' : '');
   }
-  /* full: the pane's card, body always shown; otherwise the body opens in place (phone) */
+  /* full: the pane's card, body always shown; otherwise the body opens in place (phone). The whole card selects. */
   function cardHTML(r, opts) {
     opts = opts || {};
     var open = !!opts.full || !!opts.open;
     return '<article class="mt-card outline' + (opts.full ? ' mt-card--full' : '') + (opts.sel ? ' mt-card--sel' : '') + (open ? ' mt-card--open' : '') + '" data-mt-card="' + r.id + '">' +
-      '<div class="mt-card__top" data-mt-pickr><span class="mt-card__race">' + esc(r.race) + '</span>' + tagHTML(r) + (opts.full ? '' : CHEV) + '</div>' +
-      '<div class="mt-pick" data-mt-pickr>' + pickHTML(r) + '</div>' +
-      '<div class="mt-card__meta" data-mt-pickr>' + starsHTML(r) + '<span class="mt-price">' + sidePrice(r.atCall, r) + '% at call · ' + priceNow(r) + '</span></div>' +
+      '<div class="mt-card__top"><span class="mt-card__race">' + esc(r.race) + '</span>' + oddsHTML(r) + '</div>' +
+      '<div class="mt-pick">' + pickHTML(r) + '</div>' +
+      '<div class="mt-card__meta">' + starsHTML(r) + '<span class="mt-price">' + sidePrice(r.atCall, r) + '% at call</span>' +
+        (r.volume ? '<span class="mt-price" title="volume">' + VOL_ICO + esc(r.volume) + '</span>' : '') + tagHTML(r) + '</div>' +
       (open ? '<div class="mt-card__body">' + bodyHTML(r) + '</div>' : '') +
       adHTML(r) + '</article>';
   }
   function rowHTML(r, opts) {
     var t = tally(r, true);
     var n = r.agree + r.disagree, short = n >= 3 ? Math.round(r.agree * 100 / n) + '% · ' + n + ' taps' : (t || '');
-    return '<div class="mt-row' + (opts.sel ? ' mt-row--open' : '') + '" data-mt-row="' + r.id + '">' +
-      '<span class="mt-row__race" data-mt-pickr>' + esc(r.group === 'balance' ? r.race : stateName(r)) + '</span>' +
-      '<span class="mt-row__pick" data-mt-pickr>' + pickHTML(r) + '</span>' + starsHTML(r) +
-      '<span class="mt-row__price" data-mt-pickr>' + sidePrice(r.price, r) + '%</span>' +
-      '<span class="mt-row__tag" data-mt-pickr>' + tagHTML(r) + '</span>' +
+    return '<div class="mt-row' + (opts.sel ? ' mt-row--sel' : '') + '" data-mt-row="' + r.id + '">' +
+      '<span class="mt-row__race">' + esc(r.group === 'balance' || set === 'all' ? r.race : stateName(r)) + '</span>' +
+      '<span class="mt-row__pick">' + pickHTML(r) + '</span>' + starsHTML(r) +
+      '<span class="mt-row__price">' + Math.round(sidePrice(r.price, r)) + '%<small>YES</small></span>' +
+      '<span class="mt-row__tag">' + tagHTML(r) + '</span>' +
       '<span class="mt-row__ad">' + btnHTML(r, 'agree', 'Agree') + btnHTML(r, 'disagree', 'Disagree') + '</span>' +
-      '<span class="mt-row__tally" data-mt-pickr>' + short + '</span></div>' +
+      '<span class="mt-row__tally">' + short + '</span></div>' +
       (opts.open ? '<div class="mt-inplace">' + bodyHTML(r) + (r.status === 'pending' ? '<p class="ad__closed">Taps closed. Resolution next.</p>' : '') + '</div>' : '');
   }
   function stateName(r) { return r.race.replace(/ (Senate|Governor)$/, ''); }
 
   /* ── the market set, the view and the selection ── */
-  var SAFE_KEY = 'prophet.midterms.safe.', VIEW_KEY = 'prophet.midterms.view';
-  var set = 'top', view = 'cards', selId = '', openIds = {};
+  var VIEW_KEY = 'prophet.midterms.view';
+  var set = 'all', view = 'cards', selId = '', openIds = {};
   try { view = localStorage.getItem(VIEW_KEY) === 'list' ? 'list' : 'cards'; } catch (e) {}
+  /* Top markets lead every set, full list, nothing collapsed. Placeholder order until the server's ranking lands:
+     featured, then contested by price closest to 50, then safe. */
   function ordered(g) {
-    if (g === 'top') { var f = races.filter(function (r) { return r.featured; }); return { all: f, lead: f, safe: [] }; }
-    var all = races.filter(function (r) { return r.group === g; });
+    var all = g === 'all' ? races.slice() : races.filter(function (r) { return r.group === g; });
     var fe = all.filter(function (r) { return r.featured; });
     var c = all.filter(function (r) { return !r.featured && r.layer !== 'safe'; }).sort(function (a, b) { return Math.abs(a.price - 50) - Math.abs(b.price - 50); });
     var s = all.filter(function (r) { return !r.featured && r.layer === 'safe'; });
-    return { all: all, lead: fe.concat(c), safe: s };
+    return { all: all, list: fe.concat(c, s) };
   }
-  function safeOpen(g) { try { return localStorage.getItem(SAFE_KEY + g) === '1'; } catch (e) { return false; } }
   function isDesk() { return window.matchMedia('(min-width: 1024px)').matches; }
-  function visible() { var o = ordered(set); return o.lead.concat(safeOpen(set) ? o.safe : []); }
+  function visible() { return ordered(set).list; }
   function renderMarkets() {
-    var o = ordered(set), box = root.querySelector('[data-mt-markets]'), desk = isDesk(), so = safeOpen(set);
+    var o = ordered(set), box = root.querySelector('[data-mt-markets]'), desk = isDesk();
     var vis = visible();
     if (desk && (!selId || vis.indexOf(find(selId)) < 0)) selId = vis.length ? vis[0].id : '';
     root.querySelector('[data-mt-stats="group"]').innerHTML = statsHTML(o.all);
     var item = function (r) {
-      return view === 'cards' ? cardHTML(r, { sel: desk && r.id === selId, open: !desk && openIds[r.id] })
+      return view === 'cards' ? cardHTML(r, { sel: desk ? r.id === selId : !!openIds[r.id], open: !desk && openIds[r.id] })
                               : rowHTML(r, { sel: desk ? r.id === selId : !!openIds[r.id], open: !desk && openIds[r.id] });
     };
-    var h = '<div class="mt-markets__' + view + '">' + o.lead.map(item).join('') + '</div>';
-    if (o.safe.length) {
-      h += '<button class="mt-safe" data-mt-safe aria-expanded="' + so + '">' + o.safe.length + ' safe ' + (set === 'governors' ? 'races' : 'seats') + CHEV + '</button>';
-      if (so) h += '<div class="mt-markets__' + view + '">' + o.safe.map(item).join('') + '</div>';
-    }
+    var h = '<div class="mt-markets__' + view + '">' + o.list.map(item).join('') + '</div>';
     box.innerHTML = h;
     var sel = root.querySelector('[data-mt-set]'); if (sel.value !== set) sel.value = set;
     var vb = root.querySelectorAll('[data-mt-view]');
-    for (var i = 0; i < vb.length; i++) { var on = vb[i].getAttribute('data-mt-view') === view; vb[i].classList.toggle('filters__tag--on', on); vb[i].setAttribute('aria-pressed', on ? 'true' : 'false'); }
+    for (var i = 0; i < vb.length; i++) { var on = vb[i].getAttribute('data-mt-view') === view; vb[i].classList.toggle('mt-view__btn--on', on); vb[i].setAttribute('aria-pressed', on ? 'true' : 'false'); }
     root.querySelector('[data-mt-list]').setAttribute('data-view', view);
     renderPane();
   }
   function renderPane() {
     var pane = root.querySelector('[data-mt-pane]'), r = isDesk() && selId ? find(selId) : null;
     pane.hidden = !r; root.querySelector('[data-mt-list]').classList.toggle('mt-list--pane', !!r);
-    pane.innerHTML = r ? cardHTML(r, { full: true }) : '';
+    pane.innerHTML = r ? cardHTML(r, { full: true, sel: true }) : '';
   }
   function find(id) { for (var i = 0; i < races.length; i++) if (races[i].id === id) return races[i]; }
   function renderSide() {
     root.querySelector('[data-mt-stats="all"]').innerHTML = statsHTML(races);
     var maps = root.querySelectorAll('[data-mt-map]');
     for (var i = 0; i < maps.length; i++) maps[i].querySelector('[data-mt-map-svg]').innerHTML = mapSVG(maps[i].getAttribute('data-mt-map'));
-    var five = races.filter(function (r) { return r.stars === 5; }), fr = five.filter(function (r) { return r.status === 'resolved'; }), fright = fr.filter(function (r) { return r.outcome === 'right'; });
-    root.querySelector('[data-mt-five]').innerHTML = '<span class="mt-five__n">' + five.length + '</span> five-star calls' + (fr.length ? ' · <span class="mt-five__n">' + fright.length + '</span> right' : '');
   }
   function renderAll() { renderSide(); renderMarkets(); }
   function refreshRace() { renderMarkets(); }   /* a tap repaints the markets and the pane */
@@ -1431,17 +1423,14 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
       return;
     }
     if ((t = e.target.closest('[data-mt-view]'))) { view = t.getAttribute('data-mt-view'); try { localStorage.setItem(VIEW_KEY, view); } catch (x) {} renderMarkets(); return; }
-    if ((t = e.target.closest('[data-mt-safe]'))) { try { localStorage.setItem(SAFE_KEY + set, safeOpen(set) ? '0' : '1'); } catch (x) {} renderMarkets(); return; }
     if ((t = e.target.closest('[data-mt-tap]'))) { onTap(t); return; }
     if ((t = e.target.closest('[data-mt-open]'))) {   /* a map tile opens its race in its group */
       var r0 = find(t.getAttribute('data-mt-open')); set = r0.group; openIds = {};
-      if (r0.layer === 'safe') { try { localStorage.setItem(SAFE_KEY + set, '1'); } catch (x) {} }
       selectRace(r0.id, true); return;
     }
-    if ((t = e.target.closest('[data-mt-pickr]'))) {
+    if ((t = e.target.closest('[data-mt-card], [data-mt-row]'))) {   /* anywhere on a card or row selects it */
       if (t.closest('[data-mt-pane]')) return;
-      var host = t.closest('[data-mt-card], [data-mt-row]'); if (!host) return;
-      selectRace(host.getAttribute('data-mt-card') || host.getAttribute('data-mt-row'), false); return;
+      selectRace(t.getAttribute('data-mt-card') || t.getAttribute('data-mt-row'), false); return;
     }
   });
   var lastDesk = isDesk();
@@ -1489,6 +1478,13 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
     selectRace(nx.id, true);
   });
   window.prophetMidterms = { races: races, land: function (id, k) { var r = find(id); if (r && !side(r) && !locked(r)) { taps[id] = k; refreshRace(); confirm(r, k); } } };
+
+  /* the selected market flashes green every 3s, as on the home page */
+  setInterval(function () {
+    var on = root.querySelectorAll('.mt-card--sel, .mt-row--sel');
+    for (var i = 0; i < on.length; i++) on[i].classList.add('mt--pulse');
+    setTimeout(function () { for (var j = 0; j < on.length; j++) on[j].classList.remove('mt--pulse'); }, 1000);
+  }, 3000);
 
   root.setAttribute('data-mt-mapshow', 'senate');
   renderAll();
