@@ -13,6 +13,8 @@ sections 5–7 are the contracts your side has to honour.
 
 ## 1. What changed since the last drop
 
+**Midterms closed cards, Nov 1.** Pending, resolved and void cards drop the volume; the tag sits on the stars line. Cards are tighter (less padding and gap), on phones most of all.
+
 **Midterms phone cards, Nov 1.** Cards view on a phone is two compact cards across (race, the odds under it, pick, stars · volume · tag, Agree / Disagree, tally), so it no longer looks like the list. An opened card spans both columns and the next card fills the gap.
 
 **Midterms on phones, Nov 1.** Below 1024px every card and row carries a drop-down chevron; opened (or tapped), the market renders as the desktop pane's card in place, in cards or list view, with the thesis box and its Resolution drop-down. Phone rows have more room: race · odds · chevron, then pick · stars, then the tally on the left and Agree / Disagree (or the tag) on the right.

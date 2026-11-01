@@ -1349,7 +1349,7 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
       '<div class="mt-card__top"><span class="mt-card__race">' + esc(r.race) + '</span>' + oddsHTML(r) + (opts.full ? '' : MORE) + '</div>' +
       '<div class="mt-pick">' + pickHTML(r) + '</div>' +
       '<div class="mt-card__meta">' + starsHTML(r) +
-        (r.volume ? '<span class="mt-price" title="volume">' + VOL_ICO + esc(r.volume) + '</span>' : '') + tagHTML(r) + '</div>' +
+        (r.volume && !locked(r) ? '<span class="mt-price" title="volume">' + VOL_ICO + esc(r.volume) + '</span>' : '') + tagHTML(r) + '</div>' +   /* closed: no volume, the tag on the stars line */
       (open ? '<div class="mt-card__body">' + bodyHTML(r) + '</div>' : '') +
       adHTML(r) + '</article>';
   }

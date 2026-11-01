@@ -305,7 +305,8 @@ its race in its group.
 **Card**: race and group top left; the market odds top right as on the home
 cards, "57% YES" for the pick the card names (settled 100 / 0 once resolved);
 his pick with party chip; the meta line: stars · bar-chart icon + volume (as
-the home cards), the state tag at the right of the same line (in the pane too). No
+the home cards), the state tag at the right of the same line (in the pane too).
+Once a race is pending, resolved or void the volume drops: stars and the tag. No
 "% at call". No
 chevron on the card, no time remaining. Agree / Disagree with the tally as
 built. Opened on a phone, or in the desktop pane, it adds a thesis box as on

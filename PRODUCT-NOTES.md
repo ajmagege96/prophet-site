@@ -149,7 +149,8 @@ is the fallback).
   outcome ("R Senate · D House"); NO on Senate / House control → the other party.
 - Card: race and group; market odds top right, "57% YES" for the pick the card
   names (settled 100 / 0 once resolved); pick with party chip; stars · volume ·
-  state tag, one row (no "% at call"). No time remaining. Agree /
+  state tag, one row (no "% at call"); closed races drop the volume (stars ·
+  tag). No time remaining. Agree /
   Disagree with the tally. Opened, it adds a thesis box like the home's: the
   thesis, and a chevron dropping down Resolution: the settlement line,
   the outcome line once resolved, the void line when void. Volume comes from the
