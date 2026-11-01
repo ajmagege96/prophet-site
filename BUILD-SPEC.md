@@ -254,11 +254,13 @@ placeholder copy.
 `<script type="application/json">` tags: `{{midterms.races_json}}` (event id,
 leg id, market id, group, kind, state code, race name, called leg, party,
 runner-up, runner-up party, layer, featured) and `{{midterms.calls_json}}` (market
-id, leg id, side, stars, thesis, settlement line, price at call, live price,
-state, pending reason, outcome, outcome line, tap counts, the viewer's side).
+id, leg id, side, stars, thesis, settlement line, volume, price at call, live
+price, state, pending reason, outcome, outcome line, tap counts, the viewer's
+side). `volume` is the one field added beyond the earlier spec.
 Joined on market id + leg id. The page computes every stat; there is no stats
-endpoint. `midterms-mock.js` stands in until then; `#preview=some` and
-`#preview=all` show the race and page states.
+endpoint. `midterms-mock.js` stands in until then: it opens with a few races
+pending and resolved so the stats read with numbers; `#preview=live` shows every
+race live and `#preview=all` every race resolved.
 
 **Layout.**
 
@@ -268,7 +270,7 @@ endpoint. `midterms-mock.js` stands in until then; `#preview=some` and
 | Map | One tile map, first | Both maps stacked under the stats |
 | Headline stats | One row under the map: Called · Resolved · Right · Hit rate | Left column under the title, sticky |
 | Markets bar | Sticky: set dropdown left, cards / list icon toggle right | Right column, sticky, level with the title |
-| Markets | Cards two across (compact: race top left, odds top right, no arrow (a tap opens it), pick, stars · volume · tag, buttons; an opened card spans both columns), or rows (three short lines) | Cards in a grid, or rows (one line) |
+| Markets | Cards two across (compact: race top left, odds top right, no arrow (a tap opens it), pick, stars · volume · tag, buttons, tally; the stars line, buttons and tally line up across a row; an opened card spans both columns), or rows (three lines: race · odds · chevron / pick · stars / tally left, buttons or tag right) | Cards in a grid, or rows (one line) |
 | Selected market | A drop-down chevron on every card and row; opened (or tapped), the market shows as the desktop pane's card in place, in cards or list | Always one selected; its full card in a sticky pane beside the markets |
 
 The dropdown (no label) sets what shows: **All** (the default) · Balance of
@@ -304,16 +306,19 @@ its race in its group.
 
 **Card**: race and group top left; the market odds top right as on the home
 cards, "57% YES" for the pick the card names (settled 100 / 0 once resolved);
-his pick with party chip; the meta line: stars · bar-chart icon + volume (as
-the home cards), the state tag at the right of the same line (in the pane too).
-Once a race is pending, resolved or void the volume drops: stars and the tag.
-A closed card keeps the live card's spacing: an empty row the buttons' height
-holds the tally where it would sit. No
-"% at call". No
-chevron on the card, no time remaining. Agree / Disagree with the tally as
-built. Opened on a phone, or in the desktop pane, it adds a thesis box as on
-the home page: THESIS and the thesis, one chevron dropping down RESOLUTION
-under a hairline, closed by default (the settlement line; the outcome line once
+his pick with party chip; the meta line: stars · bar-chart icon + volume (as the
+home cards), the state tag at the right of the same line (in the pane too). No
+"% at call", no time remaining, no chevron on a desktop card. Agree / Disagree
+and the tally under it on a live race.
+
+Pending, resolved and void cards drop the volume (stars and the tag on one line)
+and the buttons, but keep the live card's spacing: an empty row the buttons'
+height holds the tally where it would sit, so the stars line and the tally line
+up with the card beside it.
+
+Opened on a phone, or in the desktop pane, the card adds a thesis box as on the
+home page: THESIS and the thesis, one chevron dropping down RESOLUTION under a
+hairline, closed by default (the settlement line; the outcome line once
 resolved; the void line when void).
 
 **Row**: race over his pick with chip · stars · market odds "57% YES" · Agree /
@@ -338,3 +343,102 @@ selects it (desktop: the pane); below 1024px it opens the pane's card in place.
 Pending races stay in their group. Taps as built: one per call, final, the
 already notice, Tap Confirmed (its {label} is his pick), sign-in when signed
 out. Pending, resolved and void races show no buttons, only the tally.
+
+## 14. The 74 markets
+
+Every market the Midterms page lists, as the race list sends it. Names in the
+called-leg and runner-up columns are the preview's: real leaders where known
+(Maine Senate Troy Jackson, Michigan Senate Abdul El-Sayed, Ohio Senate Sherrod
+Brown, Nebraska Senate Pete Ricketts); the rest are stand-ins for layout and
+come from the real race list. "His call" is the preview's call (side and
+stars); the live calls come from the calls feed. Layer: featured, contested or
+safe, which sets the order inside every list.
+
+**Balance of Power (3)**
+
+| # | Race | Called leg | Party | Runner-up | Party | Layer | His call |
+|---|---|---|---|---|---|---|---|
+| 1 | Balance of Power | Democrats Sweep | D | R Senate · D House | R | featured | NO, 3★ |
+| 2 | Senate control | Republicans | R | Democrats | D | featured | YES, 5★ |
+| 3 | House control | Republicans | R | Democrats | D | featured | NO, 4★ |
+
+**Senate (35)**
+
+| # | Race | Called leg | Party | Runner-up | Party | Layer | His call |
+|---|---|---|---|---|---|---|---|
+| 1 | Alabama Senate | Steve Marshall | R | Democratic nominee | D | safe | YES, 4★ |
+| 2 | Alaska Senate | Dan Sullivan | R | Mary Peltola | D | contested | NO, 3★ |
+| 3 | Arkansas Senate | Tom Cotton | R | Democratic nominee | D | safe | YES, 5★ |
+| 4 | Colorado Senate | John Hickenlooper | D | Republican nominee | R | safe | YES, 4★ |
+| 5 | Delaware Senate | Chris Coons | D | Republican nominee | R | safe | YES, 5★ |
+| 6 | Florida Senate | Ashley Moody | R | Josh Weil | D | contested | YES, 4★ |
+| 7 | Georgia Senate | Jon Ossoff | D | Mike Collins | R | featured | YES, 3★ |
+| 8 | Idaho Senate | Jim Risch | R | Democratic nominee | D | safe | YES, 5★ |
+| 9 | Illinois Senate | Juliana Stratton | D | Don Tracy | R | safe | YES, 4★ |
+| 10 | Iowa Senate | Ashley Hinson | R | Josh Turek | D | contested | YES, 3★ |
+| 11 | Kansas Senate | Roger Marshall | R | Democratic nominee | D | safe | YES, 4★ |
+| 12 | Kentucky Senate | Andy Barr | R | Amy McGrath | D | safe | YES, 4★ |
+| 13 | Louisiana Senate | Bill Cassidy | R | Democratic nominee | D | safe | YES, 4★ |
+| 14 | Maine Senate | Troy Jackson | D | Susan Collins | R | featured | YES, 3★ |
+| 15 | Massachusetts Senate | Ed Markey | D | Republican nominee | R | safe | YES, 4★ |
+| 16 | Michigan Senate | Abdul El-Sayed | D | Mike Rogers | R | featured | YES, 2★ |
+| 17 | Minnesota Senate | Peggy Flanagan | D | Royce White | R | contested | YES, 3★ |
+| 18 | Mississippi Senate | Cindy Hyde-Smith | R | Democratic nominee | D | safe | YES, 4★ |
+| 19 | Montana Senate | Steve Daines | R | Democratic nominee | D | safe | YES, 4★ |
+| 20 | Nebraska Senate | Pete Ricketts | R | Dan Osborn | I | contested | NO, 2★ |
+| 21 | New Hampshire Senate | Chris Pappas | D | John E. Sununu | R | contested | YES, 3★ |
+| 22 | New Jersey Senate | Cory Booker | D | Republican nominee | R | safe | YES, 5★ |
+| 23 | New Mexico Senate | Ben Ray Luján | D | Republican nominee | R | safe | YES, 4★ |
+| 24 | North Carolina Senate | Roy Cooper | D | Michael Whatley | R | featured | YES, 4★ |
+| 25 | Ohio Senate | Sherrod Brown | D | Jon Husted | R | featured | NO, 3★ |
+| 26 | Oklahoma Senate | Markwayne Mullin | R | Democratic nominee | D | safe | YES, 4★ |
+| 27 | Oregon Senate | Jeff Merkley | D | Republican nominee | R | safe | YES, 4★ |
+| 28 | Rhode Island Senate | Jack Reed | D | Republican nominee | R | safe | YES, 4★ |
+| 29 | South Carolina Senate | Lindsey Graham | R | Democratic nominee | D | safe | YES, 4★ |
+| 30 | South Dakota Senate | Mike Rounds | R | Democratic nominee | D | safe | YES, 4★ |
+| 31 | Tennessee Senate | Bill Hagerty | R | Democratic nominee | D | safe | YES, 4★ |
+| 32 | Texas Senate | Ken Paxton | R | James Talarico | D | contested | YES, 2★ |
+| 33 | Virginia Senate | Mark Warner | D | Republican nominee | R | safe | YES, 4★ |
+| 34 | West Virginia Senate | Shelley Moore Capito | R | Democratic nominee | D | safe | YES, 5★ |
+| 35 | Wyoming Senate | Harriet Hageman | R | Democratic nominee | D | safe | YES, 4★ |
+
+**Governors (36)**
+
+| # | Race | Called leg | Party | Runner-up | Party | Layer | His call |
+|---|---|---|---|---|---|---|---|
+| 1 | Alabama Governor | Tommy Tuberville | R | Democratic nominee | D | safe | YES, 4★ |
+| 2 | Alaska Governor | Nancy Dahlstrom | R | Democratic nominee | D | safe | YES, 3★ |
+| 3 | Arizona Governor | Katie Hobbs | D | Andy Biggs | R | featured | YES, 3★ |
+| 4 | Arkansas Governor | Sarah Huckabee Sanders | R | Democratic nominee | D | safe | YES, 4★ |
+| 5 | California Governor | Katie Porter | D | Chad Bianco | R | contested | YES, 2★ |
+| 6 | Colorado Governor | Michael Bennet | D | Republican nominee | R | safe | YES, 4★ |
+| 7 | Connecticut Governor | Ned Lamont | D | Republican nominee | R | safe | YES, 4★ |
+| 8 | Florida Governor | Byron Donalds | R | David Jolly | D | safe | YES, 4★ |
+| 9 | Georgia Governor | Burt Jones | R | Keisha Lance Bottoms | D | featured | YES, 3★ |
+| 10 | Hawaii Governor | Josh Green | D | Republican nominee | R | safe | YES, 4★ |
+| 11 | Idaho Governor | Brad Little | R | Democratic nominee | D | safe | YES, 4★ |
+| 12 | Illinois Governor | JB Pritzker | D | Republican nominee | R | safe | YES, 4★ |
+| 13 | Iowa Governor | Rob Sand | D | Randy Feenstra | R | contested | NO, 2★ |
+| 14 | Kansas Governor | Ty Masterson | R | Democratic nominee | D | contested | YES, 3★ |
+| 15 | Maine Governor | Troy Jackson | D | Bobby Charles | R | contested | YES, 2★ |
+| 16 | Maryland Governor | Wes Moore | D | Republican nominee | R | safe | YES, 5★ |
+| 17 | Massachusetts Governor | Maura Healey | D | Republican nominee | R | safe | YES, 4★ |
+| 18 | Michigan Governor | Jocelyn Benson | D | John James | R | contested | NO, 2★ |
+| 19 | Minnesota Governor | Tim Walz | D | Lisa Demuth | R | contested | YES, 3★ |
+| 20 | Nebraska Governor | Jim Pillen | R | Democratic nominee | D | safe | YES, 4★ |
+| 21 | Nevada Governor | Joe Lombardo | R | Aaron Ford | D | contested | YES, 3★ |
+| 22 | New Hampshire Governor | Kelly Ayotte | R | Democratic nominee | D | safe | YES, 4★ |
+| 23 | New Mexico Governor | Deb Haaland | D | Republican nominee | R | safe | YES, 4★ |
+| 24 | New York Governor | Kathy Hochul | D | Bruce Blakeman | R | safe | YES, 4★ |
+| 25 | Ohio Governor | Vivek Ramaswamy | R | Amy Acton | D | contested | YES, 3★ |
+| 26 | Oklahoma Governor | Gentner Drummond | R | Democratic nominee | D | safe | YES, 4★ |
+| 27 | Oregon Governor | Tina Kotek | D | Christine Drazan | R | contested | YES, 2★ |
+| 28 | Pennsylvania Governor | Josh Shapiro | D | Stacy Garrity | R | safe | YES, 5★ |
+| 29 | Rhode Island Governor | Dan McKee | D | Republican nominee | R | contested | YES, 2★ |
+| 30 | South Carolina Governor | Pamela Evette | R | Democratic nominee | D | safe | YES, 4★ |
+| 31 | South Dakota Governor | Larry Rhoden | R | Democratic nominee | D | safe | YES, 4★ |
+| 32 | Tennessee Governor | Marsha Blackburn | R | Democratic nominee | D | safe | YES, 4★ |
+| 33 | Texas Governor | Greg Abbott | R | Democratic nominee | D | safe | YES, 4★ |
+| 34 | Vermont Governor | Phil Scott | R | Democratic nominee | D | safe | YES, 4★ |
+| 35 | Wisconsin Governor | Tom Tiffany | R | Sara Rodriguez | D | contested | YES, 2★ |
+| 36 | Wyoming Governor | Chuck Gray | R | Democratic nominee | D | safe | YES, 4★ |

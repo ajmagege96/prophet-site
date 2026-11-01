@@ -13,6 +13,8 @@ sections 5–7 are the contracts your side has to honour.
 
 ## 1. What changed since the last drop
 
+**Midterms card alignment and the market list, Nov 1.** On cards (phone and desktop) the stars line sits at a fixed place above the buttons, so a closed card's stars and tag line up with the live card beside it. BUILD-SPEC §14 now lists all 74 markets (race, called leg, runner-up, parties, layer, the preview's call).
+
 **Midterms phone cards, Nov 1 (later).** The odds sit top right on phone cards, like desktop; the drop-down arrow is off the closed card (a tap opens it; the opened card keeps its arrow). Closed cards keep the live card's spacing: an empty row the buttons' height, so the tally lines up with its neighbours.
 
 **Midterms closed cards, Nov 1.** Pending, resolved and void cards drop the volume; the tag sits on the stars line. Cards are tighter (less padding and gap), on phones most of all.

@@ -1182,7 +1182,7 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
 .mt-ad { margin: 2px 0 0; gap: 6px; }
 .mt-ad .ad__btn { min-height: 34px; padding: 0 16px; font-size: 12px; }
 .mt-ad__ghost { height: 34px; visibility: hidden; }
-.mt-markets__cards .mt-card:not(.mt-card--open) .mt-ad { margin-top: auto; }   /* buttons and tally sit on one line across a row */
+.mt-markets__cards .mt-card:not(.mt-card--open) .mt-card__meta { margin-top: auto; min-height: 18px; }   /* stars, buttons and tally line up across a row, closed cards too */
 .mt-ad .thesis__split { font-size: 12px; }
 
 /* A row: race over pick, stars, live price, tag, Agree / Disagree, tally */
