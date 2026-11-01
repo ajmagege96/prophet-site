@@ -1286,7 +1286,7 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
       if (set[i].status === 'resolved') { resolved++; if (set[i].outcome === 'right') right++; }
     }
     var dash = '—';
-    return [['Called', called], ['Resolved', resolved ? resolved : dash], ['Correct', resolved ? right : dash],
+    return [['Called', called], ['Resolved', resolved ? resolved : dash], ['Right', resolved ? right : dash],
             ['Hit rate', resolved ? Math.round(right * 100 / resolved) + '%' : dash]];
   }
   function statsHTML(set) {
@@ -1371,8 +1371,8 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
   var VIEW_KEY = 'prophet.midterms.view';
   var set = 'all', view = 'cards', selId = '', openIds = {};
   try { view = localStorage.getItem(VIEW_KEY) === 'list' ? 'list' : 'cards'; } catch (e) {}
-  /* Top markets lead every set, full list, nothing collapsed. Placeholder order until the server's ranking lands:
-     featured, then contested by price closest to 50, then safe. */
+  /* Top markets lead every set, full list, nothing collapsed. The MVP order, from the race list's featured and layer
+     fields: featured, then contested by price closest to 50, then safe. No server ranking. */
   function ordered(g) {
     var all = g === 'all' ? races.slice() : races.filter(function (r) { return r.group === g; });
     var fe = all.filter(function (r) { return r.featured; });

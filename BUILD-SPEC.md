@@ -266,7 +266,7 @@ endpoint. `midterms-mock.js` stands in until then; `#preview=some` and
 |---|---|---|
 | Title row | "Midterms" left, a Senate / Governors map dropdown right | "Midterms" alone, level with the markets bar |
 | Map | One tile map, first | Both maps stacked under the stats |
-| Headline stats | One row under the map: Called · Resolved · Correct · Hit rate | Left column under the title, sticky |
+| Headline stats | One row under the map: Called · Resolved · Right · Hit rate | Left column under the title, sticky |
 | Markets bar | Sticky: set dropdown left, cards / list icon toggle right | Right column, sticky, level with the title |
 | Markets | Cards stacked, or rows (three short lines) | Cards in a grid, or rows (one line) |
 | Selected market | Tapping opens its thesis in place | Always one selected; its full card in a sticky pane beside the markets |
@@ -274,15 +274,15 @@ endpoint. `midterms-mock.js` stands in until then; `#preview=some` and
 The dropdown (no label) sets what shows: **All** (the default) · Balance of
 Power · Senate · Governors. The view toggle is two icons, a 2×2 grid of rounded
 filled squares (cards) and three lines (list), no words, remembered per viewer. Every set is the full list,
-nothing collapsed. The top markets lead each set; until the server's ranking
-lands the page orders featured, then contested by price closest to 50, then
-safe. A click anywhere on a card or row selects it. The selected market reads
+nothing collapsed. The top markets lead each set in the MVP order, read from
+the race list's featured and layer fields: featured, then contested by price
+closest to 50, then safe. No server ranking. A click anywhere on a card or row selects it. The selected market reads
 like the home's: brighter white outline, flashing green every 3s (0.9s build
 and release) on the card, the row and the pane card.
 
 **Stats.** Called = races with a call. Resolved = resolved right or wrong.
-Correct = resolved right. Hit rate = correct ÷ resolved, void excluded.
-Resolved, Correct and Hit rate read a dash until one race resolves. These four
+Right = resolved right. Hit rate = right ÷ resolved, void excluded.
+Resolved, Right and Hit rate read a dash until one race resolves. These four
 are the only stats on the page (no per-set stats). No five-star line. No money lines
 anywhere.
 

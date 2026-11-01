@@ -120,18 +120,21 @@ is the fallback).
     (right | wrong), outcome_line, taps_agree, taps_disagree, user_side.
   Joined on market_id + leg_id.
 - Stats (headline only, left column; no per-set stats): Called = races with a call; Resolved =
-  resolved right or wrong; Correct = resolved right; Hit rate = correct ÷ resolved,
+  resolved right or wrong; Right = resolved right; Hit rate = right ÷ resolved,
   void excluded, a dash until one resolves. No five-star line. No money
   lines anywhere.
 - Markets area: a sticky bar with a dropdown (All, the default · Balance of
   Power · Senate · Governors) and a cards / list icon toggle (remembered per
   viewer); a dropdown at every width. Under it the full set. Nothing
   collapsed; no safe-seats section.
-- **Needs logic: top-markets ordering.** The top markets lead every list (All,
-  Balance of Power, Senate, Governors); there is no separate Top markets view.
-  We need a ranking that orders each list, most interesting first, and the
-  server to send it (e.g. a rank per race). Until then the page orders
-  featured, then contested by price closest to 50, then safe.
+- Order: the top markets lead every list (All, Balance of Power, Senate,
+  Governors). The MVP order is final and needs no server ranking: featured,
+  then contested by price closest to 50, then safe, read from the race list's
+  featured and layer fields.
+- Balance of Power labels live in the race list: the called leg and runner-up
+  as display text (e.g. "Democrats Sweep" / "R Senate · D House").
+- The only server addition beyond the build spec: volume on the calls feed.
+- One word for a correct call: Right, on the tag and the stat.
 - Desktop: one market is always selected and its full card (thesis included)
   stands in a pane beside the markets. Phone: tapping a market opens its thesis
   in place.
@@ -146,8 +149,8 @@ is the fallback).
   state tag, one row (no "% at call"). No time remaining. Agree /
   Disagree with the tally. Opened, it adds a thesis box like the home's: the
   thesis, and a chevron dropping down Resolution: the settlement line,
-  the outcome line once resolved, the void line when void. Needs volume per
-  race in the calls feed.
+  the outcome line once resolved, the void line when void. Volume comes from the
+  calls feed (the one added field).
 - Row: race · pick · stars · market odds · tag · Agree / Disagree · tally. A
   click anywhere on a card or row selects it; the selected one has the home's
   white outline and green flash.
