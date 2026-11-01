@@ -87,9 +87,9 @@ Top to bottom:
    - Calls: five conviction stars (`{{market.conviction}}` filled, in the call's
      green or red, the rest faint in the same colour) · bar icon +
      `{{market.volume}}` · clock icon + `{{market.ends_in}}`.
-   - History: stars · volume · and at the bottom right the result tag
+   - History: stars, and at the bottom right the result tag
      `{{market.outcome_tag}}`: **right** (green), **wrong** (red), **void**
-     (gray), **pending** (purple). No time to close.
+     (gray), **pending** (purple). No time to close and no volume.
    - The stars hide only when the carousel root carries
      `data-show-conviction="false"` (`{{show_conviction}}`).
 
@@ -217,7 +217,8 @@ Descriptions in `TEMPLATE_VARS.md`; the generated table in `HANDOFF.md` §10.
   the empty line shows on an empty tab.
 - Every card: odds top-right, Buy YES / Buy NO in its colour, stars in that
   colour, no at-call stat, one meta line, no overflow at 390px. History cards
-  show the result tag bottom right and no time to close.
+  show the result tag bottom right, no time to close and no volume. No midterm
+  race appears on the home page, in Calls or History.
 - The marker reads Called / Revised / Changed with time on Calls, "Pending" or
   "Resolved {time}" on History, nothing on void.
 - Every card opens with the drop-down closed. Opening it shows the pays line on
@@ -237,30 +238,54 @@ Descriptions in `TEMPLATE_VARS.md`; the generated table in `HANDOFF.md` §10.
 - How it Works opens from the header and the menu every time; onboarding only on
   a first visit.
 - No "vote", "take", "credits" or "trades" anywhere in the hero.
-- Midterms: 74 races under All, each race once in its group, no collapsed section; both
-  views work, rows carry Agree / Disagree, the pane follows the selection; every race and
-  page state renders at 390px and 1400px with no overflow; no double negatives;
-  the map colours match the picks (a NO shows the runner-up's party); hit rate
-  excludes void and hides until a race resolves; no money line anywhere.
+- Midterms: 74 races under All (§14), each once in its group, nothing
+  collapsed; both views work; the pane follows the selection; 390px shows two
+  cards across with no overflow and no wrapped long names ("Darline Graham
+  Nordone", "Jonathan Kreiss-Tomkins"); no race anywhere shows NO, "Not" or a
+  double negative; every map tile matches the pick's party; hit rate hides
+  until a race resolves; no money line anywhere.
 
 ## 13. Midterms page
 
-`site/midterms.html`: 74 races (3 Balance of Power markets, 35 Senate seats, 36
-governors), one locked call each. Its own rules: no deck, no carousel; the home
-Calls and History tabs carry no midterm race. Every visible string is
-placeholder copy.
+`site/midterms.html`, "Midterms" first in the header nav. 74 races (3 Balance of
+Power markets, 35 Senate, 36 governors; §14), one locked call each. Its own page:
+no deck, no carousel, and no midterm race on the home page. Only Midterms page
+calls are scored. Every visible string except the race list is placeholder copy.
 
 **Data.** Two JSON arrays the server fills, inside
-`<script type="application/json">` tags: `{{midterms.races_json}}` (event id,
-leg id, market id, group, kind, state code, race name, called leg, party,
-runner-up, runner-up party, layer, featured) and `{{midterms.calls_json}}` (market
-id, leg id, side, stars, thesis, settlement line, volume, price at call, live
-price, state, pending reason, outcome, outcome line, tap counts, the viewer's
-side). `volume` is the one field added beyond the earlier spec.
-Joined on market id + leg id. The page computes every stat; there is no stats
-endpoint. `midterms-mock.js` stands in until then: it opens with a few races
-pending and resolved so the stats read with numbers; `#preview=live` shows every
-race live and `#preview=all` every race resolved.
+`<script type="application/json">` tags:
+
+- `{{midterms.races_json}}`, the race list: event_id (the race), leg_id (the
+  listed leg, the leader; Gamma's market id), runner_up_leg_id, group (balance |
+  senate | governors), kind (race | control | bop), state code, race name, leg
+  (listed leg display name), party, runner_up, runner_up_party, layer (featured
+  | contested | safe), featured. Balance of Power display labels live here.
+- `{{midterms.calls_json}}`, the calls feed: leg_id, side (yes | no, on the
+  listed leg), stars, thesis, settlement_line, volume, price_at_call (Tap
+  Confirmed only), live_price, state (live | pending | resolved), pending_reason
+  (closed | price | disputed), outcome (right | wrong), outcome_line,
+  taps_agree, taps_disagree, user_side.
+
+Joined on **leg_id**. `volume` is the only field beyond the earlier spec. The
+page computes every stat; there is no stats endpoint. `midterms-mock.js` holds
+the real race list with preview calls until then: it opens with a few races
+pending and resolved; `#preview=live` shows every race live, `#preview=all`
+every race resolved.
+
+**His pick.** One name, always read as Buy YES (the card shows no "Buy YES"
+label, never NO, never "Not"):
+
+| Call stored on the listed leg | Shows |
+|---|---|
+| YES | The listed leg (the leader) |
+| NO | The runner-up |
+
+Multi-candidate races (AK Senate, AK Gov, CA Gov, ID Senate, MI Gov, RI Gov) are
+top-two like the rest; every other leg is under 2%. Balance of Power picks one
+outcome ("Democrats Sweep" or "R Senate · D House"). The odds are the pick's own
+YES price: the runner-up leg's price on a NO (read from a calls-feed item for
+`runner_up_leg_id` when sent; otherwise 100 minus the listed leg). A voided race
+is removed from the page: there is no Void state, tag or tile on Midterms.
 
 **Layout.**
 
@@ -270,174 +295,178 @@ race live and `#preview=all` every race resolved.
 | Map | One tile map, first | Both maps stacked under the stats |
 | Headline stats | One row under the map: Called · Resolved · Right · Hit rate | Left column under the title, sticky |
 | Markets bar | Sticky: set dropdown left, cards / list icon toggle right | Right column, sticky, level with the title |
-| Markets | Cards two across (compact: race top left, odds top right, no arrow (a tap opens it), pick, stars · volume · tag, buttons, tally; the stars line, buttons and tally line up across a row; an opened card spans both columns), or rows (three lines: race · odds · chevron / pick · stars / tally left, buttons or tag right) | Cards in a grid, or rows (one line) |
-| Selected market | A drop-down chevron on every card and row; opened (or tapped), the market shows as the desktop pane's card in place, in cards or list | Always one selected; its full card in a sticky pane beside the markets |
+| Markets | Cards two across, or the list | Cards in a grid, or the list |
+| Selected market | Tap a card or row: it opens in place as the desktop pane's card, spanning both columns | Always one selected; its full card in a sticky pane beside the markets |
 
 The dropdown (no label) sets what shows: **All** (the default) · Balance of
-Power · Senate · Governors. The view toggle is two icons, a 2×2 grid of rounded
-filled squares (cards) and three lines (list), no words, remembered per viewer. Every set is the full list,
-nothing collapsed. The top markets lead each set in the MVP order, read from
-the race list's featured and layer fields: featured, then contested by price
-closest to 50, then safe. No server ranking. A click anywhere on a card or row selects it. The selected market reads
-like the home's: brighter white outline, flashing green every 3s (0.9s build
-and release) on the card, the row and the pane card.
+Power · Senate · Governors. The view toggle is two icons: a 2×2 grid of rounded
+filled squares (cards) and three lines (list), remembered per viewer. Every set
+is the full list, nothing collapsed. **Order** (final for MVP, no server
+ranking): featured, then contested by price closest to 50, then safe, read from
+the race list's featured and layer fields. A click anywhere on a card or row
+selects it; the selected market has the home's brighter white outline and green
+3s flash (0.9s build and release) on the card, the row and the pane card.
 
-**Stats.** Called = races with a call. Resolved = resolved right or wrong.
-Right = resolved right. Hit rate = right ÷ resolved, void excluded.
-Resolved, Right and Hit rate read a dash until one race resolves. These four
-are the only stats on the page (no per-set stats). No five-star line. No money lines
-anywhere.
+**Stats.** Left column only. Called = races with a call. Resolved = resolved
+right or wrong. Right = resolved right. Hit rate = right ÷ resolved. Resolved,
+Right and Hit rate read a dash until one race resolves. No per-set stats, no
+five-star line, no money lines.
 
-**Maps.** One square tile per state. A seat in play is filled with the party of
-his pick (D blue, R red, I off-white: the one palette exception, on this page);
-a NO takes the runner-up's party. Seats not up stay neutral. Void is a dashed
-outline. Resolved seats keep the colour and gain a small drawn check (green) or X (red). A tile opens
-its race in its group.
+**Maps.** One square tile per state. Every called seat is filled with his pick's
+party (D blue, R red, I off-white: the one palette exception, on this page); no
+neutral or hatched tile for a called race; states with no race stay neutral.
+Resolved seats keep the colour and gain a small drawn check (green, right) or X
+(red, wrong). A tile opens its race in its group.
 
-**His pick, never a double negative.**
+**Card.** Race name top left; the odds top right ("57% YES", the pick's own
+price; settled 100 / 0 once resolved); his pick with party chip; the meta line:
+stars · bar-chart icon + volume, and the state tag (Pending · Right · Wrong) at
+the right of that line. No "% at call", no time remaining. Live: Agree /
+Disagree, the tally under them. Pending and resolved: no volume (stars and the
+tag), no buttons, but the live card's spacing: an empty row the buttons' height
+holds the tally where it would sit, so the stars line and tally line up with the
+card beside it.
 
-| Call | Shows |
-|---|---|
-| YES | The called candidate or party |
-| NO in any candidate race | The other candidate: the runner-up (never "Not" + a name) |
-| NO on Balance of Power | The runner-up outcome ("R Senate · D House") |
-| NO on Senate or House control | The other party |
+- Phone: two compact cards across; a long name steps its size down to stay on
+  one line; no arrow on the card (a tap opens it full width, with an arrow to
+  fold it).
+- Opened (phone) or in the desktop pane, the card adds a thesis box as on the
+  home page: THESIS and the thesis, one chevron dropping down RESOLUTION under a
+  hairline, closed by default (the settlement line, or his outcome line once
+  resolved).
 
-**Card**: race and group top left; the market odds top right as on the home
-cards, "57% YES" for the pick the card names (settled 100 / 0 once resolved);
-his pick with party chip; the meta line: stars · bar-chart icon + volume (as the
-home cards), the state tag at the right of the same line (in the pane too). No
-"% at call", no time remaining, no chevron on a desktop card. Agree / Disagree
-and the tally under it on a live race.
+**Row (list).**
 
-Pending, resolved and void cards drop the volume (stars and the tag on one line)
-and the buttons, but keep the live card's spacing: an empty row the buttons'
-height holds the tally where it would sit, so the stars line and the tally line
-up with the card beside it.
-
-Opened on a phone, or in the desktop pane, the card adds a thesis box as on the
-home page: THESIS and the thesis, one chevron dropping down RESOLUTION under a
-hairline, closed by default (the settlement line; the outcome line once
-resolved; the void line when void).
-
-**Row**: race over his pick with chip · stars · market odds "57% YES" · Agree /
-Disagree on a live race, or the state tag (Pending / Right / Wrong / Void) in
-that same column once closed · tally; one line on desktop. On a phone, three lines with
-room between them: race · odds · drop-down chevron / pick · stars / tally on
-the left, Agree and Disagree (or the tag) on the right. A click anywhere on it
-selects it (desktop: the pane); below 1024px it opens the pane's card in place.
+- Desktop, one line. Left: the market title (race over his pick with chip), then
+  right beside it in each row the stars and the odds. Right edge: the tally
+  ("77% · 43 taps"), and beside it Agree / Disagree, or the Pending / Right /
+  Wrong tag in their place once closed.
+- Phone, three lines, no arrow: race · odds / pick with Agree and Disagree (or
+  the tag) on the right / stars · tally · volume (volume on live races).
+- Under All the row names the full race ("Georgia Senate").
 
 **States.**
 
-| State | Tag | Taps | Price | Opened card |
+| State | Tag | Taps | Odds | Opened card |
 |---|---|---|---|---|
-| Live | none | open | live | thesis, settlement line |
-| Pending, closed | Pending | no buttons | live | thesis, settlement line |
-| Pending, price at 99 / 1 | Pending | no buttons | live | thesis, settlement line |
-| Pending, disputed | Pending (no disputed tag) | no buttons | live | thesis, settlement line |
-| Resolved right | Right | no buttons | settled 100 / 0 | thesis, outcome line |
-| Resolved wrong | Wrong | no buttons | settled 100 / 0 | thesis, outcome line |
-| Void | Void | no buttons | last price | thesis, void line; out of every count |
+| Live | none | Agree / Disagree | live | thesis, settlement line |
+| Pending (closed, 99 / 1 or disputed) | Pending | none, tally only | live | thesis, settlement line |
+| Resolved right | Right | none, tally only | settled 100 / 0 | thesis, outcome line |
+| Resolved wrong | Wrong | none, tally only | settled 100 / 0 | thesis, outcome line |
+| Voided | — | — | — | removed from the page |
 
-Pending races stay in their group. Taps as built: one per call, final, the
-already notice, Tap Confirmed (its {label} is his pick), sign-in when signed
-out. Pending, resolved and void races show no buttons, only the tally.
+Taps as built: one per call, final, the already notice, Tap Confirmed (its
+{label} is his pick, {price} the pick's price at the call), sign-in when signed
+out. Pending races stay in their group.
 
 ## 14. The 74 markets
 
-Every market the Midterms page lists, as the race list sends it. Names in the
-called-leg and runner-up columns are the preview's: real leaders where known
-(Maine Senate Troy Jackson, Michigan Senate Abdul El-Sayed, Ohio Senate Sherrod
-Brown, Nebraska Senate Pete Ricketts); the rest are stand-ins for layout and
-come from the real race list. "His call" is the preview's call (side and
-stars); the live calls come from the calls feed. Layer: featured, contested or
-safe, which sets the order inside every list.
+Every market the Midterms page lists, from "The Prophet — Midterms Race List —
+2026-11-01" (leaders re-checked against Gamma on November 1, ~14:10 ET; no
+leader changed since October 31). Leaders are refreshed just before the drop
+run; if a leader changes, the listed leg and runner-up leg swap for that race.
+Parties marked * are set by hand from the candidate; confirm before the drop.
+Layer: featured, contested (listed leg below 95 on October 31) or safe (95 or
+above); set once and not moved. Price is the listed leg's YES price on November 1.
+
+| Group | Races | Featured | Contested | Safe |
+|---|---|---|---|---|
+| Balance of Power | 3 | 3 | 0 | 0 |
+| Senate | 35 | 4 | 12 | 19 |
+| Governors | 36 | 3 | 16 | 17 |
+| Total | 74 | 10 | 28 | 36 |
+
+Featured ten: Balance of Power, Senate control, House control, Kansas Senate,
+Iowa Senate, Texas Senate, Maine Senate, Texas Governor, Florida Governor,
+Georgia Governor.
 
 **Balance of Power (3)**
 
-| # | Race | Called leg | Party | Runner-up | Party | Layer | His call |
-|---|---|---|---|---|---|---|---|
-| 1 | Balance of Power | Democrats Sweep | D | R Senate · D House | R | featured | NO, 3★ |
-| 2 | Senate control | Republicans | R | Democrats | D | featured | YES, 5★ |
-| 3 | House control | Republicans | R | Democrats | D | featured | NO, 4★ |
+| # | Race | Event id | Leg id | Listed leg | Party | Runner-up leg id | Runner-up | Party | Price | Layer |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | Balance of Power | 32228 | 562828 | Democrats Sweep | D | 562830 | R Senate · D House | — | 70.5 | Featured |
+| 2 | Senate control | 32224 | 562793 | Democratic Party | D | 562794 | Republican Party | R | 71.5 | Featured |
+| 3 | House control | 32225 | 562802 | Democratic Party | D | 562803 | Republican Party | R | 94.5 | Featured |
 
 **Senate (35)**
 
-| # | Race | Called leg | Party | Runner-up | Party | Layer | His call |
-|---|---|---|---|---|---|---|---|
-| 1 | Alabama Senate | Steve Marshall | R | Democratic nominee | D | safe | YES, 4★ |
-| 2 | Alaska Senate | Dan Sullivan | R | Mary Peltola | D | contested | NO, 3★ |
-| 3 | Arkansas Senate | Tom Cotton | R | Democratic nominee | D | safe | YES, 5★ |
-| 4 | Colorado Senate | John Hickenlooper | D | Republican nominee | R | safe | YES, 4★ |
-| 5 | Delaware Senate | Chris Coons | D | Republican nominee | R | safe | YES, 5★ |
-| 6 | Florida Senate | Ashley Moody | R | Josh Weil | D | contested | YES, 4★ |
-| 7 | Georgia Senate | Jon Ossoff | D | Mike Collins | R | featured | YES, 3★ |
-| 8 | Idaho Senate | Jim Risch | R | Democratic nominee | D | safe | YES, 5★ |
-| 9 | Illinois Senate | Juliana Stratton | D | Don Tracy | R | safe | YES, 4★ |
-| 10 | Iowa Senate | Ashley Hinson | R | Josh Turek | D | contested | YES, 3★ |
-| 11 | Kansas Senate | Roger Marshall | R | Democratic nominee | D | safe | YES, 4★ |
-| 12 | Kentucky Senate | Andy Barr | R | Amy McGrath | D | safe | YES, 4★ |
-| 13 | Louisiana Senate | Bill Cassidy | R | Democratic nominee | D | safe | YES, 4★ |
-| 14 | Maine Senate | Troy Jackson | D | Susan Collins | R | featured | YES, 3★ |
-| 15 | Massachusetts Senate | Ed Markey | D | Republican nominee | R | safe | YES, 4★ |
-| 16 | Michigan Senate | Abdul El-Sayed | D | Mike Rogers | R | featured | YES, 2★ |
-| 17 | Minnesota Senate | Peggy Flanagan | D | Royce White | R | contested | YES, 3★ |
-| 18 | Mississippi Senate | Cindy Hyde-Smith | R | Democratic nominee | D | safe | YES, 4★ |
-| 19 | Montana Senate | Steve Daines | R | Democratic nominee | D | safe | YES, 4★ |
-| 20 | Nebraska Senate | Pete Ricketts | R | Dan Osborn | I | contested | NO, 2★ |
-| 21 | New Hampshire Senate | Chris Pappas | D | John E. Sununu | R | contested | YES, 3★ |
-| 22 | New Jersey Senate | Cory Booker | D | Republican nominee | R | safe | YES, 5★ |
-| 23 | New Mexico Senate | Ben Ray Luján | D | Republican nominee | R | safe | YES, 4★ |
-| 24 | North Carolina Senate | Roy Cooper | D | Michael Whatley | R | featured | YES, 4★ |
-| 25 | Ohio Senate | Sherrod Brown | D | Jon Husted | R | featured | NO, 3★ |
-| 26 | Oklahoma Senate | Markwayne Mullin | R | Democratic nominee | D | safe | YES, 4★ |
-| 27 | Oregon Senate | Jeff Merkley | D | Republican nominee | R | safe | YES, 4★ |
-| 28 | Rhode Island Senate | Jack Reed | D | Republican nominee | R | safe | YES, 4★ |
-| 29 | South Carolina Senate | Lindsey Graham | R | Democratic nominee | D | safe | YES, 4★ |
-| 30 | South Dakota Senate | Mike Rounds | R | Democratic nominee | D | safe | YES, 4★ |
-| 31 | Tennessee Senate | Bill Hagerty | R | Democratic nominee | D | safe | YES, 4★ |
-| 32 | Texas Senate | Ken Paxton | R | James Talarico | D | contested | YES, 2★ |
-| 33 | Virginia Senate | Mark Warner | D | Republican nominee | R | safe | YES, 4★ |
-| 34 | West Virginia Senate | Shelley Moore Capito | R | Democratic nominee | D | safe | YES, 5★ |
-| 35 | Wyoming Senate | Harriet Hageman | R | Democratic nominee | D | safe | YES, 4★ |
+| # | State | Event id | Leg id | Listed leg | Party | Runner-up leg id | Runner-up | Party | Price | Layer |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | Alabama | 57637 | 630628 | Barry Moore | R | 630627 | Everett Wess | D | 98.5 | Safe |
+| 2 | Alaska | 59233 | 634976 | Mary Peltola | D* | 634974 | Dan Sullivan | R* | 74.5 | Contested |
+| 3 | Arkansas | 57639 | 630654 | Tom Cotton | R | 630653 | Hallie Shoffner | D | 96.8 | Safe |
+| 4 | Colorado | 57640 | 630666 | John Hickenlooper | D | 630667 | Mark Baisley | R | 99.6 | Safe |
+| 5 | Delaware | 57641 | 630679 | Democrat | D | 630680 | Republican | R | 98.9 | Safe |
+| 6 | Florida | 57681 | 631045 | Ashley Moody | R | 631044 | Angie Nixon | D | 90.5 | Contested |
+| 7 | Georgia | 57642 | 630692 | Jon Ossoff | D | 630693 | Mike Collins | R | 97.8 | Safe |
+| 8 | Idaho | 57643 | 630706 | Jim Risch | R | 630707 | Todd Achilles | I | 96.7 | Safe |
+| 9 | Illinois | 57646 | 630720 | Juliana Stratton | D | 630721 | Don Tracy | R | 99.3 | Safe |
+| 10 | Iowa | 57647 | 630734 | Ashley Hinson | R | 630733 | Josh Turek | D | 57.5 | Featured |
+| 11 | Kansas | 57648 | 630746 | Adam Hamilton | D | 630747 | Roger Marshall | R | 52.5 | Featured |
+| 12 | Kentucky | 57649 | 630760 | Andy Barr | R | 630759 | Charles Booker | D | 97.8 | Safe |
+| 13 | Louisiana | 59203 | 634879 | Julia Letlow | R | 634878 | Jamie Davis | D | 91.5 | Contested |
+| 14 | Maine | 57650 | 630772 | Troy Jackson | D | 630773 | Susan Collins | R | 69.5 | Featured |
+| 15 | Massachusetts | 57655 | 630790 | Ed Markey | D | 630791 | John Deaton | R | 99.5 | Safe |
+| 16 | Michigan | 57658 | 630805 | Abdul El-Sayed | D | 630806 | Mike Rogers | R | 72.5 | Contested |
+| 17 | Minnesota | 57659 | 630818 | Peggy Flanagan | D | 630819 | Michele Tafoya | R | 93.5 | Contested |
+| 18 | Mississippi | 57678 | 631018 | Cindy Hyde-Smith | R | 631017 | Scott Colom | D | 88.5 | Contested |
+| 19 | Montana | 57660 | 630832 | Kurt Alme | R | 630833 | Independent | I | 90.5 | Contested |
+| 20 | Nebraska | 59204 | 634892 | Pete Ricketts | R | 634893 | Independent | I | 74.5 | Contested |
+| 21 | New Hampshire | 57661 | 630844 | Chris Pappas | D | 630845 | John E. Sununu | R | 94.5 | Contested |
+| 22 | New Jersey | 57662 | 630857 | Cory Booker | D | 630858 | Justin Murphy | R | 99.3 | Safe |
+| 23 | New Mexico | 57663 | 630870 | Ben Ray Luján | D | 630871 | Larry Marker | R | 99.5 | Safe |
+| 24 | North Carolina | 57664 | 630883 | Roy Cooper | D | 630884 | Michael Whatley | R | 97.7 | Safe |
+| 25 | Ohio | 57682 | 631057 | Sherrod Brown | D | 631058 | Jon Husted | R | 73.5 | Contested |
+| 26 | Oklahoma | 57679 | 631031 | Kevin Hern | R | 631030 | Jasmine Thomas | D | 99.4 | Safe |
+| 27 | Oregon | 57667 | 630898 | Jeff Merkley | D | 630899 | David Brock Smith | R | 98.9 | Safe |
+| 28 | Rhode Island | 57668 | 630911 | Jack Reed | D | 630912 | Raymond McKay | R | 99.1 | Safe |
+| 29 | South Carolina | 57669 | 630925 | Darline Graham Nordone | R | 630924 | Annie Andrews | D | 74.5 | Contested |
+| 30 | South Dakota | 57670 | 630938 | Mike Rounds | R | 630939 | Brian Bengs | I | 94.5 | Contested |
+| 31 | Tennessee | 57671 | 630951 | Bill Hagerty | R | 630950 | Marquita Bradshaw | D | 98.3 | Safe |
+| 32 | Texas | 57672 | 630963 | James Talarico | D | 630964 | Ken Paxton | R | 71.5 | Featured |
+| 33 | Virginia | 57673 | 630976 | Mark Warner | D | 630977 | Bert Mizusawa | R | 99.1 | Safe |
+| 34 | West Virginia | 57674 | 630990 | Shelley Moore Capito | R | 630989 | Rachel Fetty Anderson | D | 98.5 | Safe |
+| 35 | Wyoming | 57675 | 631003 | Harriet Hageman | R | 631002 | James W. Byrd | D | 99.1 | Safe |
 
 **Governors (36)**
 
-| # | Race | Called leg | Party | Runner-up | Party | Layer | His call |
-|---|---|---|---|---|---|---|---|
-| 1 | Alabama Governor | Tommy Tuberville | R | Democratic nominee | D | safe | YES, 4★ |
-| 2 | Alaska Governor | Nancy Dahlstrom | R | Democratic nominee | D | safe | YES, 3★ |
-| 3 | Arizona Governor | Katie Hobbs | D | Andy Biggs | R | featured | YES, 3★ |
-| 4 | Arkansas Governor | Sarah Huckabee Sanders | R | Democratic nominee | D | safe | YES, 4★ |
-| 5 | California Governor | Katie Porter | D | Chad Bianco | R | contested | YES, 2★ |
-| 6 | Colorado Governor | Michael Bennet | D | Republican nominee | R | safe | YES, 4★ |
-| 7 | Connecticut Governor | Ned Lamont | D | Republican nominee | R | safe | YES, 4★ |
-| 8 | Florida Governor | Byron Donalds | R | David Jolly | D | safe | YES, 4★ |
-| 9 | Georgia Governor | Burt Jones | R | Keisha Lance Bottoms | D | featured | YES, 3★ |
-| 10 | Hawaii Governor | Josh Green | D | Republican nominee | R | safe | YES, 4★ |
-| 11 | Idaho Governor | Brad Little | R | Democratic nominee | D | safe | YES, 4★ |
-| 12 | Illinois Governor | JB Pritzker | D | Republican nominee | R | safe | YES, 4★ |
-| 13 | Iowa Governor | Rob Sand | D | Randy Feenstra | R | contested | NO, 2★ |
-| 14 | Kansas Governor | Ty Masterson | R | Democratic nominee | D | contested | YES, 3★ |
-| 15 | Maine Governor | Troy Jackson | D | Bobby Charles | R | contested | YES, 2★ |
-| 16 | Maryland Governor | Wes Moore | D | Republican nominee | R | safe | YES, 5★ |
-| 17 | Massachusetts Governor | Maura Healey | D | Republican nominee | R | safe | YES, 4★ |
-| 18 | Michigan Governor | Jocelyn Benson | D | John James | R | contested | NO, 2★ |
-| 19 | Minnesota Governor | Tim Walz | D | Lisa Demuth | R | contested | YES, 3★ |
-| 20 | Nebraska Governor | Jim Pillen | R | Democratic nominee | D | safe | YES, 4★ |
-| 21 | Nevada Governor | Joe Lombardo | R | Aaron Ford | D | contested | YES, 3★ |
-| 22 | New Hampshire Governor | Kelly Ayotte | R | Democratic nominee | D | safe | YES, 4★ |
-| 23 | New Mexico Governor | Deb Haaland | D | Republican nominee | R | safe | YES, 4★ |
-| 24 | New York Governor | Kathy Hochul | D | Bruce Blakeman | R | safe | YES, 4★ |
-| 25 | Ohio Governor | Vivek Ramaswamy | R | Amy Acton | D | contested | YES, 3★ |
-| 26 | Oklahoma Governor | Gentner Drummond | R | Democratic nominee | D | safe | YES, 4★ |
-| 27 | Oregon Governor | Tina Kotek | D | Christine Drazan | R | contested | YES, 2★ |
-| 28 | Pennsylvania Governor | Josh Shapiro | D | Stacy Garrity | R | safe | YES, 5★ |
-| 29 | Rhode Island Governor | Dan McKee | D | Republican nominee | R | contested | YES, 2★ |
-| 30 | South Carolina Governor | Pamela Evette | R | Democratic nominee | D | safe | YES, 4★ |
-| 31 | South Dakota Governor | Larry Rhoden | R | Democratic nominee | D | safe | YES, 4★ |
-| 32 | Tennessee Governor | Marsha Blackburn | R | Democratic nominee | D | safe | YES, 4★ |
-| 33 | Texas Governor | Greg Abbott | R | Democratic nominee | D | safe | YES, 4★ |
-| 34 | Vermont Governor | Phil Scott | R | Democratic nominee | D | safe | YES, 4★ |
-| 35 | Wisconsin Governor | Tom Tiffany | R | Sara Rodriguez | D | contested | YES, 2★ |
-| 36 | Wyoming Governor | Chuck Gray | R | Democratic nominee | D | safe | YES, 4★ |
+| # | State | Event id | Leg id | Listed leg | Party | Runner-up leg id | Runner-up | Party | Price | Layer |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | Alabama | 57154 | 629271 | Tommy Tuberville | R | 629270 | Doug Jones | D | 94.9 | Contested |
+| 2 | Alaska | 59234 | 635016 | Jonathan Kreiss-Tomkins | D* | 635012 | Bernadette Wilson | R* | 88.5 | Contested |
+| 3 | Arizona | 57141 | 629183 | Katie Hobbs | D | 629184 | Andy Biggs | R | 92.5 | Contested |
+| 4 | Arkansas | 57155 | 629284 | Sarah Huckabee Sanders | R | 629283 | Fredrick Love | D | 97.2 | Safe |
+| 5 | California | 57096 | 628941 | Xavier Becerra | D* | 628940 | Steve Hilton | R* | 98.9 | Safe |
+| 6 | Colorado | 57156 | 629296 | Phil Weiser | D | 629297 | Victor Marx | R | 97 | Safe |
+| 7 | Connecticut | 57159 | 629311 | Ned Lamont | D | 629312 | Ryan Fazio | R | 97.7 | Safe |
+| 8 | Florida | 57160 | 629325 | Byron Donalds | R | 629324 | David Jolly | D | 64.5 | Featured |
+| 9 | Georgia | 57161 | 629337 | Keisha Lance Bottoms | D | 629338 | Rick Jackson | R | 70.5 | Featured |
+| 10 | Hawaii | 57162 | 629350 | Josh Green | D | 629351 | Gary Cordery | R | 99.3 | Safe |
+| 11 | Idaho | 57163 | 629364 | Brad Little | R | 629363 | Terri Pickens | D | 99.3 | Safe |
+| 12 | Illinois | 57164 | 629376 | JB Pritzker | D | 629377 | Darren Bailey | R | 98.9 | Safe |
+| 13 | Iowa | 57169 | 629397 | Rob Sand | D | 629398 | Zach Lahn | R | 86 | Contested |
+| 14 | Kansas | 57172 | 629413 | Ty Masterson | R | 629412 | Cindy Holscher | D | 74 | Contested |
+| 15 | Maine | 57173 | 629425 | Hannah Pingree | D | 629426 | Robert Charles | R | 96.8 | Safe |
+| 16 | Maryland | 57174 | 629438 | Wes Moore | D | 629439 | Dan Cox | R | 99.4 | Safe |
+| 17 | Massachusetts | 57175 | 629451 | Maura Healey | D | 629452 | Michael Minogue | R | 98.7 | Safe |
+| 18 | Michigan | 57176 | 629464 | Jocelyn Benson | D | 629465 | John James | R | 93.7 | Contested |
+| 19 | Minnesota | 57177 | 629477 | Amy Klobuchar | D | 629478 | Lisa Demuth | R | 98.2 | Safe |
+| 20 | Nebraska | 57178 | 629491 | Jim Pillen | R | 629490 | Lynne Walz | D | 91.5 | Contested |
+| 21 | Nevada | 57181 | 629505 | Aaron Ford | D | 629506 | Joe Lombardo | R | 78.5 | Contested |
+| 22 | New Hampshire | 57182 | 629519 | Kelly Ayotte | R | 629518 | Cinde Warmington | D | 92 | Contested |
+| 23 | New Mexico | 57183 | 629531 | Deb Haaland | D | 629532 | Gregg Hull | R | 95.9 | Safe |
+| 24 | New York | 57184 | 629544 | Kathy Hochul | D | 629545 | Bruce Blakeman | R | 97.8 | Safe |
+| 25 | Ohio | 57185 | 629557 | Amy Acton | D | 629558 | Vivek Ramaswamy | R | 80.5 | Contested |
+| 26 | Oklahoma | 57186 | 629571 | Mike Mazzei | R | 629570 | Cyndi Munson | D | 92 | Contested |
+| 27 | Oregon | 57187 | 629583 | Tina Kotek | D | 629584 | Christine Drazan | R | 85 | Contested |
+| 28 | Pennsylvania | 57206 | 629614 | Josh Shapiro | D | 629615 | Stacy Garrity | R | 98.4 | Safe |
+| 29 | Rhode Island | 57207 | 629627 | Helena Foulkes | D | 629629 | Independent | I | 97 | Safe |
+| 30 | South Carolina | 57208 | 629641 | Alan Wilson | R | 629640 | Jermaine Johnson | D | 94.9 | Contested |
+| 31 | South Dakota | 57209 | 629654 | Larry Rhoden | R | 629653 | Dan Ahlers | D | 97.2 | Safe |
+| 32 | Tennessee | 57210 | 629667 | Marsha Blackburn | R | 629666 | Jerri Green | D | 93.6 | Contested |
+| 33 | Texas | 57222 | 629691 | Greg Abbott | R | 629690 | Gina Hinojosa | D | 67 | Featured |
+| 34 | Vermont | 57225 | 629708 | Phil Scott | R | 629707 | Amanda Janoo | D | 77.5 | Contested |
+| 35 | Wisconsin | 57226 | 629720 | David Crowley | D | 629721 | Tom Tiffany | R | 85.5 | Contested |
+| 36 | Wyoming | 57227 | 629734 | Eric Barlow | R | 629733 | Kenneth Casner | D | 99.2 | Safe |
+
+Out of scope: lieutenant governor races, Guam, county markets, margins, turnout, seat counts, combos, House districts.

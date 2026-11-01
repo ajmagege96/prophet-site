@@ -19,8 +19,9 @@ and Oct 26 PM logic, with the founder's UI calls on top.
 - The call, big: **Buy YES** (green) or **Buy NO** (red).
 - Meta row on Calls: five conviction stars (1–5 filled, in the call's green or
   red), volume, time to close. The odds at the call are not shown.
-- Meta row on History: stars, volume, and at the bottom right the result tag:
-  right (green), wrong (red), void (gray), pending (purple). No time to close.
+- Meta row on History: stars, and at the bottom right the result tag: right
+  (green), wrong (red), void (gray), pending (purple). No time to close, no
+  volume. No midterm race in Calls or History.
 - The selected card has a brighter outline and flashes green every 3s with the
   thesis block.
 
@@ -105,64 +106,45 @@ scoring_line; notice.already_agree, notice.already_disagree (the copy above
 is the fallback).
 
 ## Midterms page (midterms.html, "Midterms" in the header)
-- 74 races: 3 Balance of Power markets (Balance of Power, Senate control, House
-  control), 35 Senate seats, 36 governors. One locked call each. No deck, no
-  carousel; the home tabs carry no midterm race.
-- The page reads two feeds and computes every stat itself (no stats endpoint):
-  race list per race: event_id, leg_id, market_id, group (balance | senate |
-    governors), kind (race | control | bop), state code, race name, called leg,
-    party (D | R | I), runner-up, runner-up party, layer (featured | contested |
-    safe), featured flag;
-  calls (live + History endpoints, listed set): market_id, leg_id, side,
-    stars, thesis, settlement_line, volume, price_at_call and live_price (the called
-    leg's YES price; the page flips it for a NO), state (live | pending |
-    resolved | void), pending_reason (closed | price | disputed; all read "Pending"), outcome
-    (right | wrong), outcome_line, taps_agree, taps_disagree, user_side.
-  Joined on market_id + leg_id.
-- Stats (headline only, left column; no per-set stats): Called = races with a call; Resolved =
-  resolved right or wrong; Right = resolved right; Hit rate = right ÷ resolved,
-  void excluded, a dash until one resolves. No five-star line. No money
-  lines anywhere.
-- Markets area: a sticky bar with a dropdown (All, the default · Balance of
-  Power · Senate · Governors) and a cards / list icon toggle (remembered per
-  viewer); a dropdown at every width. Under it the full set. Nothing
-  collapsed; no safe-seats section.
-- Order: the top markets lead every list (All, Balance of Power, Senate,
-  Governors). The MVP order is final and needs no server ranking: featured,
-  then contested by price closest to 50, then safe, read from the race list's
-  featured and layer fields.
-- Balance of Power labels live in the race list: the called leg and runner-up
-  as display text (e.g. "Democrats Sweep" / "R Senate · D House").
-- The only server addition beyond the build spec: volume on the calls feed.
-- One word for a correct call: Right, on the tag and the stat.
-- Desktop: one market is always selected and its full card (thesis included)
-  stands in a pane beside the markets. Phone (below 1024px): every card and row
-  has a drop-down; opened, it shows the desktop pane's card in place (thesis
-  box with its Resolution drop-down included), in cards or list view. Phone
-  rows: race · odds / pick · stars / tally left, Agree and Disagree right.
-  Phone cards view: two compact cards across, like the desktop card.
-- Maps: a seat takes the party of his pick (a NO takes the runner-up's);
-  seats not up stay neutral; void dashed; resolved seats get a green check / red X.
-- His pick, never a double negative: YES → the called candidate or party; NO in
-  any candidate race → the other candidate, the runner-up (never "Not" + a
-  name); NO on Balance of Power → the runner-up
-  outcome ("R Senate · D House"); NO on Senate / House control → the other party.
-- Card: race and group; market odds top right, "57% YES" for the pick the card
-  names (settled 100 / 0 once resolved); pick with party chip; stars · volume ·
-  state tag, one row (no "% at call"); closed races drop the volume (stars ·
-  tag). No time remaining. Agree /
-  Disagree with the tally. Opened, it adds a thesis box like the home's: the
-  thesis, and a chevron dropping down Resolution: the settlement line,
-  the outcome line once resolved, the void line when void. Volume comes from the
-  calls feed (the one added field).
-- Row: race · pick · stars · market odds · Agree / Disagree (live) or the
-  state tag in that same column (closed) · tally. A
-  click anywhere on a card or row selects it; the selected one has the home's
-  white outline and green flash.
-- Tags: Pending · Right · Wrong · Void (no disputed tag). Taps: one per call,
-  final, the already notice, Tap Confirmed; no buttons from pending on (pending, resolved and void show only the tally). Pending
-  races stay in their group.
-- Every visible string on the page is placeholder copy for Awetu.
+- 74 races (3 Balance of Power, 35 Senate, 36 Governors), one locked call each,
+  from "The Prophet — Midterms Race List — 2026-11-01" (full list in BUILD-SPEC
+  §14). Old midterm calls are deleted with their taps; no midterm race on the
+  home page. Only Midterms page calls are scored.
+- Feeds, joined on leg_id (Gamma's market id; event_id is the race):
+  race list: event_id, leg_id, runner_up_leg_id, group, kind, state code, race
+    name, leg (display label), party, runner_up, runner_up_party, layer,
+    featured. Balance of Power labels live here.
+  calls: leg_id, side (on the listed leg), stars, thesis, settlement_line,
+    volume, price_at_call (Tap Confirmed only), live_price, state (live |
+    pending | resolved), pending_reason, outcome, outcome_line, taps_agree,
+    taps_disagree, user_side.
+  Volume is the only server field beyond the build spec.
+- His pick: one name, always read as Buy YES (no label, never NO, never "Not"):
+  the listed leg on YES, the runner-up on NO. Multi-candidate races are
+  top-two. Odds = the pick's own YES price (runner-up leg's on a NO; 100 minus
+  the listed leg until the feed carries it).
+- Voided races are removed from the page. No Void state, tag or tile.
+- Order (final for MVP, no ranking): featured, then contested by price closest
+  to 50, then safe.
+- Stats, left column only: Called · Resolved · Right · Hit rate (right ÷
+  resolved; dashes until one resolves). No per-set stats, no five-star line, no
+  money lines.
+- Markets bar: dropdown All (default) · Balance of Power · Senate · Governors;
+  cards / list icon toggle (remembered). Full lists, nothing collapsed.
+- Card: race, odds top right, pick + party chip, stars · volume · tag; Agree /
+  Disagree + tally when live. Pending / resolved: no volume, no buttons, same
+  spacing (tally where it would sit). Opened (phone) or in the desktop pane:
+  plus a thesis box with a Resolution drop-down.
+- Phone cards: two across; long names shrink to one line; a tap opens the full
+  card in place.
+- Rows, desktop: market title, then its stars and odds right beside it; at the
+  right edge the tally, with Agree / Disagree (or the tag) beside it. Phone: race
+  · odds / pick with buttons (or tag) right / stars · tally · volume.
+- Selection: a click anywhere selects; white outline + green 3s flash.
+- Maps: every called seat in the pick's party; resolved seats get a green check
+  or red X.
+- Tags: Pending · Right · Wrong.
+- Every visible string except the race list is placeholder copy.
 
 ## Not built (founder's call)
 "Against the market" tag; "Changed his mind on {date}" note; History "called
