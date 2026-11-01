@@ -1158,6 +1158,12 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
 .mt-markets { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }
 .mt-markets__cards { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; margin-bottom: 12px; }
 .mt-markets__list { display: flex; flex-direction: column; }
+/* tablet and desktop: the rows share one set of columns, so the market column is as wide as the longest name and the
+   stars and odds sit right beside it, lined up down the list */
+@media (min-width: 768px) {
+  .mt-markets__list { display: grid; grid-template-columns: max-content 62px 66px minmax(0, 1fr) auto 84px; column-gap: 8px; }
+  .mt-markets__list > .mt-row { grid-column: 1 / -1; grid-template-columns: subgrid; }
+}
 .mt-card { padding: 12px 14px; display: flex; flex-direction: column; gap: 7px; min-width: 0; cursor: pointer; transition: border-color 0.9s ease-in-out, box-shadow 0.9s ease-in-out; }
 .mt-card--full { cursor: default; }
 .mt-card__top { display: flex; align-items: flex-start; gap: 8px; }
