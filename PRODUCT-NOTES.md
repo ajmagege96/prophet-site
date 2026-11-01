@@ -136,8 +136,10 @@ is the fallback).
 - The only server addition beyond the build spec: volume on the calls feed.
 - One word for a correct call: Right, on the tag and the stat.
 - Desktop: one market is always selected and its full card (thesis included)
-  stands in a pane beside the markets. Phone: tapping a market opens its thesis
-  in place.
+  stands in a pane beside the markets. Phone (below 1024px): every card and row
+  has a drop-down; opened, it shows the desktop pane's card in place (thesis
+  box with its Resolution drop-down included), in cards or list view. Phone
+  rows: race · odds / pick · stars / tally left, Agree and Disagree right.
 - Maps: a seat takes the party of his pick (a NO takes the runner-up's);
   seats not up stay neutral; void dashed; resolved seats get a green check / red X.
 - His pick, never a double negative: YES → the called candidate or party; NO

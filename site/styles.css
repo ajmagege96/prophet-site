@@ -1198,9 +1198,19 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
 .mt-row__ad { grid-area: ad; display: flex; gap: 6px; justify-content: flex-end; }
 .mt-row__ad .ad__btn { min-height: 28px; padding: 0 8px; font-size: 10px; letter-spacing: 0.06em; }
 .mt-row__tally { grid-area: tally; font-size: 11px; opacity: 0.6; white-space: nowrap; text-align: right; font-variant-numeric: tabular-nums; }
-.mt-inplace { display: flex; flex-direction: column; gap: 6px; padding: 10px 6px 12px; border-bottom: 1px solid var(--outline); }
-.mt-inplace p { margin: 0; }
 .mt-pane { position: sticky; top: 120px; flex: 0 0 300px; }
+/* below 1024px: one drop-down per card and row; opened, the market shows as the desktop pane's card in place */
+.mt-more { display: none; grid-area: more; align-self: center; justify-self: end; opacity: 0.6; }
+.mt-more .tsec__chev { margin: 0; opacity: 1; }
+.mt-card--open .mt-more .tsec__chev { transform: rotate(180deg); }
+.mt-markets__list > .mt-card { margin: 8px 0; }
+@media (max-width: 1023px) {
+  .mt-more { display: inline-flex; }
+  .mt-card__top .mt-more { margin-left: 2px; }
+}
+@media (min-width: 768px) and (max-width: 1023px) {
+  .mt-row { grid-template-columns: minmax(0, 1fr) 62px 66px 132px 84px 20px; grid-template-areas: "race stars price ad tally more" "pick stars price ad tally more"; }
+}
 .mt-pane[hidden] { display: none; }
 
 @media (min-width: 768px) {
@@ -1296,8 +1306,11 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
   .carousel__meta { gap: 4px 4px; font-size: 10px; }   /* four items (202px of text) on one line in a 216px row */
   .carousel__meta > .prow__outcome { letter-spacing: 0.03em; padding: 1px 4px; }
   /* Midterms rows on a phone: race · price · tag, then pick · stars, then Agree / Disagree · tally */
-  .mt-row { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "race price" "pick stars" "ad tally"; row-gap: 7px; column-gap: 10px; padding: 11px 4px; }
-  .mt-row__ad { justify-content: flex-start; }
+  /* phone row: race · odds · drop-down / pick · stars / tally · Agree and Disagree on the right */
+  .mt-row { grid-template-columns: minmax(0, 1fr) auto 20px; grid-template-areas: "race price more" "pick stars stars" "tally ad ad"; row-gap: 10px; column-gap: 10px; padding: 14px 4px; }
+  .mt-row .mt-stars { justify-self: end; }
+  .mt-row__ad { justify-content: flex-end; }
+  .mt-row__tally { text-align: left; }
   .mt-row__ad .ad__btn { min-height: 34px; padding: 0 14px; font-size: 11px; }
   .mt-row__race { font-size: 11px; }
   .mt-stat__value { font-size: 17px; }   /* stars · volume · ends-in · PENDING on one 216px line */

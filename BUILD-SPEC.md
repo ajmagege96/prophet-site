@@ -269,7 +269,7 @@ endpoint. `midterms-mock.js` stands in until then; `#preview=some` and
 | Headline stats | One row under the map: Called · Resolved · Right · Hit rate | Left column under the title, sticky |
 | Markets bar | Sticky: set dropdown left, cards / list icon toggle right | Right column, sticky, level with the title |
 | Markets | Cards stacked, or rows (three short lines) | Cards in a grid, or rows (one line) |
-| Selected market | Tapping opens its thesis in place | Always one selected; its full card in a sticky pane beside the markets |
+| Selected market | A drop-down chevron on every card and row; opened (or tapped), the market shows as the desktop pane's card in place, in cards or list | Always one selected; its full card in a sticky pane beside the markets |
 
 The dropdown (no label) sets what shows: **All** (the default) · Balance of
 Power · Senate · Governors. The view toggle is two icons, a 2×2 grid of rounded
@@ -315,9 +315,10 @@ resolved; the void line when void).
 
 **Row**: race over his pick with chip · stars · market odds "57% YES" · Agree /
 Disagree on a live race, or the state tag (Pending / Right / Wrong / Void) in
-that same column once closed · tally; one line on desktop, three short lines on
-a phone (race · odds / pick · stars / buttons or tag · tally). A click anywhere
-on it selects it (desktop: the pane) or opens its thesis in place (phone).
+that same column once closed · tally; one line on desktop. On a phone, three lines with
+room between them: race · odds · drop-down chevron / pick · stars / tally on
+the left, Agree and Disagree (or the tag) on the right. A click anywhere on it
+selects it (desktop: the pane); below 1024px it opens the pane's card in place.
 
 **States.**
 

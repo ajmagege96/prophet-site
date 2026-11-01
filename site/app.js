@@ -1346,7 +1346,7 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
     opts = opts || {};
     var open = !!opts.full || !!opts.open;
     return '<article class="mt-card outline' + (opts.full ? ' mt-card--full' : '') + (opts.sel ? ' mt-card--sel' : '') + (open ? ' mt-card--open' : '') + '" data-mt-card="' + r.id + '">' +
-      '<div class="mt-card__top"><span class="mt-card__race">' + esc(r.race) + '</span>' + oddsHTML(r) + '</div>' +
+      '<div class="mt-card__top"><span class="mt-card__race">' + esc(r.race) + '</span>' + oddsHTML(r) + (opts.full ? '' : MORE) + '</div>' +
       '<div class="mt-pick">' + pickHTML(r) + '</div>' +
       '<div class="mt-card__meta">' + starsHTML(r) +
         (r.volume ? '<span class="mt-price" title="volume">' + VOL_ICO + esc(r.volume) + '</span>' : '') + tagHTML(r) + '</div>' +
@@ -1359,11 +1359,12 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
     return '<div class="mt-row' + (opts.sel ? ' mt-row--sel' : '') + '" data-mt-row="' + r.id + '">' +
       '<span class="mt-row__race">' + esc(r.group === 'balance' || set === 'all' ? r.race : stateName(r)) + '</span>' +
       '<span class="mt-row__pick">' + pickHTML(r) + '</span>' + starsHTML(r) +
-      '<span class="mt-row__price">' + Math.round(sidePrice(r.price, r)) + '%<small>YES</small></span>' +
+      '<span class="mt-row__price">' + Math.round(sidePrice(r.price, r)) + '%<small>YES</small></span>' + MORE +
       '<span class="mt-row__ad">' + (locked(r) ? tagHTML(r) : btnHTML(r, 'agree', 'Agree') + btnHTML(r, 'disagree', 'Disagree')) + '</span>'   /* closed: the tag takes the buttons' place */ +
-      '<span class="mt-row__tally">' + short + '</span></div>' +
-      (opts.open ? '<div class="mt-inplace">' + bodyHTML(r) + '</div>' : '');
+      '<span class="mt-row__tally">' + short + '</span></div>';
   }
+  /* below 1024px each card and row carries a drop-down; opened, it becomes the desktop pane's card in place */
+  var MORE = '<span class="mt-more" aria-hidden="true">' + CHEV + '</span>';
   function stateName(r) { return r.race.replace(/ (Senate|Governor)$/, ''); }
 
   /* ── the market set, the view and the selection ── */
@@ -1386,8 +1387,8 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
     var vis = visible();
     if (desk && (!selId || vis.indexOf(find(selId)) < 0)) selId = vis.length ? vis[0].id : '';
     var item = function (r) {
-      return view === 'cards' ? cardHTML(r, { sel: desk ? r.id === selId : !!openIds[r.id], open: !desk && openIds[r.id] })
-                              : rowHTML(r, { sel: desk ? r.id === selId : !!openIds[r.id], open: !desk && openIds[r.id] });
+      if (!desk && openIds[r.id]) return cardHTML(r, { sel: true, open: true });   /* opened: the pane's card, in cards or list */
+      return view === 'cards' ? cardHTML(r, { sel: desk && r.id === selId }) : rowHTML(r, { sel: desk && r.id === selId });
     };
     var h = '<div class="mt-markets__' + view + '">' + o.list.map(item).join('') + '</div>';
     box.innerHTML = h;
@@ -1434,6 +1435,7 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
     }
     if ((t = e.target.closest('[data-mt-card], [data-mt-row]'))) {   /* anywhere on a card or row selects it */
       if (t.closest('[data-mt-pane]')) return;
+      if (!isDesk() && e.target.closest('.mt-card__body')) return;   /* reading the opened thesis never folds it */
       selectRace(t.getAttribute('data-mt-card') || t.getAttribute('data-mt-row'), false); return;
     }
   });
