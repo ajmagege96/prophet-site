@@ -1320,12 +1320,15 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
     return '<svg class="mt-map__svg" viewBox="0 0 ' + (12 * (T + G) - G) + ' ' + (8 * (T + G) - G) + '" role="img" aria-label="' + group + ' map">' + out + '</svg>';
   }
 
-  /* ── card (featured ten, and any opened row) ── */
+  /* ── market card and market row ── */
+  var CHEV = '<svg class="tsec__chev" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>';
+  function btnHTML(r, k, label) {
+    var s = side(r);
+    return '<button class="ad__btn ad__btn--' + k + (s === k ? ' ad__btn--on' : '') + (s && s !== k ? ' ad__btn--off' : '') + '" data-mt-tap="' + k + '"' + (locked(r) ? ' disabled' : '') + '>' + label + '</button>';
+  }
   function adHTML(r) {
-    var s = side(r), lk = locked(r);
-    var btn = function (k, label) { return '<button class="ad__btn ad__btn--' + k + (s === k ? ' ad__btn--on' : '') + (s && s !== k ? ' ad__btn--off' : '') + '" data-mt-tap="' + k + '"' + (lk ? ' disabled' : '') + '>' + label + '</button>'; };
     var t = tally(r);
-    return '<div class="ad mt-ad"><div class="ad__row">' + btn('agree', 'Agree') + btn('disagree', 'Disagree') + '</div>' +
+    return '<div class="ad mt-ad"><div class="ad__row">' + btnHTML(r, 'agree', 'Agree') + btnHTML(r, 'disagree', 'Disagree') + '</div>' +
       (t ? '<span class="thesis__split">' + t + '</span>' : '') +
       (r.status === 'pending' ? '<span class="ad__closed">Taps closed. Resolution next.</span>' : '') + '</div>';
   }
@@ -1334,66 +1337,73 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
     var lineCls = r.status === 'resolved' ? 'thesis__note' : 'thesis__fact';
     return '<p class="thesis__text">' + esc(r.thesis) + '</p>' + (line ? '<p class="' + lineCls + '">' + esc(line) + '</p>' : '');
   }
-  function cardHTML(r, open) {
-    return '<article class="mt-card outline' + (open ? ' mt-card--open' : '') + '" data-mt-card="' + r.id + '">' +
-      '<div class="mt-card__top" data-mt-toggle><span class="mt-card__race">' + esc(r.race) + '</span>' + tagHTML(r) +
-      '<svg class="tsec__chev" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></div>' +
-      '<div class="mt-pick" data-mt-toggle>' + pickHTML(r) + '</div>' +
-      '<div class="mt-card__meta" data-mt-toggle>' + starsHTML(r) + '<span class="mt-price">' + sidePrice(r.atCall, r) + '% at call · ' + priceNow(r) + '</span></div>' +
-      '<div class="mt-card__body"' + (open ? '' : ' hidden') + '>' + bodyHTML(r) + '</div>' +
+  /* full: the pane's card, body always shown; otherwise the body opens in place (phone) */
+  function cardHTML(r, opts) {
+    opts = opts || {};
+    var open = !!opts.full || !!opts.open;
+    return '<article class="mt-card outline' + (opts.full ? ' mt-card--full' : '') + (opts.sel ? ' mt-card--sel' : '') + (open ? ' mt-card--open' : '') + '" data-mt-card="' + r.id + '">' +
+      '<div class="mt-card__top" data-mt-pickr><span class="mt-card__race">' + esc(r.race) + '</span>' + tagHTML(r) + (opts.full ? '' : CHEV) + '</div>' +
+      '<div class="mt-pick" data-mt-pickr>' + pickHTML(r) + '</div>' +
+      '<div class="mt-card__meta" data-mt-pickr>' + starsHTML(r) + '<span class="mt-price">' + sidePrice(r.atCall, r) + '% at call · ' + priceNow(r) + '</span></div>' +
+      (open ? '<div class="mt-card__body">' + bodyHTML(r) + '</div>' : '') +
       adHTML(r) + '</article>';
   }
-  function rowHTML(r) {
+  function rowHTML(r, opts) {
     var t = tally(r, true);
-    return '<div class="mt-row" data-mt-row="' + r.id + '" tabindex="0">' +
-      '<span class="mt-row__race">' + esc(r.group === 'balance' ? r.race : stateName(r)) + '</span>' +
-      '<span class="mt-row__pick">' + pickHTML(r) + '</span>' + starsHTML(r) +
-      '<span class="mt-row__price">' + sidePrice(r.price, r) + '%</span>' +
-      '<span class="mt-row__tag">' + tagHTML(r) + '</span>' +
-      '<span class="mt-row__tally">' + (t || '') + '</span></div>';
+    var n = r.agree + r.disagree, short = n >= 3 ? Math.round(r.agree * 100 / n) + '% · ' + n + ' taps' : (t || '');
+    return '<div class="mt-row' + (opts.sel ? ' mt-row--open' : '') + '" data-mt-row="' + r.id + '">' +
+      '<span class="mt-row__race" data-mt-pickr>' + esc(r.group === 'balance' ? r.race : stateName(r)) + '</span>' +
+      '<span class="mt-row__pick" data-mt-pickr>' + pickHTML(r) + '</span>' + starsHTML(r) +
+      '<span class="mt-row__price" data-mt-pickr>' + sidePrice(r.price, r) + '%</span>' +
+      '<span class="mt-row__tag" data-mt-pickr>' + tagHTML(r) + '</span>' +
+      '<span class="mt-row__ad">' + btnHTML(r, 'agree', 'Agree') + btnHTML(r, 'disagree', 'Disagree') + '</span>' +
+      '<span class="mt-row__tally" data-mt-pickr>' + short + '</span></div>' +
+      (opts.open ? '<div class="mt-inplace">' + bodyHTML(r) + (r.status === 'pending' ? '<p class="ad__closed">Taps closed. Resolution next.</p>' : '') + '</div>' : '');
   }
   function stateName(r) { return r.race.replace(/ (Senate|Governor)$/, ''); }
 
-  /* ── groups ── */
-  var group = 'balance', openId = '', SAFE_KEY = 'prophet.midterms.safe.';
+  /* ── the market set, the view and the selection ── */
+  var SAFE_KEY = 'prophet.midterms.safe.', VIEW_KEY = 'prophet.midterms.view';
+  var set = 'top', view = 'cards', selId = '', openIds = {};
+  try { view = localStorage.getItem(VIEW_KEY) === 'list' ? 'list' : 'cards'; } catch (e) {}
   function ordered(g) {
-    var set = races.filter(function (r) { return r.group === g; });
-    var f = set.filter(function (r) { return r.featured; });
-    var c = set.filter(function (r) { return !r.featured && r.layer !== 'safe'; }).sort(function (a, b) { return Math.abs(a.price - 50) - Math.abs(b.price - 50); });
-    var s = set.filter(function (r) { return !r.featured && r.layer === 'safe'; });
-    return { all: set, lead: f.concat(c), safe: s };
+    if (g === 'top') { var f = races.filter(function (r) { return r.featured; }); return { all: f, lead: f, safe: [] }; }
+    var all = races.filter(function (r) { return r.group === g; });
+    var fe = all.filter(function (r) { return r.featured; });
+    var c = all.filter(function (r) { return !r.featured && r.layer !== 'safe'; }).sort(function (a, b) { return Math.abs(a.price - 50) - Math.abs(b.price - 50); });
+    var s = all.filter(function (r) { return !r.featured && r.layer === 'safe'; });
+    return { all: all, lead: fe.concat(c), safe: s };
   }
   function safeOpen(g) { try { return localStorage.getItem(SAFE_KEY + g) === '1'; } catch (e) { return false; } }
   function isDesk() { return window.matchMedia('(min-width: 1024px)').matches; }
-  function renderGroup() {
-    var o = ordered(group), rows = root.querySelector('[data-mt-rows]'), so = safeOpen(group);
+  function visible() { var o = ordered(set); return o.lead.concat(safeOpen(set) ? o.safe : []); }
+  function renderMarkets() {
+    var o = ordered(set), box = root.querySelector('[data-mt-markets]'), desk = isDesk(), so = safeOpen(set);
+    var vis = visible();
+    if (desk && (!selId || vis.indexOf(find(selId)) < 0)) selId = vis.length ? vis[0].id : '';
     root.querySelector('[data-mt-stats="group"]').innerHTML = statsHTML(o.all);
-    var h = o.lead.map(rowWithCard).join('');
+    var item = function (r) {
+      return view === 'cards' ? cardHTML(r, { sel: desk && r.id === selId, open: !desk && openIds[r.id] })
+                              : rowHTML(r, { sel: desk ? r.id === selId : !!openIds[r.id], open: !desk && openIds[r.id] });
+    };
+    var h = '<div class="mt-markets__' + view + '">' + o.lead.map(item).join('') + '</div>';
     if (o.safe.length) {
-      h += '<button class="mt-safe" data-mt-safe aria-expanded="' + so + '">' + o.safe.length + ' safe ' + (group === 'governors' ? 'races' : 'seats') +
-        '<svg class="tsec__chev" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>';
-      if (so) h += o.safe.map(rowWithCard).join('');
+      h += '<button class="mt-safe" data-mt-safe aria-expanded="' + so + '">' + o.safe.length + ' safe ' + (set === 'governors' ? 'races' : 'seats') + CHEV + '</button>';
+      if (so) h += '<div class="mt-markets__' + view + '">' + o.safe.map(item).join('') + '</div>';
     }
-    rows.innerHTML = h;
-    var tabs = root.querySelectorAll('[data-mt-group]');
-    for (var i = 0; i < tabs.length; i++) tabs[i].classList.toggle('filters__tag--on', tabs[i].getAttribute('data-mt-group') === group);
+    box.innerHTML = h;
+    var sel = root.querySelector('[data-mt-set]'); if (sel.value !== set) sel.value = set;
+    var vb = root.querySelectorAll('[data-mt-view]');
+    for (var i = 0; i < vb.length; i++) { var on = vb[i].getAttribute('data-mt-view') === view; vb[i].classList.toggle('filters__tag--on', on); vb[i].setAttribute('aria-pressed', on ? 'true' : 'false'); }
+    root.querySelector('[data-mt-list]').setAttribute('data-view', view);
     renderPane();
   }
-  function rowWithCard(r) {
-    var open = r.id === openId;
-    return rowHTML(r).replace('class="mt-row"', 'class="mt-row' + (open ? ' mt-row--open' : '') + '"') + (open && !isDesk() ? '<div class="mt-inplace">' + cardHTML(r, true) + '</div>' : '');
-  }
   function renderPane() {
-    var pane = root.querySelector('[data-mt-pane]'), list = root.querySelector('[data-mt-list]');
-    var r = openId && isDesk() ? find(openId) : null;
-    if (r && r.group !== group) r = null;
-    pane.hidden = !r; list.classList.toggle('mt-list--pane', !!r);
-    pane.innerHTML = r ? '<button class="mdl__close mt-pane__close" data-mt-close aria-label="Close">&times;</button>' + cardHTML(r, true) : '';
+    var pane = root.querySelector('[data-mt-pane]'), r = isDesk() && selId ? find(selId) : null;
+    pane.hidden = !r; root.querySelector('[data-mt-list]').classList.toggle('mt-list--pane', !!r);
+    pane.innerHTML = r ? cardHTML(r, { full: true }) : '';
   }
   function find(id) { for (var i = 0; i < races.length; i++) if (races[i].id === id) return races[i]; }
-  function renderFeatured() {
-    root.querySelector('[data-mt-featured]').innerHTML = races.filter(function (r) { return r.featured; }).map(function (r) { return cardHTML(r, false); }).join('');
-  }
   function renderSide() {
     root.querySelector('[data-mt-stats="all"]').innerHTML = statsHTML(races);
     var maps = root.querySelectorAll('[data-mt-map]');
@@ -1401,16 +1411,18 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
     var five = races.filter(function (r) { return r.stars === 5; }), fr = five.filter(function (r) { return r.status === 'resolved'; }), fright = fr.filter(function (r) { return r.outcome === 'right'; });
     root.querySelector('[data-mt-five]').innerHTML = '<span class="mt-five__n">' + five.length + '</span> five-star calls' + (fr.length ? ' · <span class="mt-five__n">' + fright.length + '</span> right' : '');
   }
-  function renderAll() { renderSide(); renderFeatured(); renderGroup(); }
-  function refreshRace(id) {   /* repaint every place a race shows after a tap */
-    var r = find(id); if (!r) return;
-    var cards = root.querySelectorAll('[data-mt-card="' + id + '"]');
-    for (var i = 0; i < cards.length; i++) { var open = !cards[i].querySelector('.mt-card__body').hidden; cards[i].outerHTML = cardHTML(r, open); }
-    var rows = root.querySelectorAll('[data-mt-row="' + id + '"] .mt-row__tally');
-    for (var k = 0; k < rows.length; k++) rows[k].textContent = tally(r, true) || '';
+  function renderAll() { renderSide(); renderMarkets(); }
+  function refreshRace() { renderMarkets(); }   /* a tap repaints the markets and the pane */
+  function selectRace(id, scroll) {
+    if (isDesk()) selId = id; else openIds[id] = !openIds[id];
+    renderMarkets();
+    if (scroll) { var el = root.querySelector('[data-mt-card="' + id + '"], [data-mt-row="' + id + '"]'); if (el && el.scrollIntoView) el.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
   }
 
   /* ── interactions ── */
+  root.addEventListener('change', function (e) {
+    if (e.target.matches('[data-mt-set]')) { set = e.target.value; openIds = {}; selId = ''; renderMarkets(); }
+  });
   root.addEventListener('click', function (e) {
     var t;
     if ((t = e.target.closest('[data-mt-map-tab]'))) {
@@ -1418,28 +1430,22 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
       var mt = root.querySelectorAll('[data-mt-map-tab]'); for (var i = 0; i < mt.length; i++) mt[i].classList.toggle('filters__tag--on', mt[i] === t);
       return;
     }
-    if ((t = e.target.closest('[data-mt-group]'))) { group = t.getAttribute('data-mt-group'); openId = ''; renderGroup(); return; }
-    if ((t = e.target.closest('[data-mt-safe]'))) { try { localStorage.setItem(SAFE_KEY + group, safeOpen(group) ? '0' : '1'); } catch (x) {} renderGroup(); return; }
-    if ((t = e.target.closest('[data-mt-close]'))) { openId = ''; renderGroup(); return; }
+    if ((t = e.target.closest('[data-mt-view]'))) { view = t.getAttribute('data-mt-view'); try { localStorage.setItem(VIEW_KEY, view); } catch (x) {} renderMarkets(); return; }
+    if ((t = e.target.closest('[data-mt-safe]'))) { try { localStorage.setItem(SAFE_KEY + set, safeOpen(set) ? '0' : '1'); } catch (x) {} renderMarkets(); return; }
     if ((t = e.target.closest('[data-mt-tap]'))) { onTap(t); return; }
-    if ((t = e.target.closest('[data-mt-row]'))) { var id = t.getAttribute('data-mt-row'); openId = openId === id ? '' : id; renderGroup(); return; }
     if ((t = e.target.closest('[data-mt-open]'))) {   /* a map tile opens its race in its group */
-      var r0 = find(t.getAttribute('data-mt-open')); group = r0.group; openId = r0.id;
-      if (r0.layer === 'safe') { try { localStorage.setItem(SAFE_KEY + group, '1'); } catch (x) {} }
-      renderGroup(); var row = root.querySelector('[data-mt-row="' + r0.id + '"]'); if (row && row.scrollIntoView) row.scrollIntoView({ block: 'center', behavior: 'smooth' });
-      return;
+      var r0 = find(t.getAttribute('data-mt-open')); set = r0.group; openIds = {};
+      if (r0.layer === 'safe') { try { localStorage.setItem(SAFE_KEY + set, '1'); } catch (x) {} }
+      selectRace(r0.id, true); return;
     }
-    if ((t = e.target.closest('[data-mt-toggle]'))) {
-      var card = t.closest('[data-mt-card]'), body = card.querySelector('.mt-card__body');
-      body.hidden = !body.hidden; card.classList.toggle('mt-card--open', !body.hidden); return;
+    if ((t = e.target.closest('[data-mt-pickr]'))) {
+      if (t.closest('[data-mt-pane]')) return;
+      var host = t.closest('[data-mt-card], [data-mt-row]'); if (!host) return;
+      selectRace(host.getAttribute('data-mt-card') || host.getAttribute('data-mt-row'), false); return;
     }
-  });
-  root.addEventListener('keydown', function (e) {
-    var row = e.target.closest && e.target.closest('[data-mt-row]');
-    if (row && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); row.click(); }
   });
   var lastDesk = isDesk();
-  window.addEventListener('resize', function () { if (isDesk() !== lastDesk) { lastDesk = isDesk(); renderGroup(); } });
+  window.addEventListener('resize', function () { if (isDesk() !== lastDesk) { lastDesk = isDesk(); renderMarkets(); } });
 
   /* ── Agree / Disagree: one tap per call, final; the "already" notice; locked once pending; signed out → sign-in ── */
   var tapModal = document.querySelector('[data-tap-modal]'), already = document.querySelector('[data-notice="already"]');
@@ -1453,12 +1459,12 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
                scoring: "Scored when the market resolves. Right or wrong, it's on your record and you'll earn XP." };
   var lastTapped = '';
   function onTap(b) {
-    var card = b.closest('[data-mt-card]'), r = find(card.getAttribute('data-mt-card')), k = b.getAttribute('data-mt-tap');
+    var host = b.closest('[data-mt-card], [data-mt-row]'), r = find(host.getAttribute('data-mt-card') || host.getAttribute('data-mt-row')), k = b.getAttribute('data-mt-tap');
     if (!r || locked(r)) return;
     if (signedIn === 'false') { document.dispatchEvent(new CustomEvent('prophet:signin', { detail: { then: 'agree', slug: r.id } })); return; }
     var prev = side(r);
     if (prev) { if (already) { already.querySelector('[data-already-line]').textContent = prev === 'agree' ? val(already, 'already-agree', 'You agreed already.') : val(already, 'already-disagree', 'You disagreed already.'); openM(already); } return; }
-    taps[r.id] = k; refreshRace(r.id); confirm(r, k);
+    taps[r.id] = k; refreshRace(); confirm(r, k);
   }
   function confirm(r, k) {
     if (!tapModal) return; lastTapped = r.id;
@@ -1471,19 +1477,18 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
     var nx = nextRace(r); tapModal.querySelector('[data-tc-next]').textContent = nx ? 'Next call' : 'Back to top';
     openM(tapModal);
   }
-  function nextRace(r) {   /* the next open call in the same place: the featured ten, or the race's group */
-    var seq = r.featured && root.querySelector('[data-mt-featured] [data-mt-card="' + r.id + '"]') && !openId ? races.filter(function (x) { return x.featured; }) : (function () { var o = ordered(r.group); return o.lead.concat(o.safe); })();
+  function nextRace(r) {   /* the next open call in what the viewer is looking at */
+    var seq = visible();
     for (var i = seq.indexOf(r) + 1; i < seq.length; i++) if (!locked(seq[i])) return seq[i];
     return null;
   }
   if (tapModal) tapModal.querySelector('[data-tc-next]').addEventListener('click', function () {
     closeM(tapModal); var r = find(lastTapped); if (!r) return; var nx = nextRace(r);
     if (!nx) { window.scrollTo({ top: 0, behavior: 'smooth' }); return; }
-    if (r.featured && !openId) { var el = root.querySelector('[data-mt-featured] [data-mt-card="' + nx.id + '"]'); if (el) { el.scrollIntoView({ block: 'nearest', inline: 'start', behavior: 'smooth' }); var b = el.querySelector('.mt-card__body'); b.hidden = false; el.classList.add('mt-card--open'); } return; }
-    group = nx.group; openId = nx.id; if (nx.layer === 'safe') { try { localStorage.setItem(SAFE_KEY + group, '1'); } catch (x) {} } renderGroup();
-    var row = root.querySelector('[data-mt-row="' + nx.id + '"]'); if (row) row.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    if (!isDesk()) openIds = {};
+    selectRace(nx.id, true);
   });
-  window.prophetMidterms = { races: races, land: function (id, k) { var r = find(id); if (r && !side(r) && !locked(r)) { taps[id] = k; refreshRace(id); confirm(r, k); } } };
+  window.prophetMidterms = { races: races, land: function (id, k) { var r = find(id); if (r && !side(r) && !locked(r)) { taps[id] = k; refreshRace(); confirm(r, k); } } };
 
   root.setAttribute('data-mt-mapshow', 'senate');
   renderAll();

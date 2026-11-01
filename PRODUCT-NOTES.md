@@ -123,9 +123,14 @@ is the fallback).
   resolved right or wrong; Right = resolved right; Hit rate = right ÷ resolved,
   void excluded, a dash until one resolves. Five-star line: count, then how
   many right. No money lines anywhere.
+- Markets area: a sticky bar with a dropdown (Top markets = the featured ten,
+  the default · Balance of Power · Senate · Governors) and a Cards / List
+  toggle (remembered per viewer). Under it, that set's four stats, then the set.
 - Order in a group: featured, then contested by price closest to 50, then safe
-  (collapsed behind a count, remembered per viewer). Featured races show twice:
-  card and row.
+  (collapsed behind a count, remembered per viewer).
+- Desktop: one market is always selected and its full card (thesis included)
+  stands in a pane beside the markets. Phone: tapping a market opens its thesis
+  in place.
 - Maps: a seat takes the party of his pick (a NO takes the runner-up's);
   seats not up stay neutral; void dashed; resolved seats get ✓ / ✗.
 - His pick, never a double negative: YES → the called candidate or party; NO
@@ -134,10 +139,9 @@ is the fallback).
   sweep"; NO on Senate / House control → the other party.
 - Card: race and group, state tag, pick with party chip, stars, "N% at call ·
   M% now" for his side (settled 100 / 0 once resolved, last price when void),
-  Agree / Disagree with the tally. Open it for the thesis and the settlement
-  line, the outcome line once resolved, the void line when void.
-- Row: race · pick · stars · live price · tag · tally. Opens the card in place
-  (phone) or beside the list (desktop).
+  Agree / Disagree with the tally. Opened, it adds the thesis and the
+  settlement line, the outcome line once resolved, the void line when void.
+- Row: race · pick · stars · live price · tag · Agree / Disagree · tally.
 - Tags: Pending · Pending · disputed · Right · Wrong · Void. Taps: one per call,
   final, the already notice, Tap Confirmed; locked from pending on. Pending
   races stay in their group.

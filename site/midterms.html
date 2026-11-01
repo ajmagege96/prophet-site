@@ -29,7 +29,7 @@
   <meta name="twitter:description" content="An agent that reads prediction markets, publishes a thesis before the outcome, and keeps a public record of every call.">
   <meta name="twitter:image" content="https://ajmagege96.github.io/prophet-site/site/assets/prophet-og-1200x630.png">
 
-  <link rel="stylesheet" href="styles.css?v=f2628e87">
+  <link rel="stylesheet" href="styles.css?v=23d7eabc">
 </head>
 <body data-page="midterms">
 
@@ -116,7 +116,7 @@
   <script type="application/json" data-midterms-calls>{{midterms.calls_json}}</script>
 
   <div class="mt__cols">
-    <!-- Left (desktop, sticky): headline stats, both maps, five-star line. Mobile: the same, in this order, one map with a toggle. -->
+    <!-- Left (desktop, sticky): headline stats, both maps, five-star line. Phone: the same, in this order, one map with a toggle. -->
     <aside class="mt__side">
       <h1 class="mt__title heading">Midterms</h1>
       <div class="mt-stats" data-mt-stats="all"></div>
@@ -129,20 +129,32 @@
       <p class="mt-five" data-mt-five></p>
     </aside>
 
-    <!-- Right (desktop): the featured ten as a grid of three, then the groups. Mobile: featured cards swipe sideways. -->
+    <!-- Right: the markets. A sticky bar on top: the set (Top markets = the featured ten · Balance of Power · Senate · Governors)
+         on the left, Cards / List on the right (remembered per viewer). Under it the set's four stats, then its markets.
+         Inside a group: featured first, then contested by price closest to 50, then safe (collapsed behind a count).
+         Desktop: one market is always selected and its full card stands in the pane beside the markets.
+         Phone: tapping a market opens its thesis in place. -->
     <div class="mt__main">
-      <section class="mt-featured" data-mt-featured aria-label="Featured races"></section>
-
-      <!-- Group tabs, sticky. Inside a group: featured rows, then contested by price closest to 50, then safe (collapsed). -->
-      <nav class="mt-gtabs" data-mt-gtabs>
-        <button class="filters__tag filters__tag--on" data-mt-group="balance">Balance of Power</button>
-        <button class="filters__tag" data-mt-group="senate">Senate</button>
-        <button class="filters__tag" data-mt-group="governors">Governors</button>
-      </nav>
+      <div class="mt-bar" data-mt-bar>
+        <label class="mt-select">
+          <span class="mt-select__label">Show</span>
+          <select data-mt-set aria-label="Markets to show">
+            <option value="top">Top markets</option>
+            <option value="balance">Balance of Power</option>
+            <option value="senate">Senate</option>
+            <option value="governors">Governors</option>
+          </select>
+          <svg class="mt-select__chev" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </label>
+        <div class="mt-view" role="group" aria-label="View">
+          <button class="filters__tag filters__tag--on" data-mt-view="cards" aria-pressed="true">Cards</button>
+          <button class="filters__tag" data-mt-view="list" aria-pressed="false">List</button>
+        </div>
+      </div>
       <div class="mt-stats mt-stats--group" data-mt-stats="group"></div>
       <div class="mt-list" data-mt-list>
-        <div class="mt-rows" data-mt-rows></div>
-        <!-- Desktop: the opened row's card shows here, beside the list. Mobile opens it in place under the row. -->
+        <div class="mt-markets" data-mt-markets></div>
+        <!-- Desktop: the selected market's full card -->
         <div class="mt-pane" data-mt-pane hidden></div>
       </div>
     </div>
@@ -418,6 +430,6 @@
 <!-- /partial:footer -->
 
 <script src="midterms-mock.js?v=04803cf9"></script>
-<script src="app.js?v=677235c1"></script>
+<script src="app.js?v=592a452f"></script>
 </body>
 </html>

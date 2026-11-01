@@ -238,7 +238,8 @@ Descriptions in `TEMPLATE_VARS.md`; the generated table in `HANDOFF.md` §10.
 - How it Works opens from the header and the menu every time; onboarding only on
   a first visit.
 - No "vote", "take", "credits" or "trades" anywhere in the hero.
-- Midterms: 74 races, 10 cards, each race once in its group; every race and
+- Midterms: 74 races, 10 under Top markets, each race once in its group; both
+  views work, rows carry Agree / Disagree, the pane follows the selection; every race and
   page state renders at 390px and 1400px with no overflow; no double negatives;
   the map colours match the picks (a NO shows the runner-up's party); hit rate
   excludes void and hides until a race resolves; no money line anywhere.
@@ -267,14 +268,16 @@ endpoint. `midterms-mock.js` stands in until then; `#preview=some` and
 | Headline stats | One row: Called · Resolved · Right · Hit rate | Left column, sticky |
 | Map | One tile map with a Senate / Governors toggle | Both maps stacked under the stats |
 | Five-star line | "N five-star calls · M right" | Under the maps |
-| Featured ten | Cards, swipe sideways | Grid of three, right column |
-| Group tabs | Sticky: Balance of Power · Senate · Governors | Right column, sticky |
-| Group stats | One line under the tabs | Same |
-| Contested | Rows | Rows |
-| Safe | Collapsed: "23 safe seats" opens the rows (remembered per viewer) | Same |
+| Markets bar | Sticky: set dropdown left, Cards / List right | Right column, sticky |
+| Set stats | One line under the bar | Same |
+| Markets | Cards stacked, or rows (three short lines) | Cards in a grid, or rows (one line) |
+| Selected market | Tapping opens its thesis in place | Always one selected; its full card in a sticky pane beside the markets |
+| Safe | Collapsed: "23 safe seats" opens them (remembered per viewer) | Same |
 
-Inside a group: featured rows first, then contested by price closest to 50, then
-safe. Featured races appear twice: as a card and as a row in their group.
+The dropdown sets what shows: **Top markets** (the featured ten, the default) ·
+Balance of Power · Senate · Governors. Cards / List is remembered per viewer.
+Inside a group: featured first, then contested by price closest to 50, then
+safe. Featured races show under Top markets and again in their group.
 
 **Stats.** Called = races with a call. Resolved = resolved right or wrong.
 Right = resolved right. Hit rate = right ÷ resolved, void excluded. Resolved,
@@ -298,15 +301,16 @@ its race in its group.
 | NO on Balance of Power | "Not a Democratic sweep" |
 | NO on Senate or House control | The other party |
 
-**Card** (the featured ten, and any opened row): race and group, the state tag,
+**Card**: race and group, the state tag,
 his pick with party chip, stars, "N% at call · M% now" (read for his side;
 "settled" 100 / 0 once resolved; "last" price when void), Agree / Disagree with
-the tally as built. Tap it to open the thesis and the settlement line (the
-outcome line once resolved; the void line when void).
+the tally as built. Opened on a phone, or in the desktop pane, it adds the
+thesis and the settlement line (the outcome line once resolved; the void line
+when void).
 
-**Row**: race · pick with chip · stars · live price · state tag · tally, one line
-on desktop, two short lines on a phone. Tap it to open the card in place on a
-phone, beside the list on desktop (with a close X).
+**Row**: race over his pick with chip · stars · live price · state tag · Agree /
+Disagree · tally; one line on desktop, three short lines on a phone. Tap it to
+select it (desktop: the pane) or open its thesis in place (phone).
 
 **States.**
 

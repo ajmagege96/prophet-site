@@ -1142,60 +1142,74 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
 .mt-stars .ico { width: 11px; height: 11px; fill: currentColor; opacity: 0.25; }
 .mt-stars .carousel__star--on .ico { opacity: 1; }
 
-/* Featured ten: cards. Phones swipe sideways; desktop is a grid of three. */
-.mt-featured { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 4px; scrollbar-width: none; }
-.mt-featured::-webkit-scrollbar { display: none; }
-.mt-featured .mt-card { flex: 0 0 calc(100% - 32px); scroll-snap-align: start; }
+/* The bar over the markets: the set on the left, Cards / List on the right; sticky under the header */
+.mt-bar { position: sticky; top: 56px; z-index: 5; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; background: var(--navy); }
+.mt-select { position: relative; display: inline-flex; align-items: center; gap: 8px; }
+.mt-select__label { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.55; }
+.mt-select select { appearance: none; -webkit-appearance: none; font: inherit; font-family: var(--font-display); font-weight: 500; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--offwhite); background: var(--navy); border: 1px solid rgba(242, 240, 230, 0.6); border-radius: 4px; padding: 7px 32px 7px 10px; cursor: pointer; }
+.mt-select select:focus-visible { outline: 1px solid var(--green); outline-offset: 2px; }
+.mt-select__chev { position: absolute; right: 10px; pointer-events: none; opacity: 0.7; }
+.mt-view { display: flex; gap: 6px; }
+
+/* Markets: cards or rows, with the selected market's full card beside them on desktop */
+.mt-list { display: flex; gap: 16px; align-items: flex-start; }
+.mt-markets { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }
+.mt-markets__cards { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; margin-bottom: 12px; }
+.mt-markets__list { display: flex; flex-direction: column; }
 .mt-card { padding: 14px; display: flex; flex-direction: column; gap: 9px; min-width: 0; }
 .mt-card__top { display: flex; align-items: center; gap: 8px; cursor: pointer; }
 .mt-card__race { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .mt-card__top .tsec__chev { margin-left: auto; }
-.mt-card__top .prow__outcome { font-size: 9px; padding: 1px 6px; line-height: 1.3; }
+.mt-card__top .prow__outcome { font-size: 9px; padding: 1px 6px; line-height: 1.3; white-space: nowrap; }
 .mt-card--open .mt-card__top .tsec__chev { transform: rotate(180deg); }
+.mt-card--sel, .mt-card--sel:hover { border-color: rgba(242, 240, 230, 0.7); }
+.mt-card:not(.mt-card--full):hover { border-color: rgba(242, 240, 230, 0.3); }
+.mt-card--sel:hover { border-color: rgba(242, 240, 230, 0.7); }
 .mt-pick { display: flex; align-items: center; gap: 8px; font-size: 20px; line-height: 1.2; cursor: pointer; min-width: 0; }
 .mt-pick__name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .mt-card__meta { display: flex; align-items: center; gap: 12px; font-size: 12px; cursor: pointer; }
 .mt-price { opacity: 0.6; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .mt-card__body { display: flex; flex-direction: column; gap: 6px; border-top: 1px solid var(--outline); padding-top: 9px; }
-.mt-card__body[hidden] { display: none; }
 .mt-ad { margin: 2px 0 0; gap: 6px; }
 .mt-ad .ad__btn { min-height: 34px; padding: 0 16px; font-size: 12px; }
 .mt-ad .thesis__split { font-size: 12px; }
 
-/* Group tabs, sticky under the header */
-.mt-gtabs { position: sticky; top: 56px; z-index: 5; display: flex; gap: 8px; padding: 10px 0; background: var(--navy); margin-top: 6px; }
-.mt-list { display: flex; gap: 16px; align-items: flex-start; }
-.mt-rows { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }
-.mt-row { display: grid; grid-template-columns: 120px minmax(0, 1fr) 64px 40px 92px 120px; align-items: center; gap: 10px; padding: 10px 6px; border-bottom: 1px solid var(--outline); font-size: 13px; cursor: pointer; }
+/* A row: race over pick, stars, live price, tag, Agree / Disagree, tally */
+.mt-row { display: grid; grid-template-columns: minmax(0, 1fr) 62px 40px 104px 132px 84px; grid-template-areas: "race stars price tag ad tally" "pick stars price tag ad tally"; align-items: center; column-gap: 8px; row-gap: 2px; padding: 9px 6px; border-bottom: 1px solid var(--outline); font-size: 13px; }
 .mt-row:hover, .mt-row--open { background: rgba(242, 240, 230, 0.04); }
-.mt-row__race { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0.85; }
-.mt-row__pick { display: flex; align-items: center; gap: 6px; min-width: 0; }
-.mt-row__price { font-variant-numeric: tabular-nums; text-align: right; }
+.mt-row--open { box-shadow: inset 2px 0 0 rgba(242, 240, 230, 0.7); }
+.mt-row [data-mt-pickr] { cursor: pointer; }
+.mt-row__race { grid-area: race; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mt-row__pick { grid-area: pick; display: flex; align-items: center; gap: 6px; min-width: 0; font-size: 14px; }
+.mt-row .mt-stars { grid-area: stars; }
+.mt-row__price { grid-area: price; font-variant-numeric: tabular-nums; text-align: right; }
+.mt-row__tag { grid-area: tag; justify-self: end; }
 .mt-row__tag .prow__outcome { font-size: 9px; padding: 1px 6px; line-height: 1.3; white-space: nowrap; }
-.mt-row__tally { font-size: 12px; opacity: 0.6; white-space: nowrap; text-align: right; font-variant-numeric: tabular-nums; }
-.mt-inplace { padding: 8px 0 12px; border-bottom: 1px solid var(--outline); }
-.mt-safe { display: flex; align-items: center; gap: 8px; width: 100%; padding: 12px 6px; border: 0; border-bottom: 1px solid var(--outline); background: none; color: inherit; font: inherit; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.75; cursor: pointer; text-align: left; }
+.mt-row__ad { grid-area: ad; display: flex; gap: 6px; justify-content: flex-end; }
+.mt-row__ad .ad__btn { min-height: 28px; padding: 0 8px; font-size: 10px; letter-spacing: 0.06em; }
+.mt-row__tally { grid-area: tally; font-size: 11px; opacity: 0.6; white-space: nowrap; text-align: right; font-variant-numeric: tabular-nums; }
+.mt-inplace { display: flex; flex-direction: column; gap: 6px; padding: 10px 6px 12px; border-bottom: 1px solid var(--outline); }
+.mt-inplace p { margin: 0; }
+.mt-safe { display: flex; align-items: center; gap: 8px; width: 100%; padding: 12px 6px; border: 0; border-bottom: 1px solid var(--outline); background: none; color: inherit; font: inherit; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.75; cursor: pointer; text-align: left; margin-bottom: 12px; }
 .mt-safe:hover { opacity: 1; }
 .mt-safe .tsec__chev { margin-left: auto; }
 .mt-safe[aria-expanded="true"] .tsec__chev { transform: rotate(180deg); }
-.mt-pane { position: sticky; top: 112px; flex: 0 0 340px; }
+.mt-pane { position: sticky; top: 120px; flex: 0 0 300px; }
 .mt-pane[hidden] { display: none; }
-.mt-pane .mt-card { position: relative; }
-.mt-pane__close { position: absolute; z-index: 1; right: 6px; top: 6px; }
-.mt-pane__close + .mt-card .mt-card__top .tsec__chev { display: none; }
-.mt-list--pane .mt-row { grid-template-columns: 104px minmax(0, 1fr) 64px 36px 80px 104px; gap: 8px; }
 
+@media (min-width: 768px) {
+  .mt-markets__cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
 @media (min-width: 1024px) {
   .mt { padding: 28px 48px 56px; }
-  .mt__cols { flex-direction: row; align-items: flex-start; gap: 32px; }
-  .mt__side { flex: 0 0 340px; position: sticky; top: 84px; }
+  .mt__cols { flex-direction: row; align-items: flex-start; gap: 28px; }
+  .mt__side { flex: 0 0 320px; position: sticky; top: 84px; }
   .mt-maptabs { display: none; }
   .mt-map__cap { display: block; }
   .mt[data-mt-mapshow] [data-mt-map] { display: block; }
   .mt__main { flex: 1 1 auto; }
-  .mt-featured { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); overflow: visible; align-items: start; }
-  .mt-featured .mt-card { flex: none; }
-  .mt-gtabs { top: 64px; }
+  .mt-bar { top: 64px; }
+  .mt-list:not(.mt-list--pane) .mt-markets__cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
 /* ══ MOBILE PASS ═══════════════════════════════════════════
@@ -1274,10 +1288,12 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
   /* Resolved cards carry four meta items; keep them on one line inside the fixed card */
   .carousel__meta { gap: 4px 4px; font-size: 10px; }   /* four items (202px of text) on one line in a 216px row */
   .carousel__meta > .prow__outcome { letter-spacing: 0.03em; padding: 1px 4px; }
-  /* Midterms rows on a phone: two short lines instead of one long one */
-  .mt-row { grid-template-columns: minmax(0, 1fr) auto auto; grid-template-areas: "race price tag" "pick stars tally"; row-gap: 6px; column-gap: 10px; }
-  .mt-row__race { grid-area: race; } .mt-row__price { grid-area: price; } .mt-row__tag { grid-area: tag; justify-self: end; }
-  .mt-row__pick { grid-area: pick; } .mt-row .mt-stars { grid-area: stars; } .mt-row__tally { grid-area: tally; }
+  /* Midterms rows on a phone: race · price · tag, then pick · stars, then Agree / Disagree · tally */
+  .mt-row { grid-template-columns: minmax(0, 1fr) auto auto; grid-template-areas: "race price tag" "pick pick stars" "ad ad tally"; row-gap: 7px; column-gap: 10px; padding: 11px 4px; }
+  .mt-row__ad { justify-content: flex-start; }
+  .mt-row__ad .ad__btn { min-height: 34px; padding: 0 14px; font-size: 11px; }
+  .mt-row__race { font-size: 11px; }
+  .mt-select__label { display: none; }   /* the bar fits 358px: set on the left, Cards / List on the right */
   .mt-stat__value { font-size: 17px; }   /* stars · volume · ends-in · PENDING on one 216px line */
   .thesis__top { flex-wrap: wrap; row-gap: 4px; }
   .filters::-webkit-scrollbar { display: none; }
