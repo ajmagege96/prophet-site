@@ -438,6 +438,7 @@ ul, ol { list-style: none; }
 /* conviction stars, first in the meta row, in the call's colour; hidden only when the deck's show_conviction is "false" */
 .carousel__conv { display: inline-flex; gap: 2px; line-height: 1; opacity: 1; }
 .carousel__conv[hidden] { display: none; }
+.ad__row[hidden] { display: none; }
 .carousel__star .ico { width: 11px; height: 11px; fill: currentColor; opacity: 0.25; }
 .carousel__star--on .ico { opacity: 1; }
 .carousel__conv--yes { color: var(--green); }     /* the call's colour: full on the filled stars, faint on the rest */

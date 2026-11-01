@@ -148,8 +148,7 @@ A centred row under the block, Calls only (hidden on History):
   Tapping either button again opens a small notice — "You agreed already." /
   "You disagreed already." (`{{notice.already_agree}}`,
   `{{notice.already_disagree}}`) with OK. No switching, no deselect.
-  `{{market_closed}}` true disables both and shows "Taps closed. Resolution
-  next." under them.
+  `{{market_closed}}` true hides both buttons; only the split shows.
 - Under the buttons, centred, from three taps: "`{{agree_pct}}`% agree ·
   `{{tap_count}}` taps" (e.g. "71% agree · 38 taps"); below three, only "You
   agree" / "You disagree". The server's figure; never recomputed on a tap.
@@ -229,8 +228,8 @@ Descriptions in `TEMPLATE_VARS.md`; the generated table in `HANDOFF.md` §10.
 - A changed card reads "Changed" and its buttons start unselected.
 - Agree / Disagree: bright until the first tap; after it the chosen side stays
   bright, the other dims, and tapping either opens "You agreed already." /
-  "You disagreed already."; a changed call starts fresh; closed markets disable
-  with "Taps closed. Resolution next."; the split never moves on a tap; the
+  "You disagreed already."; a changed call starts fresh; closed markets show no
+  buttons, only the split; the split never moves on a tap; the
   word is taps.
 - Signed out: a tap fires `prophet:signin` only; `prophetTap.land` shows the
   modal. Tap Confirmed opens on the first tap; Next call advances; Back to
@@ -273,8 +272,8 @@ endpoint. `midterms-mock.js` stands in until then; `#preview=some` and
 | Selected market | Tapping opens its thesis in place | Always one selected; its full card in a sticky pane beside the markets |
 
 The dropdown (no label) sets what shows: **All** (the default) · Balance of
-Power · Senate · Governors. The view toggle is two icons, a plain box
-(cards) and three lines (list), no words, remembered per viewer. Every set is the full list,
+Power · Senate · Governors. The view toggle is two icons, a 2×2 grid of rounded
+filled squares (cards) and three lines (list), no words, remembered per viewer. Every set is the full list,
 nothing collapsed. The top markets lead each set; until the server's ranking
 lands the page orders featured, then contested by price closest to 50, then
 safe. A click anywhere on a card or row selects it. The selected market reads
@@ -331,5 +330,5 @@ select it (desktop: the pane) or open its thesis in place (phone).
 | Void | Void | locked | last price | thesis, void line; out of every count |
 
 Pending races stay in their group. Taps as built: one per call, final, the
-already notice, Tap Confirmed (its {label} is his pick), "Taps closed.
-Resolution next." while pending, sign-in when signed out.
+already notice, Tap Confirmed (its {label} is his pick), sign-in when signed
+out. Pending, resolved and void races show no buttons, only the tally.

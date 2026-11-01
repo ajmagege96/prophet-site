@@ -431,7 +431,7 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
     var closed = card.dataset.marketClosed === 'true';
     var btns = adWrap.querySelectorAll('[data-ad-btn]');
     for (var i = 0; i < btns.length; i++) { btns[i].classList.toggle('ad__btn--on', btns[i].dataset.adBtn === side); btns[i].classList.toggle('ad__btn--off', !!side && btns[i].dataset.adBtn !== side); btns[i].disabled = closed; }
-    var cl = adWrap.querySelector('[data-ad-closed]'); if (cl) cl.hidden = !closed;
+    var row = adWrap.querySelector('.ad__row'); if (row) row.hidden = closed;   /* a closed market has no buttons; the split stays */
     var n = parseInt(card.dataset.tapCount || '0', 10) || 0, pct = card.dataset.agreePct || '';
     if (thesisSplit) {
       if (n >= 3 && pct) { thesisSplit.textContent = pct + '% agree · ' + n + ' tap' + (n === 1 ? '' : 's'); thesisSplit.hidden = false; }
@@ -1324,11 +1324,11 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
     var s = side(r);
     return '<button class="ad__btn ad__btn--' + k + (s === k ? ' ad__btn--on' : '') + (s && s !== k ? ' ad__btn--off' : '') + '" data-mt-tap="' + k + '"' + (locked(r) ? ' disabled' : '') + '>' + label + '</button>';
   }
+  /* pending, resolved and void markets carry no Agree / Disagree, only the tally */
   function adHTML(r) {
     var t = tally(r);
-    return '<div class="ad mt-ad"><div class="ad__row">' + btnHTML(r, 'agree', 'Agree') + btnHTML(r, 'disagree', 'Disagree') + '</div>' +
-      (t ? '<span class="thesis__split">' + t + '</span>' : '') +
-      (r.status === 'pending' ? '<span class="ad__closed">Taps closed. Resolution next.</span>' : '') + '</div>';
+    return '<div class="ad mt-ad">' + (locked(r) ? '' : '<div class="ad__row">' + btnHTML(r, 'agree', 'Agree') + btnHTML(r, 'disagree', 'Disagree') + '</div>') +
+      (t ? '<span class="thesis__split">' + t + '</span>' : '') + '</div>';
   }
   /* as the home thesis box: THESIS and the thesis, one chevron dropping down RESOLUTION under a hairline, closed by default */
   var CHEV = '<svg class="tsec__chev" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>';
@@ -1361,9 +1361,9 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
       '<span class="mt-row__pick">' + pickHTML(r) + '</span>' + starsHTML(r) +
       '<span class="mt-row__price">' + Math.round(sidePrice(r.price, r)) + '%<small>YES</small></span>' +
       '<span class="mt-row__tag">' + tagHTML(r) + '</span>' +
-      '<span class="mt-row__ad">' + btnHTML(r, 'agree', 'Agree') + btnHTML(r, 'disagree', 'Disagree') + '</span>' +
+      '<span class="mt-row__ad">' + (locked(r) ? '' : btnHTML(r, 'agree', 'Agree') + btnHTML(r, 'disagree', 'Disagree')) + '</span>' +
       '<span class="mt-row__tally">' + short + '</span></div>' +
-      (opts.open ? '<div class="mt-inplace">' + bodyHTML(r) + (r.status === 'pending' ? '<p class="ad__closed">Taps closed. Resolution next.</p>' : '') + '</div>' : '');
+      (opts.open ? '<div class="mt-inplace">' + bodyHTML(r) + '</div>' : '');
   }
   function stateName(r) { return r.race.replace(/ (Senate|Governor)$/, ''); }
 

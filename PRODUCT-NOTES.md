@@ -73,7 +73,7 @@ and Oct 26 PM logic, with the founder's UI calls on top.
 - Under the buttons: "71% agree · 38 taps" from three taps; below three, only
   "You agree" / "You disagree". The server's figures; never changed
   client-side on a tap.
-- Market closed: both disabled, "Taps closed. Resolution next." under them.
+- Market closed (pending, resolved, void): no buttons at all, only the split.
 - Signed out: a tap fires a sign-in event; after sign-in the server lands it.
 - The tap opens Tap Confirmed: side chip; "You're calling
   him right. Buy YES at 84. Let's see if you're both right." (Agree) / "You're
@@ -152,7 +152,7 @@ is the fallback).
   click anywhere on a card or row selects it; the selected one has the home's
   white outline and green flash.
 - Tags: Pending · Right · Wrong · Void (no disputed tag). Taps: one per call,
-  final, the already notice, Tap Confirmed; locked from pending on. Pending
+  final, the already notice, Tap Confirmed; no buttons from pending on (pending, resolved and void show only the tally). Pending
   races stay in their group.
 - Every visible string on the page is placeholder copy for Awetu.
 
