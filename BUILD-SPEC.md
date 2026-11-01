@@ -193,6 +193,56 @@ How it Works link every time, never on its own. The first-visit onboarding
 (`partials/onboarding.html`) opens once per device. Globals:
 `window.prophetHowItWorks.open()`, `window.prophetOnboarding.open()`.
 
+## 11. Variables
+
+Added across this drop: `label`, `call_state`, `listed_leg_date`, `agree_pct`,
+`tap_count`, `user_side`, `market_closed`, `tap_modal.confirm_agree`,
+`tap_modal.confirm_disagree`, `tap_modal.scoring_line`, `notice.already_agree`,
+`notice.already_disagree`, `market.side`,
+`market.side_upper`, `market.state` (called / revised / changed / pending /
+resolved), `market.time_line`, `market.conviction`, `show_conviction`,
+`market.outcome_tag`, `market.resolution_text`, `market.outcome_note`,
+`midterms.races_json`, `midterms.calls_json`.
+`market.outcome` takes `right` / `wrong` / `void` / `pending`;
+`market.filter_state` takes `called` / `resolved`.
+
+Not built, by the founder's call: `market.against_market`,
+`market.called_date`, `market.called_number`, `market.change_count`,
+`market.change_note`.
+
+Descriptions in `TEMPLATE_VARS.md`; the generated table in `HANDOFF.md` §10.
+
+## 12. Check before shipping
+
+- Calls shows at most twenty cards; History holds resolved, pending and void;
+  the empty line shows on an empty tab.
+- Every card: odds top-right, Buy YES / Buy NO in its colour, stars in that
+  colour, no at-call stat, one meta line, no overflow at 390px. History cards
+  show the result tag bottom right and no time to close.
+- The marker reads Called / Revised / Changed with time on Calls, "Pending" or
+  "Resolved {time}" on History, nothing on void.
+- Every card opens with the drop-down closed. Opening it shows the pays line on
+  a live card, the pending line on a pending card, only his outcome note on a
+  resolved card, the void line on a void card.
+- A pending card sits in History with the purple pending tag and a price that
+  matches Polymarket.
+- A changed card reads "Changed" and its buttons start unselected.
+- Agree / Disagree: bright until the first tap; after it the chosen side stays
+  bright, the other dims, and tapping either opens "You agreed already." /
+  "You disagreed already."; a changed call starts fresh; closed markets disable
+  with "Taps closed. Resolution next."; the split never moves on a tap; the
+  word is taps.
+- Signed out: a tap fires `prophet:signin` only; `prophetTap.land` shows the
+  modal. Tap Confirmed opens on the first tap; Next call advances; Back to
+  top on the last card; swipe down closes it on a phone.
+- How it Works opens from the header and the menu every time; onboarding only on
+  a first visit.
+- No "vote", "take", "credits" or "trades" anywhere in the hero.
+- Midterms: 74 races, 10 cards, each race once in its group; every race and
+  page state renders at 390px and 1400px with no overflow; no double negatives;
+  the map colours match the picks (a NO shows the runner-up's party); hit rate
+  excludes void and hides until a race resolves; no money line anywhere.
+
 ## 13. Midterms page
 
 `site/midterms.html`: 74 races (3 Balance of Power markets, 35 Senate seats, 36
@@ -273,53 +323,3 @@ phone, beside the list on desktop (with a close X).
 Pending races stay in their group. Taps as built: one per call, final, the
 already notice, Tap Confirmed (its {label} is his pick), "Taps closed.
 Resolution next." while pending, sign-in when signed out.
-
-## 11. Variables
-
-Added across this drop: `label`, `call_state`, `listed_leg_date`, `agree_pct`,
-`tap_count`, `user_side`, `market_closed`, `tap_modal.confirm_agree`,
-`tap_modal.confirm_disagree`, `tap_modal.scoring_line`, `notice.already_agree`,
-`notice.already_disagree`, `market.side`,
-`market.side_upper`, `market.state` (called / revised / changed / pending /
-resolved), `market.time_line`, `market.conviction`, `show_conviction`,
-`market.outcome_tag`, `market.resolution_text`, `market.outcome_note`,
-`midterms.races_json`, `midterms.calls_json`.
-`market.outcome` takes `right` / `wrong` / `void` / `pending`;
-`market.filter_state` takes `called` / `resolved`.
-
-Not built, by the founder's call: `market.against_market`,
-`market.called_date`, `market.called_number`, `market.change_count`,
-`market.change_note`.
-
-Descriptions in `TEMPLATE_VARS.md`; the generated table in `HANDOFF.md` §10.
-
-## 12. Check before shipping
-
-- Calls shows at most twenty cards; History holds resolved, pending and void;
-  the empty line shows on an empty tab.
-- Every card: odds top-right, Buy YES / Buy NO in its colour, stars in that
-  colour, no at-call stat, one meta line, no overflow at 390px. History cards
-  show the result tag bottom right and no time to close.
-- The marker reads Called / Revised / Changed with time on Calls, "Pending" or
-  "Resolved {time}" on History, nothing on void.
-- Every card opens with the drop-down closed. Opening it shows the pays line on
-  a live card, the pending line on a pending card, only his outcome note on a
-  resolved card, the void line on a void card.
-- A pending card sits in History with the purple pending tag and a price that
-  matches Polymarket.
-- A changed card reads "Changed" and its buttons start unselected.
-- Agree / Disagree: bright until the first tap; after it the chosen side stays
-  bright, the other dims, and tapping either opens "You agreed already." /
-  "You disagreed already."; a changed call starts fresh; closed markets disable
-  with "Taps closed. Resolution next."; the split never moves on a tap; the
-  word is taps.
-- Signed out: a tap fires `prophet:signin` only; `prophetTap.land` shows the
-  modal. Tap Confirmed opens on the first tap; Next call advances; Back to
-  top on the last card; swipe down closes it on a phone.
-- How it Works opens from the header and the menu every time; onboarding only on
-  a first visit.
-- No "vote", "take", "credits" or "trades" anywhere in the hero.
-- Midterms: 74 races, 10 cards, each race once in its group; every race and
-  page state renders at 390px and 1400px with no overflow; no double negatives;
-  the map colours match the picks (a NO shows the runner-up's party); hit rate
-  excludes void and hides until a race resolves; no money line anywhere.
