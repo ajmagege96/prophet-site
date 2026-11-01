@@ -1,7 +1,7 @@
 /* MOCK DATA for the Midterms page. Delete this file (and its <script> tag in midterms.html) once the server
    fills {{midterms.races_json}} and {{midterms.calls_json}}. Names, prices and theses are placeholders for layout.
    Preview the race and page states by adding a hash to the URL:
-     (default, or #preview=some) a few races pending (closed, 99/1, disputed), some resolved right / wrong, one void,
+     (default, or #preview=some) a few races pending (closed, 99/1), some resolved right / wrong, one void,
                                  so the stats read with numbers
      midterms.html#preview=live  every race live (the stats read dashes)
      midterms.html#preview=all   every race resolved, one void */
@@ -14,7 +14,7 @@ window.PROPHET_MIDTERMS_MOCK = (function () {
   if (mode === 'some') {
     byId('mk-senate-GA').state = 'pending'; byId('mk-senate-GA').pending_reason = 'closed';
     byId('mk-senate-NC').state = 'pending'; byId('mk-senate-NC').pending_reason = 'price'; byId('mk-senate-NC').live_price = 99;
-    byId('mk-gov-AZ').state = 'pending'; byId('mk-gov-AZ').pending_reason = 'disputed';
+    byId('mk-gov-AZ').state = 'pending'; byId('mk-gov-AZ').pending_reason = 'closed';
     ['mk-senate-AR','mk-senate-DE','mk-senate-ID','mk-senate-WV','mk-senate-NJ','mk-senate-KS','mk-gov-MD','mk-gov-PA','mk-senate-IA','mk-gov-FL'].forEach(function (id) { settle(byId(id), true); });
     ['mk-senate-ME','mk-senate-TX','mk-gov-IA','mk-gov-OH'].forEach(function (id) { settle(byId(id), false); });
     byId('mk-gov-VT').state = 'void';

@@ -1241,7 +1241,6 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
       outcomeLine: c.outcome_line || '', volume: c.volume || '', agree: +c.taps_agree || 0, disagree: +c.taps_disagree || 0, userSide: c.user_side || '' });
   }
   var MULTI = { AK: 1, CA: 1, ID: 1, MI: 1, RI: 1 };   /* multi-candidate races: a NO reads "Not" + the called candidate */
-  var PARTY_WORD = { D: 'Democratic', R: 'Republican', I: 'Independent' };
   var VOID_LINE = "Polymarket closed this market without a result. His calls and every tap on them don't count.";
   var STAR = (root.querySelector('[data-mt-star]') || {}).innerHTML || '';
   var signedIn = root.getAttribute('data-signed-in') || '';
@@ -1252,7 +1251,7 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
   /* His pick, never a double negative */
   function pick(r) {
     if (r.side === 'yes') return { text: r.leg, party: r.kind === 'bop' ? '' : r.party };
-    if (r.kind === 'bop') return { text: 'Not a ' + PARTY_WORD[r.party] + ' sweep', party: '' };
+    if (r.kind === 'bop') return { text: r.ru, party: '' };   /* a NO on Balance of Power shows the runner-up outcome, as a two-candidate race does */
     if (r.kind === 'control') { var o = other(r.party); return { text: o === 'D' ? 'Democrats' : 'Republicans', party: o }; }
     if (MULTI[r.state]) return { text: 'Not ' + r.leg, party: '' };
     return { text: r.ru, party: r.ruParty };
@@ -1261,7 +1260,7 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
   function sidePrice(p, r) { return r.side === 'yes' ? p : 100 - p; }   /* prices read for his side */
   function locked(r) { return r.status !== 'live'; }
   function tagHTML(r) {
-    if (r.status === 'pending') return '<span class="prow__outcome prow__outcome--pending">' + (r.reason === 'disputed' ? 'Pending · disputed' : 'Pending') + '</span>';
+    if (r.status === 'pending') return '<span class="prow__outcome prow__outcome--pending">' + 'Pending' + '</span>';
     if (r.status === 'resolved') return '<span class="prow__outcome prow__outcome--' + r.outcome + '">' + (r.outcome === 'right' ? 'Right' : 'Wrong') + '</span>';
     if (r.status === 'void') return '<span class="prow__outcome prow__outcome--void">Void</span>';
     return '';
@@ -1308,10 +1307,12 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
       out += '<g class="' + cls + '"' + (r ? ' data-mt-open="' + r.id + '"' : '') + '><title>' + (r ? esc(r.race + ': ' + pick(r).text) : st) + '</title>' +
         '<rect x="' + x + '" y="' + y + '" width="' + T + '" height="' + T + '" rx="2"/>' +
         '<text x="' + (x + T / 2) + '" y="' + (y + T / 2 + 4) + '" text-anchor="middle">' + st + '</text>';
-      if (r && r.status === 'resolved') {
-        var ok = r.outcome === 'right';
-        out += '<rect class="mt-mark__bg" x="' + (x + T - 12) + '" y="' + (y + 1) + '" width="11" height="11"/>' +
-          '<text class="mt-mark mt-mark--' + r.outcome + '" x="' + (x + T - 6.5) + '" y="' + (y + 10) + '" text-anchor="middle">' + (ok ? '✓' : '✗') + '</text>';
+      if (r && r.status === 'resolved') {   /* a drawn green check or red X in the tile's corner */
+        var mx = x + T - 12, my = y + 1;
+        out += '<rect class="mt-mark__bg" x="' + mx + '" y="' + my + '" width="11" height="11"/>' +
+          (r.outcome === 'right'
+            ? '<path class="mt-mark mt-mark--right" d="M' + (mx + 2.5) + ' ' + (my + 5.8) + 'l2.2 2.2 4-4.6"/>'
+            : '<path class="mt-mark mt-mark--wrong" d="M' + (mx + 3) + ' ' + (my + 3) + 'l5 5M' + (mx + 8) + ' ' + (my + 3) + 'l-5 5"/>');
       }
       out += '</g>';
     }
@@ -1347,7 +1348,7 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
     return '<article class="mt-card outline' + (opts.full ? ' mt-card--full' : '') + (opts.sel ? ' mt-card--sel' : '') + (open ? ' mt-card--open' : '') + '" data-mt-card="' + r.id + '">' +
       '<div class="mt-card__top"><span class="mt-card__race">' + esc(r.race) + '</span>' + oddsHTML(r) + '</div>' +
       '<div class="mt-pick">' + pickHTML(r) + '</div>' +
-      '<div class="mt-card__meta">' + starsHTML(r) + '<span class="mt-price">' + sidePrice(r.atCall, r) + '% at call</span>' +
+      '<div class="mt-card__meta">' + starsHTML(r) +
         (r.volume ? '<span class="mt-price" title="volume">' + VOL_ICO + esc(r.volume) + '</span>' : '') + tagHTML(r) + '</div>' +
       (open ? '<div class="mt-card__body">' + bodyHTML(r) + '</div>' : '') +
       adHTML(r) + '</article>';

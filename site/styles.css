@@ -1129,9 +1129,9 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
 .mt-tile[data-mt-open] { cursor: pointer; }
 .mt-tile[data-mt-open]:hover rect:first-of-type { stroke: var(--offwhite); stroke-width: 1.5; }
 .mt-tile .mt-mark__bg { fill: var(--navy); stroke: none; }
-.mt-tile text.mt-mark { font-size: 9px; font-weight: 700; }
-.mt-tile text.mt-mark--right { fill: var(--green); }
-.mt-tile text.mt-mark--wrong { fill: var(--offwhite); }
+.mt-tile .mt-mark { fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.mt-tile .mt-mark--right { stroke: var(--green); }
+.mt-tile .mt-mark--wrong { stroke: #e53935; }   /* the Disagree red */
 
 .mt-chip { display: inline-block; font-size: 10px; font-weight: 700; line-height: 1; padding: 3px 5px; border-radius: 2px; color: var(--navy); vertical-align: 1px; }
 .mt-chip--d { background: var(--party-d); }
@@ -1171,7 +1171,7 @@ html.onb-lock, html.onb-lock body { overflow: hidden; }   /* shared by every mod
 .mt-card--sel.mt--pulse, .mt-card--sel.mt--pulse:hover { border-color: rgba(16, 240, 95, 0.5); box-shadow: 0 0 12px 0 rgba(16, 240, 95, 0.13); }
 .mt-pick { display: flex; align-items: center; gap: 8px; font-size: 20px; line-height: 1.2; min-width: 0; }
 .mt-pick__name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.mt-card__meta { display: flex; align-items: center; gap: 12px; font-size: 12px; }
+.mt-card__meta { display: flex; align-items: center; gap: 12px; font-size: 12px; flex-wrap: nowrap; }   /* stars · volume · tag, one row in the pane too */
 .mt-price { display: inline-flex; align-items: center; gap: 4px; opacity: 0.6; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .mt-price .ico { width: 12px; height: 12px; fill: currentColor; flex: 0 0 auto; }   /* the home cards' volume icon */
 .mt-card__body { display: flex; flex-direction: column; gap: 6px; border-top: 1px solid var(--outline); padding-top: 9px; }

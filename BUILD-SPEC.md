@@ -273,7 +273,7 @@ endpoint. `midterms-mock.js` stands in until then; `#preview=some` and
 | Selected market | Tapping opens its thesis in place | Always one selected; its full card in a sticky pane beside the markets |
 
 The dropdown (no label) sets what shows: **All** (the default) · Balance of
-Power · Senate · Governors. The view toggle is two icons, two stacked cards
+Power · Senate · Governors. The view toggle is two icons, a plain box
 (cards) and three lines (list), no words, remembered per viewer. Every set is the full list,
 nothing collapsed. The top markets lead each set; until the server's ranking
 lands the page orders featured, then contested by price closest to 50, then
@@ -290,7 +290,7 @@ anywhere.
 **Maps.** One square tile per state. A seat in play is filled with the party of
 his pick (D blue, R red, I off-white: the one palette exception, on this page);
 a NO takes the runner-up's party. Seats not up stay neutral. Void is a dashed
-outline. Resolved seats keep the colour and gain a small ✓ or ✗. A tile opens
+outline. Resolved seats keep the colour and gain a small drawn check (green) or X (red). A tile opens
 its race in its group.
 
 **His pick, never a double negative.**
@@ -300,13 +300,14 @@ its race in its group.
 | YES | The called candidate or party |
 | NO, two-candidate race | The runner-up |
 | NO, multi-candidate race (AK, CA, ID, MI, RI) | "Not" + the called candidate |
-| NO on Balance of Power | "Not a Democratic sweep" |
+| NO on Balance of Power | The runner-up outcome ("R Senate · D House") |
 | NO on Senate or House control | The other party |
 
 **Card**: race and group top left; the market odds top right as on the home
 cards, "57% YES" for the pick the card names (settled 100 / 0 once resolved);
-his pick with party chip; the meta line: stars · "N% at call" (his side) ·
-bar-chart icon + volume (as the home cards), the state tag bottom right. No
+his pick with party chip; the meta line: stars · bar-chart icon + volume (as
+the home cards), the state tag at the right of the same line (in the pane too). No
+"% at call". No
 chevron on the card, no time remaining. Agree / Disagree with the tally as
 built. Opened on a phone, or in the desktop pane, it adds a thesis box as on
 the home page: THESIS and the thesis, one chevron dropping down RESOLUTION
@@ -324,7 +325,7 @@ select it (desktop: the pane) or open its thesis in place (phone).
 | Live | none | open | live | thesis, settlement line |
 | Pending, closed | Pending | locked | live | thesis, settlement line |
 | Pending, price at 99 / 1 | Pending | locked | live | thesis, settlement line |
-| Pending, disputed | Pending · disputed | locked | live | thesis, settlement line |
+| Pending, disputed | Pending (no disputed tag) | locked | live | thesis, settlement line |
 | Resolved right | Right | locked | settled 100 / 0 | thesis, outcome line |
 | Resolved wrong | Wrong | locked | settled 100 / 0 | thesis, outcome line |
 | Void | Void | locked | last price | thesis, void line; out of every count |

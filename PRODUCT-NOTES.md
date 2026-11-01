@@ -136,14 +136,14 @@ is the fallback).
   stands in a pane beside the markets. Phone: tapping a market opens its thesis
   in place.
 - Maps: a seat takes the party of his pick (a NO takes the runner-up's);
-  seats not up stay neutral; void dashed; resolved seats get ✓ / ✗.
+  seats not up stay neutral; void dashed; resolved seats get a green check / red X.
 - His pick, never a double negative: YES → the called candidate or party; NO
   two-candidate → the runner-up; NO multi-candidate (AK, CA, ID, MI, RI) →
-  "Not" + the called candidate; NO on Balance of Power → "Not a Democratic
-  sweep"; NO on Senate / House control → the other party.
+  "Not" + the called candidate; NO on Balance of Power → the runner-up
+  outcome ("R Senate · D House"); NO on Senate / House control → the other party.
 - Card: race and group; market odds top right, "57% YES" for the pick the card
-  names (settled 100 / 0 once resolved); pick with party chip; stars · "N% at
-  call" (his side) · volume, state tag bottom right. No time remaining. Agree /
+  names (settled 100 / 0 once resolved); pick with party chip; stars · volume ·
+  state tag, one row (no "% at call"). No time remaining. Agree /
   Disagree with the tally. Opened, it adds a thesis box like the home's: the
   thesis, and a chevron dropping down Resolution: the settlement line,
   the outcome line once resolved, the void line when void. Needs volume per
@@ -151,7 +151,7 @@ is the fallback).
 - Row: race · pick · stars · market odds · tag · Agree / Disagree · tally. A
   click anywhere on a card or row selects it; the selected one has the home's
   white outline and green flash.
-- Tags: Pending · Pending · disputed · Right · Wrong · Void. Taps: one per call,
+- Tags: Pending · Right · Wrong · Void (no disputed tag). Taps: one per call,
   final, the already notice, Tap Confirmed; locked from pending on. Pending
   races stay in their group.
 - Every visible string on the page is placeholder copy for Awetu.
