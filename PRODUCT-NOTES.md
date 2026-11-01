@@ -1,6 +1,6 @@
 # The Prophet — UI as built, for the product / logic side
 
-October 31, 2026 · preview https://ajmagege96.github.io/prophet-site/site/
+November 1, 2026 · preview https://ajmagege96.github.io/prophet-site/site/
 What the surface shows and what the server has to send. Builds on the Oct 26
 and Oct 26 PM logic, with the founder's UI calls on top.
 
@@ -114,9 +114,9 @@ is the fallback).
     party (D | R | I), runner-up, runner-up party, layer (featured | contested |
     safe), featured flag;
   calls (live + History endpoints, listed set): market_id, leg_id, side,
-    stars, thesis, settlement_line, price_at_call and live_price (the called
+    stars, thesis, settlement_line, volume, price_at_call and live_price (the called
     leg's YES price; the page flips it for a NO), state (live | pending |
-    resolved | void), pending_reason (closed | price | disputed), outcome
+    resolved | void), pending_reason (closed | price | disputed; all read "Pending"), outcome
     (right | wrong), outcome_line, taps_agree, taps_disagree, user_side.
   Joined on market_id + leg_id.
 - Stats (headline only, left column; no per-set stats): Called = races with a call; Resolved =
