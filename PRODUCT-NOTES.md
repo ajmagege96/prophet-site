@@ -151,7 +151,8 @@ is the fallback).
   thesis, and a chevron dropping down Resolution: the settlement line,
   the outcome line once resolved, the void line when void. Volume comes from the
   calls feed (the one added field).
-- Row: race · pick · stars · market odds · tag · Agree / Disagree · tally. A
+- Row: race · pick · stars · market odds · Agree / Disagree (live) or the
+  state tag in that same column (closed) · tally. A
   click anywhere on a card or row selects it; the selected one has the home's
   white outline and green flash.
 - Tags: Pending · Right · Wrong · Void (no disputed tag). Taps: one per call,

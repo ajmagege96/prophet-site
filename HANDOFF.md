@@ -13,6 +13,8 @@ sections 5–7 are the contracts your side has to honour.
 
 ## 1. What changed since the last drop
 
+**Midterms rows, Nov 1.** The state tag moved into the Agree / Disagree column: live rows show the buttons, closed rows (pending / resolved / void) show Pending / Right / Wrong / Void in their place. The separate tag column is gone; on a phone the row is race · odds, pick · stars, buttons-or-tag · tally.
+
 **Product notes, Nov 1.** The Midterms order (featured, then contested by price closest to 50, then safe, read from `featured` and `layer`) is the final MVP order; there is no server ranking. `volume` on the calls feed is the only server addition beyond the build spec. Balance of Power labels live in the race list (`leg` / `runner_up` as display text, e.g. "Democrats Sweep" / "R Senate · D House"). The headline stat is **Right** again (one word on the tag and the stat). The mock now uses real leaders where known (Maine Senate Troy Jackson, Michigan Senate Abdul El-Sayed, Ohio Senate Sherrod Brown, Nebraska Senate Pete Ricketts); the rest of the names come from your race list.
 
 **No buttons on closed markets, Nov 1.** Pending, resolved and void markets show no Agree / Disagree, only the split, on Midterms and on the home thesis row (`market_closed` true hides the buttons). "Taps closed. Resolution next." is gone. The Midterms cards view icon is a 2×2 grid of rounded filled squares.

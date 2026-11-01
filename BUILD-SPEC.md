@@ -1,6 +1,6 @@
 # The Prophet — UI Build Spec: changes to theprophet.fun
 
-October 31, 2026 · preview https://ajmagege96.github.io/prophet-site/site/ (matches `main`)
+November 1, 2026 · preview https://ajmagege96.github.io/prophet-site/site/ (matches `main`)
 
 This is the delta between what theprophet.fun serves today and the UI in this
 drop. The live page still renders a deck of no-thesis cards with the prompt bar,
@@ -313,21 +313,23 @@ the home page: THESIS and the thesis, one chevron dropping down RESOLUTION
 under a hairline, closed by default (the settlement line; the outcome line once
 resolved; the void line when void).
 
-**Row**: race over his pick with chip · stars · market odds "57% YES" · state tag · Agree /
-Disagree · tally; one line on desktop, three short lines on a phone. Tap it to
-select it (desktop: the pane) or open its thesis in place (phone).
+**Row**: race over his pick with chip · stars · market odds "57% YES" · Agree /
+Disagree on a live race, or the state tag (Pending / Right / Wrong / Void) in
+that same column once closed · tally; one line on desktop, three short lines on
+a phone (race · odds / pick · stars / buttons or tag · tally). A click anywhere
+on it selects it (desktop: the pane) or opens its thesis in place (phone).
 
 **States.**
 
 | State | Tag | Taps | Price | Opened card |
 |---|---|---|---|---|
 | Live | none | open | live | thesis, settlement line |
-| Pending, closed | Pending | locked | live | thesis, settlement line |
-| Pending, price at 99 / 1 | Pending | locked | live | thesis, settlement line |
-| Pending, disputed | Pending (no disputed tag) | locked | live | thesis, settlement line |
-| Resolved right | Right | locked | settled 100 / 0 | thesis, outcome line |
-| Resolved wrong | Wrong | locked | settled 100 / 0 | thesis, outcome line |
-| Void | Void | locked | last price | thesis, void line; out of every count |
+| Pending, closed | Pending | no buttons | live | thesis, settlement line |
+| Pending, price at 99 / 1 | Pending | no buttons | live | thesis, settlement line |
+| Pending, disputed | Pending (no disputed tag) | no buttons | live | thesis, settlement line |
+| Resolved right | Right | no buttons | settled 100 / 0 | thesis, outcome line |
+| Resolved wrong | Wrong | no buttons | settled 100 / 0 | thesis, outcome line |
+| Void | Void | no buttons | last price | thesis, void line; out of every count |
 
 Pending races stay in their group. Taps as built: one per call, final, the
 already notice, Tap Confirmed (its {label} is his pick), sign-in when signed

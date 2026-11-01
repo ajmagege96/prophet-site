@@ -1360,8 +1360,7 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
       '<span class="mt-row__race">' + esc(r.group === 'balance' || set === 'all' ? r.race : stateName(r)) + '</span>' +
       '<span class="mt-row__pick">' + pickHTML(r) + '</span>' + starsHTML(r) +
       '<span class="mt-row__price">' + Math.round(sidePrice(r.price, r)) + '%<small>YES</small></span>' +
-      '<span class="mt-row__tag">' + tagHTML(r) + '</span>' +
-      '<span class="mt-row__ad">' + (locked(r) ? '' : btnHTML(r, 'agree', 'Agree') + btnHTML(r, 'disagree', 'Disagree')) + '</span>' +
+      '<span class="mt-row__ad">' + (locked(r) ? tagHTML(r) : btnHTML(r, 'agree', 'Agree') + btnHTML(r, 'disagree', 'Disagree')) + '</span>'   /* closed: the tag takes the buttons' place */ +
       '<span class="mt-row__tally">' + short + '</span></div>' +
       (opts.open ? '<div class="mt-inplace">' + bodyHTML(r) + '</div>' : '');
   }
