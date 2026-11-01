@@ -1215,7 +1215,7 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
 
 /* ── Midterms page ────────────────────────────────────── */
 /* 74 races, one locked call each. Reads the race list and the calls (two JSON blobs the server fills; midterms-mock.js
-   while they are unfilled), joins them on market_id + leg_id and computes every stat on the page. */
+   while they are unfilled), joins them on leg_id and computes every stat on the page. */
 (function () {
   var root = document.querySelector('[data-midterms]');
   if (!root) return;
@@ -1228,39 +1228,41 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
     var m = window.PROPHET_MIDTERMS_MOCK; return m ? m[key] : [];
   }
   var list = blob('[data-midterms-races]', 'races'), calls = blob('[data-midterms-calls]', 'calls');
-  var byKey = {};
-  for (var ci = 0; ci < calls.length; ci++) byKey[calls[ci].market_id + '|' + calls[ci].leg_id] = calls[ci];
+  var byLeg = {};   /* joined on leg_id, Gamma's market id; event_id is the race */
+  for (var ci = 0; ci < calls.length; ci++) byLeg[calls[ci].leg_id] = calls[ci];
   var races = [];
   for (var ri = 0; ri < list.length; ri++) {
-    var r = list[ri], c = byKey[r.market_id + '|' + r.leg_id];
-    if (!c) continue;
-    races.push({ id: r.market_id, group: r.group, kind: r.kind || 'race', state: r.state || '', race: r.race, leg: r.leg, party: r.party,
+    var r = list[ri], c = byLeg[r.leg_id], ruc = byLeg[r.runner_up_leg_id];
+    if (!c || c.state === 'void') continue;   /* a voided race leaves the page */
+    races.push({ id: String(r.leg_id), group: r.group, kind: r.kind || 'race', state: r.state || '', race: r.race, leg: r.leg, party: r.party,
       ru: r.runner_up, ruParty: r.runner_up_party, layer: r.layer, featured: !!r.featured,
       side: c.side, stars: +c.stars || 0, thesis: c.thesis || '', settle: c.settlement_line || '', atCall: +c.price_at_call,
-      price: +c.live_price, status: c.state || 'live', reason: c.pending_reason || '', outcome: c.outcome || '',
+      price: +c.live_price, ruAtCall: ruc ? +ruc.price_at_call : NaN, ruPrice: ruc ? +ruc.live_price : NaN,
+      status: c.state || 'live', reason: c.pending_reason || '', outcome: c.outcome || '',
       outcomeLine: c.outcome_line || '', volume: c.volume || '', agree: +c.taps_agree || 0, disagree: +c.taps_disagree || 0, userSide: c.user_side || '' });
   }
-  var VOID_LINE = "Polymarket closed this market without a result. His calls and every tap on them don't count.";
   var STAR = (root.querySelector('[data-mt-star]') || {}).innerHTML || '';
   var signedIn = root.getAttribute('data-signed-in') || '';
-  var taps = {};   /* market_id -> side, mock and in-memory; the server keeps the real one */
+  var taps = {};   /* leg_id -> side, mock and in-memory; the server keeps the real one */
 
   function esc(t) { return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
-  function other(p) { return p === 'D' ? 'R' : 'D'; }
-  /* His pick, never a double negative */
+  /* His pick is one name, always read as Buy YES: the listed leg on a YES call, the runner-up on a NO call.
+     Multi-candidate races are top-two like the rest. */
   function pick(r) {
-    if (r.side === 'yes') return { text: r.leg, party: r.kind === 'bop' ? '' : r.party };
-    if (r.kind === 'bop') return { text: r.ru, party: '' };   /* a NO on Balance of Power shows the runner-up outcome, as a two-candidate race does */
-    if (r.kind === 'control') { var o = other(r.party); return { text: o === 'D' ? 'Democrats' : 'Republicans', party: o }; }
-    return { text: r.ru, party: r.ruParty };
+    var yes = r.side === 'yes';
+    return { text: yes ? r.leg : r.ru, party: r.kind === 'bop' ? '' : (yes ? r.party : r.ruParty) };
   }
-  function mapParty(r) { return r.side === 'yes' ? r.party : r.ruParty; }   /* a NO colours the seat by the runner-up's party */
-  function sidePrice(p, r) { return r.side === 'yes' ? p : 100 - p; }   /* prices read for his side */
+  function mapParty(r) { return pick(r).party || ''; }   /* every called seat takes his pick's party */
+  /* his pick's own YES price: the listed leg's, or on a NO the runner-up leg's (from the calls feed when it carries
+     runner_up_leg_id, otherwise 100 minus the listed leg; every third leg is under 2%) */
+  function pickPrice(r, atCall) {
+    var own = atCall ? r.atCall : r.price, ru = atCall ? r.ruAtCall : r.ruPrice;
+    return r.side === 'yes' ? own : (isNaN(ru) ? 100 - own : ru);
+  }
   function locked(r) { return r.status !== 'live'; }
   function tagHTML(r) {
     if (r.status === 'pending') return '<span class="prow__outcome prow__outcome--pending">' + 'Pending' + '</span>';
     if (r.status === 'resolved') return '<span class="prow__outcome prow__outcome--' + r.outcome + '">' + (r.outcome === 'right' ? 'Right' : 'Wrong') + '</span>';
-    if (r.status === 'void') return '<span class="prow__outcome prow__outcome--void">Void</span>';
     return '';
   }
   function chip(p) { return p ? '<span class="mt-chip mt-chip--' + p.toLowerCase() + '">' + p + '</span>' : ''; }
@@ -1273,7 +1275,7 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
     var s = side(r); return s ? 'You ' + s : (short ? '' : '');
   }
   /* market odds, as on the home cards, for the pick the card names (settled 100 / 0 once resolved) */
-  function oddsHTML(r) { return '<span class="carousel__odds heading mt-odds">' + Math.round(sidePrice(r.price, r)) + '%<small>YES</small></span>'; }
+  function oddsHTML(r) { return '<span class="carousel__odds heading mt-odds">' + Math.round(pickPrice(r)) + '%<small>YES</small></span>'; }
   var VOL_ICO = '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="16" y="3" width="4" height="17"/></svg>';
 
   /* ── stats (headline and per group) ── */
@@ -1301,7 +1303,7 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
     var T = 30, G = 3, out = '';
     for (var st in TILES) {
       var x = TILES[st][0] * (T + G), y = TILES[st][1] * (T + G), r = seats[st];
-      var cls = r ? 'mt-tile mt-tile--' + (r.status === 'void' ? 'void' : mapParty(r).toLowerCase()) : 'mt-tile mt-tile--off';
+      var cls = r ? 'mt-tile mt-tile--' + mapParty(r).toLowerCase() : 'mt-tile mt-tile--off';
       out += '<g class="' + cls + '"' + (r ? ' data-mt-open="' + r.id + '"' : '') + '><title>' + (r ? esc(r.race + ': ' + pick(r).text) : st) + '</title>' +
         '<rect x="' + x + '" y="' + y + '" width="' + T + '" height="' + T + '" rx="2"/>' +
         '<text x="' + (x + T / 2) + '" y="' + (y + T / 2 + 4) + '" text-anchor="middle">' + st + '</text>';
@@ -1322,7 +1324,7 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
     var s = side(r);
     return '<button class="ad__btn ad__btn--' + k + (s === k ? ' ad__btn--on' : '') + (s && s !== k ? ' ad__btn--off' : '') + '" data-mt-tap="' + k + '"' + (locked(r) ? ' disabled' : '') + '>' + label + '</button>';
   }
-  /* pending, resolved and void markets carry no Agree / Disagree, only the tally */
+  /* pending and resolved markets carry no Agree / Disagree, only the tally */
   function adHTML(r) {
     var t = tally(r);
     /* closed: an empty row the buttons' height, so the card keeps the live card's spacing */
@@ -1333,7 +1335,7 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
   var CHEV = '<svg class="tsec__chev" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>';
   var moreIds = {};
   function bodyHTML(r) {
-    var line = r.status === 'resolved' ? r.outcomeLine : r.status === 'void' ? VOID_LINE : r.settle;
+    var line = r.status === 'resolved' ? r.outcomeLine : r.settle;
     var lineCls = r.status === 'resolved' ? 'thesis__note' : 'thesis__fact', m = !!moreIds[r.id] && !!line;
     return '<div class="mt-thesis' + (m ? ' thesis--more' : '') + (line ? '' : ' thesis--nomore') + '">' +
       '<button class="tsec__head" data-mt-more="' + r.id + '" aria-expanded="' + m + '"><span class="thesis__label heading">Thesis</span>' + CHEV + '</button>' +
@@ -1352,17 +1354,21 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
       (open ? '<div class="mt-card__body">' + bodyHTML(r) + '</div>' : '') +
       adHTML(r) + '</article>';
   }
+  /* A row: race over pick · stars · odds · Agree / Disagree · tally. Closed, the tag goes to the far right after the
+     tally. On a phone: race · odds / pick / stars · tally · volume, with the buttons (or the tag) on the right. */
   function rowHTML(r, opts) {
-    var t = tally(r, true);
+    var t = tally(r, true), closed = locked(r);
     var n = r.agree + r.disagree, short = n >= 3 ? Math.round(r.agree * 100 / n) + '% · ' + n + ' taps' : (t || '');
-    return '<div class="mt-row' + (opts.sel ? ' mt-row--sel' : '') + '" data-mt-row="' + r.id + '">' +
+    return '<div class="mt-row' + (opts.sel ? ' mt-row--sel' : '') + (closed ? ' mt-row--closed' : '') + '" data-mt-row="' + r.id + '">' +
       '<span class="mt-row__race">' + esc(r.group === 'balance' || set === 'all' ? r.race : stateName(r)) + '</span>' +
-      '<span class="mt-row__pick">' + pickHTML(r) + '</span>' + starsHTML(r) +
-      '<span class="mt-row__price">' + Math.round(sidePrice(r.price, r)) + '%<small>YES</small></span>' + MORE +
-      '<span class="mt-row__ad">' + (locked(r) ? tagHTML(r) : btnHTML(r, 'agree', 'Agree') + btnHTML(r, 'disagree', 'Disagree')) + '</span>'   /* closed: the tag takes the buttons' place */ +
-      '<span class="mt-row__tally">' + short + '</span></div>';
+      '<span class="mt-row__pick">' + pickHTML(r) + '</span>' +
+      '<span class="mt-row__info">' + starsHTML(r) + '<span class="mt-row__tally">' + short + '</span>' +
+        (r.volume && !closed ? '<span class="mt-price mt-row__vol" title="volume">' + VOL_ICO + esc(r.volume) + '</span>' : '') + '</span>' +
+      '<span class="mt-row__price">' + Math.round(pickPrice(r)) + '%<small>YES</small></span>' +
+      (closed ? '<span class="mt-row__tag">' + tagHTML(r) + '</span>'
+              : '<span class="mt-row__ad">' + btnHTML(r, 'agree', 'Agree') + btnHTML(r, 'disagree', 'Disagree') + '</span>') + '</div>';
   }
-  /* below 1024px each card and row carries a drop-down; opened, it becomes the desktop pane's card in place */
+  /* below 1024px an opened card carries a drop-down arrow to fold it again */
   var MORE = '<span class="mt-more" aria-hidden="true">' + CHEV + '</span>';
   function stateName(r) { return r.race.replace(/ (Senate|Governor)$/, ''); }
 
@@ -1391,11 +1397,21 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
     };
     var h = '<div class="mt-markets__' + view + '">' + o.list.map(item).join('') + '</div>';
     box.innerHTML = h;
+    fitNames(box);
     var sel = root.querySelector('[data-mt-set]'); if (sel.value !== set) sel.value = set;
     var vb = root.querySelectorAll('[data-mt-view]');
     for (var i = 0; i < vb.length; i++) { var on = vb[i].getAttribute('data-mt-view') === view; vb[i].classList.toggle('mt-view__btn--on', on); vb[i].setAttribute('aria-pressed', on ? 'true' : 'false'); }
     root.querySelector('[data-mt-list]').setAttribute('data-view', view);
     renderPane();
+  }
+  /* phone cards keep a long name on one line ("Jonathan Kreiss-Tomkins"): step the font down until it fits */
+  function fitNames(box) {
+    if (window.matchMedia('(min-width: 768px)').matches) return;
+    var names = box.querySelectorAll('.mt-markets__cards .mt-card:not(.mt-card--open) .mt-pick__name');
+    for (var i = 0; i < names.length; i++) {
+      var el = names[i], fs = 15; el.style.fontSize = '';
+      while (el.scrollWidth > el.clientWidth + 0.5 && fs > 10) { fs -= 0.5; el.style.fontSize = fs + 'px'; }
+    }
   }
   function renderPane() {
     var pane = root.querySelector('[data-mt-pane]'), r = isDesk() && selId ? find(selId) : null;
@@ -1466,7 +1482,7 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
     chipEl.textContent = k === 'agree' ? 'Agree' : 'Disagree'; chipEl.className = 'ad__btn tc__chip ad__btn--' + k + ' ad__btn--on';
     var label = '<span class="tc__word">' + esc(pick(r).text) + '</span>';
     tapModal.querySelector('[data-tc-confirm]').innerHTML = esc(val(tapModal, k === 'agree' ? 'confirm-agree' : 'confirm-disagree', COPY[k]))
-      .replace(/\{label\}/g, label).replace(/\{verdict\}/g, k === 'agree' ? 'right' : 'wrong').replace(/\{price\}/g, String(sidePrice(r.atCall, r)));
+      .replace(/\{label\}/g, label).replace(/\{verdict\}/g, k === 'agree' ? 'right' : 'wrong').replace(/\{price\}/g, String(Math.round(pickPrice(r, true))));
     tapModal.querySelector('[data-tc-scoring]').textContent = val(tapModal, 'scoring-line', COPY.scoring);
     var nx = nextRace(r); tapModal.querySelector('[data-tc-next]').textContent = nx ? 'Next call' : 'Back to top';
     openM(tapModal);

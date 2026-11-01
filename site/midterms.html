@@ -29,7 +29,7 @@
   <meta name="twitter:description" content="An agent that reads prediction markets, publishes a thesis before the outcome, and keeps a public record of every call.">
   <meta name="twitter:image" content="https://ajmagege96.github.io/prophet-site/site/assets/prophet-og-1200x630.png">
 
-  <link rel="stylesheet" href="styles.css?v=07f9e6b9">
+  <link rel="stylesheet" href="styles.css?v=4eab90eb">
 </head>
 <body data-page="midterms">
 
@@ -102,14 +102,17 @@
 
 <!-- ══ Midterms ══════════════════════════════════════════
      74 races, one locked call each. The page reads two JSON blobs and computes every stat itself (there is no stats endpoint):
-       {{midterms.races_json}}  the race list: event_id, leg_id, market_id, group (balance | senate | governors), kind (race | control | bop),
-                                state (two-letter code; empty for the control markets), race, leg (called leg name), party (D | R | I),
-                                runner_up, runner_up_party, layer (featured | contested | safe), featured (true | false)
-       {{midterms.calls_json}}  the live and History endpoints, listed set: market_id, leg_id, side (yes | no), stars (1–5), thesis,
-                                settlement_line, price_at_call, live_price (the called leg's YES price, 0–100), state (live | pending |
-                                resolved | void), pending_reason (closed | price | disputed), outcome (right | wrong), outcome_line,
-                                taps_agree, taps_disagree, user_side (agree | disagree | empty, for the viewer)
-     Joined on market_id and leg_id. While a blob is unfilled the page uses midterms-mock.js.
+       {{midterms.races_json}}  the race list: event_id (the race), leg_id (the listed leg = Gamma's market id), runner_up_leg_id,
+                                group (balance | senate | governors), kind (race | control | bop), state (two-letter code; empty
+                                for the control markets), race, leg (listed leg name), party (D | R | I), runner_up,
+                                runner_up_party, layer (featured | contested | safe), featured (true | false)
+       {{midterms.calls_json}}  the live and History endpoints, listed set: leg_id, side (yes | no, on the listed leg), stars (1–5),
+                                thesis, settlement_line, volume, price_at_call, live_price (the leg's YES price, 0–100), state
+                                (live | pending | resolved), pending_reason (closed | price | disputed), outcome (right | wrong),
+                                outcome_line, taps_agree, taps_disagree, user_side (agree | disagree | empty, for the viewer)
+     Joined on leg_id. His pick is one name, read as Buy YES: the listed leg on a YES call, the runner-up on a NO call; the odds
+     are the pick's own YES price (an item for runner_up_leg_id in the calls feed, else 100 minus the listed leg). A voided
+     race is removed from the page. While a blob is unfilled the page uses midterms-mock.js.
      Every visible string on this page is placeholder copy. -->
 <main class="mt" data-midterms data-signed-in="{{viewer.signed_in}}">
   <script type="application/json" data-midterms-races>{{midterms.races_json}}</script>
@@ -432,7 +435,7 @@
 </footer>
 <!-- /partial:footer -->
 
-<script src="midterms-mock.js?v=c5250ab6"></script>
-<script src="app.js?v=2ee3da93"></script>
+<script src="midterms-mock.js?v=61acfd71"></script>
+<script src="app.js?v=5f40ca62"></script>
 </body>
 </html>
