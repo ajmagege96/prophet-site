@@ -143,9 +143,9 @@ is the fallback).
   Phone cards view: two compact cards across, like the desktop card.
 - Maps: a seat takes the party of his pick (a NO takes the runner-up's);
   seats not up stay neutral; void dashed; resolved seats get a green check / red X.
-- His pick, never a double negative: YES → the called candidate or party; NO
-  two-candidate → the runner-up; NO multi-candidate (AK, CA, ID, MI, RI) →
-  "Not" + the called candidate; NO on Balance of Power → the runner-up
+- His pick, never a double negative: YES → the called candidate or party; NO in
+  any candidate race → the other candidate, the runner-up (never "Not" + a
+  name); NO on Balance of Power → the runner-up
   outcome ("R Senate · D House"); NO on Senate / House control → the other party.
 - Card: race and group; market odds top right, "57% YES" for the pick the card
   names (settled 100 / 0 once resolved); pick with party chip; stars · volume ·

@@ -299,8 +299,7 @@ its race in its group.
 | Call | Shows |
 |---|---|
 | YES | The called candidate or party |
-| NO, two-candidate race | The runner-up |
-| NO, multi-candidate race (AK, CA, ID, MI, RI) | "Not" + the called candidate |
+| NO in any candidate race | The other candidate: the runner-up (never "Not" + a name) |
 | NO on Balance of Power | The runner-up outcome ("R Senate · D House") |
 | NO on Senate or House control | The other party |
 

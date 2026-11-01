@@ -1240,7 +1240,6 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
       price: +c.live_price, status: c.state || 'live', reason: c.pending_reason || '', outcome: c.outcome || '',
       outcomeLine: c.outcome_line || '', volume: c.volume || '', agree: +c.taps_agree || 0, disagree: +c.taps_disagree || 0, userSide: c.user_side || '' });
   }
-  var MULTI = { AK: 1, CA: 1, ID: 1, MI: 1, RI: 1 };   /* multi-candidate races: a NO reads "Not" + the called candidate */
   var VOID_LINE = "Polymarket closed this market without a result. His calls and every tap on them don't count.";
   var STAR = (root.querySelector('[data-mt-star]') || {}).innerHTML || '';
   var signedIn = root.getAttribute('data-signed-in') || '';
@@ -1253,7 +1252,6 @@ window.prophetHowItWorks = walkthrough(document.querySelector('[data-hiw]'), { o
     if (r.side === 'yes') return { text: r.leg, party: r.kind === 'bop' ? '' : r.party };
     if (r.kind === 'bop') return { text: r.ru, party: '' };   /* a NO on Balance of Power shows the runner-up outcome, as a two-candidate race does */
     if (r.kind === 'control') { var o = other(r.party); return { text: o === 'D' ? 'Democrats' : 'Republicans', party: o }; }
-    if (MULTI[r.state]) return { text: 'Not ' + r.leg, party: '' };
     return { text: r.ru, party: r.ruParty };
   }
   function mapParty(r) { return r.side === 'yes' ? r.party : r.ruParty; }   /* a NO colours the seat by the runner-up's party */
